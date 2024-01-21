@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/buttonPreviousMonth"
+        android:text="-"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        />
+
+    <TextView
+        android:id="@+id/textViewYear"
+        android:text="Year"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:padding="8sp"
+        android:textSize="25sp"
+        />
+
+    <TextView
+        android:id="@+id/textViewMonth"
+        android:text="Month"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/textViewYear"
+        android:padding="8sp"
+        android:textSize="25sp"
+        />
+    
+    <Button
+        android:id="@+id/buttonNextMonth"
+        android:text="+"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        />
+
+    <com.kamjer.mycalendarview.DaysOfMonthView
+        android:id="@+id/daysOfMonth"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/textViewMonth"
+        />
+
+</RelativeLayout>
