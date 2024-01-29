@@ -31,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.75" />
+        app:layout_constraintGuide_percent="0.65" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline4"
@@ -40,15 +40,15 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.98" />
 
-    <Button
+    <ImageButton
         android:id="@+id/buttonCalendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/calendar"
+        android:scaleType="fitCenter"
         app:layout_constraintStart_toStartOf="@+id/guideline1"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+        app:layout_constraintTop_toTopOf="@+id/guideline2"
+        app:srcCompat="@drawable/calendar"
+        android:contentDescription="@string/calendar" />
 
     <TextView
         android:id="@+id/textViewDate"
@@ -56,21 +56,20 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:padding="15dp"
+        android:background="@drawable/border"
         android:text="test"
-        app:layout_constraintEnd_toStartOf="@+id/buttonUser"
-        app:layout_constraintStart_toEndOf="@+id/buttonCalendar"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="@+id/buttonUser"
+        app:layout_constraintStart_toStartOf="@+id/guideline1"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
-    <Button
+    <ImageButton
         android:id="@+id/buttonUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:text="@string/user"
         app:layout_constraintEnd_toStartOf="@+id/guideline4"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+        app:layout_constraintTop_toTopOf="@+id/guideline2"
+        app:srcCompat="@drawable/bullseye" />
 
     <ImageView
         android:id="@+id/imageView"
@@ -93,6 +92,8 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_centerHorizontal="true"
+        app:layout_constraintEnd_toStartOf="@+id/guideline4"
+        app:layout_constraintStart_toStartOf="@+id/guideline1"
         app:layout_constraintTop_toTopOf="@+id/guideline5">
 
         <ProgressBar
@@ -100,7 +101,8 @@
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:progressDrawable="@drawable/water_progres_bar" />
 
         <TextView
             android:id="@+id/textViewWaterToDrink"
@@ -108,7 +110,8 @@
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/progressBarWaterDrank"
             android:layout_centerHorizontal="true"
-            android:text="test" />
+            android:text="test"
+            android:textColor="@color/dark_grey" />
 
     </RelativeLayout>
 
@@ -119,8 +122,18 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:text="@string/addWaterDrankButtonText"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRemoveWaterDrank"
+        app:layout_constraintEnd_toStartOf="@+id/guideline4"
+        app:layout_constraintStart_toStartOf="@+id/guideline1" />
+
+    <Button
+        android:id="@+id/buttonRemoveWaterDrank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/removeWaterDrankButtonTex"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toStartOf="@+id/guideline4"
         app:layout_constraintStart_toStartOf="@+id/guideline1" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

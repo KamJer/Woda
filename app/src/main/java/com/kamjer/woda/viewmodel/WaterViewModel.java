@@ -2,19 +2,16 @@ package com.kamjer.woda.viewmodel;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import androidx.room.Room;
 
 import com.kamjer.woda.R;
-import com.kamjer.woda.dao.WaterDAO;
-import com.kamjer.woda.database.WaterDatabase;
 import com.kamjer.woda.model.Water;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,8 +33,9 @@ public class WaterViewModel extends ViewModel {
     }
     
     public void loadWaterAmount(AppCompatActivity activity) {
-        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
-        WaterDataRepository.getInstance().setWaterAmountToDrink(sharedPref.getInt(activity.getString(R.string.water_amount_to_drink), DEFAULT_WATER_TO_DRINK));
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        int test = sharedPref.getInt(activity.getString(R.string.water_amount_to_drink), DEFAULT_WATER_TO_DRINK);
+        WaterDataRepository.getInstance().setWaterAmountToDrink(test);
     }
 
     public void loadWaterById(long id) {
@@ -67,6 +65,16 @@ public class WaterViewModel extends ViewModel {
                         RxJavaPlugins::onError);
     }
 
+    public Disposable loadWatersFromMonth(LocalDate date) {
+        return WaterDataRepository.getInstance().getWaterDAO().getFromMonth(date.toString()).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        waters -> {
+
+                        },
+                        RxJavaPlugins::onError);
+    }
+
     public Disposable loadWatersFromMonth(LocalDate date, Consumer<List<Water>> onSuccess) {
         return WaterDataRepository.getInstance().getWaterDAO().getFromMonth(date.toString()).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -87,13 +95,26 @@ public class WaterViewModel extends ViewModel {
     }
 
     public void insertWater(Water water) {
-        Disposable waterDisposable = WaterDataRepository.getInstance().getWaterDAO().insertWater(water).subscribeOn(Schedulers.io())
+        Disposable waterDisposable   = WaterDataRepository.getInstance().getWaterDAO().insertWater(water).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).
                 subscribe(() ->
                         setWater(water),
                         RxJavaPlugins::onError
                 );
     }
+
+    public MutableLiveData<List<Water>> getWatersForMonth() {
+        return WaterDataRepository.getInstance().getWatersForMonth();
+    }
+
+    public List<Water> getWatersForMonthValue() {
+        return Optional.ofNullable(WaterDataRepository.getInstance().getWatersForMonth().getValue()).orElseGet(ArrayList::new);
+    }
+
+    public void setWaterForMonthValue(List<Water> waters) {
+        WaterDataRepository.getInstance().getWatersForMonth().setValue(waters);
+    }
+
 
     public MutableLiveData<Water> getWater() {
         return WaterDataRepository.getInstance().getWater();

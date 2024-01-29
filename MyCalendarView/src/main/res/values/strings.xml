@@ -1,12 +1,9 @@
 <resources>
-    <string name="app_name">Woda</string>
-    <string name="water_date">dzień</string>
-    <string name="water_to_drink">do wypicia</string>
-    <string name="drank_water">wypita woda</string>
-    <string name="calendar">Kalendarz</string>
-    <string name="user">Użytkownik</string>
-    <string name="glassDesc">Szklanka, czego się spodziewasz?</string>
-    <string name="addWaterDrankButtonText">+</string>
-    <string name="edit_text_add_water_amount_hint">250 ml</string>
-    <string name="water_type">Typ napoju</string>
+    <string name="monday">Po</string>
+    <string name="tuesday">Wt</string>
+    <string name="wednesday">Śr</string>
+    <string name="thursday">Cz</string>
+    <string name="friday">Pi</string>
+    <string name="saturday">So</string>
+    <string name="sunday">Ni</string>
 </resources>

@@ -5,22 +5,22 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.lang.reflect.Constructor;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 public class MyCalendarView extends RelativeLayout {
 
     private TextView textViewYear;
-
     private TextView textViewMonth;
-
-    private Button buttonPreviousMonth;
-    private Button buttonNextMonth;
-
+    private ImageButton buttonPreviousMonth;
+    private ImageButton buttonNextMonth;
     private DaysOfMonthView daysOfMonthView;
-
     private SelectedDataChangedListener previousMonthChangeListener;
     private SelectedDataChangedListener nextMonthChangeListener;
 
@@ -44,7 +44,7 @@ public class MyCalendarView extends RelativeLayout {
         init();
     }
 
-    private void init() {
+    protected void init() {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.calendar_view, this, true);
 
@@ -59,19 +59,21 @@ public class MyCalendarView extends RelativeLayout {
         buttonPreviousMonth.setOnClickListener(this::previousMonthAction);
         buttonNextMonth.setOnClickListener(this::nextMonthAction);
 
-        textViewMonth.setText(daysOfMonthView.getSelectedDate().getMonth().toString());
-        textViewYear.setText(String.valueOf(daysOfMonthView.getSelectedDate().getYear()));
+        setTextYearMonth();
     }
 
     public void setSelectedDateChangedListener(SelectedDataChangedListener selectedDataChangedListener) {
         daysOfMonthView.setSelectedDateChangedListener(selectedDataChangedListener);
     }
 
+    public void setCustomHolderBehavior(CustomHolderBehavior customHolderBehavior) {
+        this.daysOfMonthView.setCustomHolderBehavior(customHolderBehavior);
+    }
+
     public void previousMonthAction(View view) {
         daysOfMonthView.previousMonthAction();
         setSelectedDate(daysOfMonthView.getSelectedDate());
-        textViewMonth.setText(daysOfMonthView.getSelectedDate().getMonth().toString());
-        textViewYear.setText(String.valueOf(daysOfMonthView.getSelectedDate().getYear()));
+        setTextYearMonth();
         if (previousMonthChangeListener != null) {
             previousMonthChangeListener.dataChangedAction(daysOfMonthView, getSelectedDate());
         }
@@ -80,11 +82,15 @@ public class MyCalendarView extends RelativeLayout {
     public void nextMonthAction(View view) {
         daysOfMonthView.nextMonthAction();
         setSelectedDate(daysOfMonthView.getSelectedDate());
-        textViewMonth.setText(daysOfMonthView.getSelectedDate().getMonth().toString());
-        textViewYear.setText(String.valueOf(daysOfMonthView.getSelectedDate().getYear()));
+        setTextYearMonth();
         if (nextMonthChangeListener != null) {
             nextMonthChangeListener.dataChangedAction(daysOfMonthView, getSelectedDate());
         }
+    }
+
+    protected void setTextYearMonth() {
+        textViewMonth.setText(daysOfMonthView.getSelectedDate().getMonth().getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()).toUpperCase());
+        textViewYear.setText(String.valueOf(daysOfMonthView.getSelectedDate().getYear()));
     }
 
     public LocalDate getSelectedDate() {
@@ -113,5 +119,9 @@ public class MyCalendarView extends RelativeLayout {
 
     public void setNextMonthChangeListener(SelectedDataChangedListener nextMonthChangeListener) {
         this.nextMonthChangeListener = nextMonthChangeListener;
+    }
+
+    public void setCustomCalendarViewHolder(Class<? extends CalendarViewHolder> calendarViewHolderClass, int layoutId) throws NoSuchMethodException {
+        this.daysOfMonthView.setCalendarViewHolderConstructor(calendarViewHolderClass.getConstructor(View.class), layoutId);
     }
 }

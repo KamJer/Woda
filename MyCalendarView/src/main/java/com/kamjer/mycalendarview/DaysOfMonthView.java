@@ -3,6 +3,7 @@ package com.kamjer.mycalendarview;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,17 +11,24 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class DaysOfMonthView extends RecyclerView {
 
+    private Month shownMonth;
     private LocalDate selectedDate;
     private CalendarViewAdapter calendarAdapter;
-
+    private CustomHolderBehavior customHolderBehavior;
+    private Constructor<? extends CalendarViewHolder> calendarViewHolderConstructor;
     private SelectedDataChangedListener selectedDataChangedListener;
+    private int layoutId;
 
     public DaysOfMonthView(@NonNull Context context) {
         super(context);
@@ -43,9 +51,19 @@ public class DaysOfMonthView extends RecyclerView {
     }
 
     public void setMonthView() {
+        shownMonth = selectedDate.getMonth();
         ArrayList<LocalDate> daysInMonth = daysInMonthArray(selectedDate);
 
-        calendarAdapter = new CalendarViewAdapter(selectedDataChangedListener, this, selectedDate, daysInMonth, getContext());
+        if (calendarViewHolderConstructor == null) {
+            try {
+                calendarViewHolderConstructor = CalendarViewHolder.class.getConstructor(View.class);
+                layoutId = R.layout.calendar_cell;
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        calendarAdapter = new CalendarViewAdapter(calendarViewHolderConstructor, layoutId, selectedDataChangedListener, customHolderBehavior, this, daysInMonth, getContext());
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 7);
         setLayoutManager(layoutManager);
         setAdapter(calendarAdapter);
@@ -61,17 +79,18 @@ public class DaysOfMonthView extends RecyclerView {
         LocalDate lastOfMonth = date.withDayOfMonth(yearMonth.lengthOfMonth());
         int startDayOfWeek = firstOfMonth.getDayOfWeek().getValue();
         int endDayOfWeek = lastOfMonth.getDayOfWeek().getValue();
-        int endTemp = 7 - endDayOfWeek;
+        int endTemp = 7 - endDayOfWeek - 1;
+
+
 
 //                                  days in a month
-        int maxDaysCount = yearMonth.getMonth().maxLength() +
+        int maxDaysCount = yearMonth.getMonth().length(Year.isLeap(yearMonth.getYear())) +
 //      the number of days in a week before month begin
                             startDayOfWeek +
 //      the number of days in a week after month ends
-                            endTemp - 1;
+                            endTemp;
 
         for (int i = 1; i <= maxDaysCount; i++) {
-//            if (i <= startDayOfWeek || i > daysInMonth + startDayOfWeek) {
             if (i < startDayOfWeek) {
                 daysInMonthArray.add(firstOfMonth.minusDays(startDayOfWeek - i));
             } else if (i > daysInMonth + startDayOfWeek) {
@@ -85,17 +104,12 @@ public class DaysOfMonthView extends RecyclerView {
 
     public void setSelectedDateChangedListener(SelectedDataChangedListener selectedDataChangedListener) {
         this.selectedDataChangedListener = selectedDataChangedListener;
-        calendarAdapter.setSelectedDataChangedListener(selectedDataChangedListener);
+        this.calendarAdapter.setSelectedDataChangedListener(selectedDataChangedListener);
     }
 
-    private String monthFromDate(LocalDate date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM");
-        return date.format(formatter);
-    }
-
-    private String yearFromDate(LocalDate date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
-        return date.format(formatter);
+    public void setCustomHolderBehavior(CustomHolderBehavior customHolderBehavior) {
+        this.customHolderBehavior = customHolderBehavior;
+        this.calendarAdapter.setCustomHolderBehavior(customHolderBehavior);
     }
 
     public void previousMonthAction() {
@@ -113,42 +127,26 @@ public class DaysOfMonthView extends RecyclerView {
     }
 
     public void setSelectedDate(LocalDate selectedDate) {
-        LocalDate localDateTemp = this.selectedDate;
         this.selectedDate = selectedDate;
-        calendarAdapter.setSelectedDate(selectedDate);
-
-        if (!selectedDate.getMonth().equals(localDateTemp.getMonth())) {
-            setMonthView();
-        }
     }
 
     public CalendarViewAdapter getCalendarAdapter() {
         return calendarAdapter;
     }
 
-    public static int getPositionByDate(DaysOfMonthView daysOfMonthView, LocalDate targetDate) {
-        CalendarViewAdapter adapter = daysOfMonthView.getCalendarAdapter() ;
-
-        if (adapter == null) {
-            return RecyclerView.NO_POSITION;
-        }
-
-        int itemCount = adapter.getItemCount();
-
-        for (int i = 0; i < itemCount; i++) {
-            RecyclerView.ViewHolder viewHolder = daysOfMonthView.findViewHolderForAdapterPosition(i);
-
-            if (viewHolder instanceof CalendarViewHolder) {
-                CalendarViewHolder yourViewHolder = (CalendarViewHolder) viewHolder;
-                LocalDate dateInHolder = yourViewHolder.getDate();
-
-                if (targetDate.equals(dateInHolder)) {
-                    return i;
-                }
-            }
-        }
-
-        return RecyclerView.NO_POSITION;
+    public Month getShownMonth() {
+        return shownMonth;
     }
 
+    public Constructor<? extends CalendarViewHolder> getCalendarViewHolderConstructor() {
+        return calendarViewHolderConstructor;
+    }
+
+    public void setCalendarViewHolderConstructor(Constructor<? extends CalendarViewHolder> calendarViewHolderConstructor, int layoutId) {
+//        setting new holder for a calendar
+        this.calendarViewHolderConstructor = calendarViewHolderConstructor;
+        this.layoutId = layoutId;
+//      setting new month view with new holder
+        setMonthView();
+    }
 }

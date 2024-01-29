@@ -1,14 +1,16 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Woda</string>
-    <string name="water_date">dzień</string>
     <string name="water_to_drink">do wypicia</string>
     <string name="drank_water">wypita woda</string>
-    <string name="calendar">Kalendarz</string>
-    <string name="user">Użytkownik</string>
+    <string name="calendar">Kal</string>
     <string name="glassDesc">Szklanka, czego się spodziewasz?</string>
     <string name="addWaterDrankButtonText">+</string>
     <string name="edit_text_add_water_amount_hint">250 ml</string>
     <string name="water_type">Typ napoju</string>
     <string name="water_goal">Woda do wypicia [ml]</string>
     <string name="water_amount_to_drink">waterAmountToDrink</string>
+    <string name="shared_preferences">com.kamjer.woda.SHARED_PREFERENCES</string>
+    <string name="removeWaterDrankButtonTex">-</string>
+    <string name="goal">Cel</string>
+
 </resources>

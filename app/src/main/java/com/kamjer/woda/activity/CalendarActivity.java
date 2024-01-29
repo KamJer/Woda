@@ -2,20 +2,25 @@ package com.kamjer.woda.activity;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 import android.widget.CalendarView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.kamjer.mycalendarview.CalendarViewAdapter;
 import com.kamjer.mycalendarview.CalendarViewHolder;
+import com.kamjer.mycalendarview.CustomHolderBehavior;
 import com.kamjer.mycalendarview.DaysOfMonthView;
 import com.kamjer.mycalendarview.MyCalendarView;
 import com.kamjer.mycalendarview.SelectedDataChangedListener;
 import com.kamjer.woda.R;
+import com.kamjer.woda.activity.calendaractivity.WaterCalendarViewHolder;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
@@ -37,7 +42,6 @@ public class CalendarActivity extends AppCompatActivity {
 
     private WaterViewModel waterViewModel;
     private MyCalendarView calendarView;
-    private SelectedDataChangedListener selectedDataChangedListener;
     private List<Water> waters;
 
     @Override
@@ -45,25 +49,37 @@ public class CalendarActivity extends AppCompatActivity {
         super.onStart();
         setContentView(R.layout.calendar_activity_layout);
 
+//      getting viewModel
         waterViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(WaterViewModel.class);
 
-        calendarView = findViewById(R.id.calendarViewSelectDate);
-        calendarView.setSelectedDateChangedListener(this::dataChangedAction);
+//      getting date from active water
+        LocalDate defaultSelectedDate = waterViewModel.getWaterValue().getDate();
 
-        Water water = waterViewModel.getWaterValue();
-        calendarView.setSelectedDate(water.getDate());
+//      fetching data from database
+        waterViewModel.loadWatersFromMonth(defaultSelectedDate, waters -> {
+            CalendarActivity.this.waters = waters;
 
-        selectedDataChangedListener = (view, localDate) ->
-                waterViewModel.loadWatersFromMonth(localDate, waters -> {
-                    CalendarActivity.this.waters = waters;
-                    colorDays(waters);
-                }
-        );
+//          after finding data creating calendar and operating on it
+            calendarView = findViewById(R.id.calendarViewSelectDate);
 
-        selectedDataChangedListener.dataChangedAction(calendarView.getDaysOfMonthView(), calendarView.getSelectedDate());
+//          setting loaded selected date
+            calendarView.setSelectedDate(defaultSelectedDate);
+            calendarView.setCustomCalendarViewHolder(WaterCalendarViewHolder.class, R.layout.water_calendar_cell);
 
-        calendarView.setNextMonthChangeListener(selectedDataChangedListener);
-        calendarView.setPreviousMonthChangeListener(selectedDataChangedListener);
+
+//          setting calendar listeners
+            calendarView.setSelectedDateChangedListener(this::dataChangedAction);
+            calendarView.setCustomHolderBehavior(holder -> colorDays(waters, holder));
+
+            SelectedDataChangedListener selectedDataChangedListener = (view, localDate) ->
+                    waterViewModel.loadWatersFromMonth(calendarView.getSelectedDate(), waters1 ->
+                            CalendarActivity.this.waters = waters1);
+
+            calendarView.setNextMonthChangeListener(selectedDataChangedListener);
+            calendarView.setPreviousMonthChangeListener(selectedDataChangedListener);
+        });
+
+
     }
 
     /**
@@ -71,44 +87,50 @@ public class CalendarActivity extends AppCompatActivity {
      * water drank in a day (gradient from red when 0% water drank, green when 100%),
      * if water does not exist in a day paint that day red.
      * @param waters list of water from specific dates
+     * @param holder to modify
      */
-    private void colorDays(List<Water> waters) {
-//      getting view of days
-        DaysOfMonthView daysView = calendarView.getDaysOfMonthView();
-//      looping through days in a calendarView
-        for (int i = 0; i < daysView.getCalendarAdapter().getItemCount(); i++) {
-//          getting a day
-            CalendarViewHolder day = (CalendarViewHolder) daysView.getChildViewHolder(daysView.getChildAt(i));
-//          if a selected day is currently checked day do nothing
-            if (!daysView.getSelectedDate().equals(day.getDate())) {
-//              looking for a water for a day
-                findWaterByDate(waters, day.getDate()).map(water -> {
+    private void colorDays(List<Water> waters, CalendarViewHolder holder) {
+        if (holder instanceof WaterCalendarViewHolder) {
+            WaterCalendarViewHolder waterHolder = (WaterCalendarViewHolder) holder;
+
+            findWaterByDate(waters, holder.getDate()).map(waterFound -> {
 //                  painting elements for a found water
 //                  normalizing water drank
-                    float normalizedWater = (float) water.getWaterDrank() / (float) water.getWaterToDrink();
-//                  we want it to be half see through
-                    int a = 255 / 2;
+                float normalizedWater = Math.min(1.0f, (float) waterFound.getWaterDrank() / (float) waterFound.getWaterToDrink());
+//                  we want it to be half see through (a = 255/2)
+                int a = 255;
 //                  calculating green value
-                    int g = (int) (255 * normalizedWater);
-//                  subtracting green value from red (if green is 100% aka water drank goal is achieved it will be equal to
-//                  255 so red will be equal to 0, achieving completely green paint
-//                  creates nice gradient
-                    int r = 255 - g;
-//                  paint day
-                    day.getDateCell().setBackgroundColor(Color.argb(a, r, g, 0));
-                    return water;
-                }).orElseGet(() -> {
-//                  we want it to be half see through
-                    int a = 255 / 2;
-//                  painting day in red (no value found, no water in a database, no water drank)
-                    int r = 255;
-                    day.getDateCell().setBackgroundColor(Color.argb(a, r, 0, 0));
-                    return null;
-                });
-            }
-            day.getDateCell().invalidate();
-        }
+                int g = (int) (255 * normalizedWater);
+//                  calculating red value
+                int r = (int) (255 - g);
 
+                Drawable circle = ResourcesCompat.getDrawable(CalendarActivity.this.getResources(), R.drawable.circle, null);
+                circle.setColorFilter(Color.argb(a, r, g, 0), PorterDuff.Mode.SRC_IN);
+                waterHolder.getCircle().setBackground(circle);
+                return waterFound;
+            }).orElseGet(() -> {
+//                  we want it to be half see through
+                int a = 255;
+//                  painting day in red (no value found, no water in a database, no water drank)
+                int r = 255;
+                Drawable circle = ResourcesCompat.getDrawable(CalendarActivity.this.getResources(), R.drawable.circle, null);
+                circle.setColorFilter(Color.argb(a, r, 0, 0), PorterDuff.Mode.SRC_IN);
+                waterHolder.getCircle().setBackground(circle);
+                return null;
+            });
+        }
+    }
+
+    private static int calculateGradient(int[] color1, int[] color2, float percent) {
+        int r = interpolate(color1[0], color2[0], percent);
+        int g = interpolate(color1[1], color2[1], percent);
+        int b = interpolate(color1[2], color2[2], percent);
+
+        return Color.argb(255, r, g, b);
+    }
+
+    private static int interpolate(float start, float end, float percent) {
+        return (int) (start + Math.round((end - start) * percent));
     }
 
     /**

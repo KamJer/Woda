@@ -4,20 +4,27 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.kamjer.woda.activity.AddWaterDialog;
 import com.kamjer.woda.activity.CalendarActivity;
 import com.kamjer.woda.activity.UserActivity;
+import com.kamjer.woda.activity.listeners.ChangeWatersGestureListener;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.viewmodel.WaterDataRepository;
 import com.kamjer.woda.viewmodel.WaterViewModel;
@@ -29,15 +36,19 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 public class MainActivity extends AppCompatActivity {
     private WaterViewModel waterViewModel;
 
-    private ActivityResultLauncher<Intent> startYourDialogLauncher;
-    private ActivityResultLauncher<Intent> calendarActivityLauncher;
+    private ActivityResultLauncher<Intent> addStartYourDialogLauncher;
+    private ActivityResultLauncher<Intent> removeStartYourDialogLauncher;
 
-    private Button calendarButton;
-    private Button userButton;
+    private ImageButton calendarButton;
+    private ImageButton userButton;
     private Button addWaterDrankButton;
+    private Button removeWaterDrankButton;
+
     private TextView textViewDate;
     private TextView textViewWaterToDrink;
     private ProgressBar progressBarWaterDrank;
+    
+    private GestureDetectorCompat gestureDetector;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,13 +61,16 @@ public class MainActivity extends AppCompatActivity {
 //      loading waterSaved
         waterViewModel.loadWaterAmount(this);
 
-//      handling response from addWaterDialog
-        startYourDialogLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+        GestureDetector.OnGestureListener gestureListener = new ChangeWatersGestureListener(this, waterViewModel);
+        gestureDetector = new GestureDetectorCompat(this, gestureListener);
+
+//      handling response from WaterDialog
+        addStartYourDialogLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         if (data != null) {
-                            int resultData = data.getIntExtra("waterAmount", WaterViewModel.DEFAULT_WATER_TO_DRINK);
+                            int resultData = data.getIntExtra("waterAmount", WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO);
                             Water waterToUpdate = waterViewModel.getWaterValue();
                             waterToUpdate.setWaterDrank(waterToUpdate.getWaterDrank() + resultData);
                             waterViewModel.setWater(waterToUpdate);
@@ -65,8 +79,27 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+//      handling response from WaterDialog (deleting water)
+        removeStartYourDialogLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            int resultData = data.getIntExtra("waterAmount", WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO);
+                            Water waterToUpdate = waterViewModel.getWaterValue();
+                            waterToUpdate.setWaterDrank(waterToUpdate.getWaterDrank() - resultData);
+                            waterViewModel.setWater(waterToUpdate);
+                            waterViewModel.insertWater(waterToUpdate);
+                        }
+                    }
+                });
+
 //      creating behavior for error in a RxJava
-        RxJavaPlugins.setErrorHandler(e -> Log.e("errorHandler", e.getMessage()));
+        RxJavaPlugins.setErrorHandler(e -> {
+            Log.e("errorHandler", e.getMessage());
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+        });
+
 
 //      creating observer for liveData in a ViewModel
         waterViewModel.getWater().observe(this, water -> {
@@ -95,12 +128,15 @@ public class MainActivity extends AppCompatActivity {
         userButton = findViewById(R.id.buttonUser);
         userButton.setOnClickListener(this::onClickUserButtonAction);
 
-        addWaterDrankButton = findViewById(R.id.buttonAddWaterDrank);
-        addWaterDrankButton.setOnClickListener(this::onClickAddWaterDrankAction);
-
         textViewWaterToDrink = findViewById(R.id.textViewWaterToDrink);
 
         progressBarWaterDrank = findViewById(R.id.progressBarWaterDrank);
+
+        addWaterDrankButton = findViewById(R.id.buttonAddWaterDrank);
+        addWaterDrankButton.setOnClickListener(this::onClickAddWaterDrankAction);
+
+        removeWaterDrankButton = findViewById(R.id.buttonRemoveWaterDrank);
+        removeWaterDrankButton.setOnClickListener(this::onClickRemoveWaterDrankAction);
     }
 
     /**
@@ -126,9 +162,16 @@ public class MainActivity extends AppCompatActivity {
      * @param v view returned from setOnClickListener(...)
      */
     private  void onClickAddWaterDrankAction(View v) {
-//        TODO: add action
         Intent addWaterToDrinkIntent = new Intent(this, AddWaterDialog.class);
-        startYourDialogLauncher.launch(addWaterToDrinkIntent);
+        addStartYourDialogLauncher.launch(addWaterToDrinkIntent);
+    }
+    /**
+     * Action for removing water button
+     * @param v view returned from setOnClickListener(...)
+     */
+    private  void onClickRemoveWaterDrankAction(View v) {
+        Intent addWaterToDrinkIntent = new Intent(this, AddWaterDialog.class);
+        removeStartYourDialogLauncher.launch(addWaterToDrinkIntent);
     }
 
     @Override
@@ -140,7 +183,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.d("tester", String.valueOf(waterViewModel.getWater().hasObservers()));
         waterViewModel.getWater().observe(this, water -> {
             progressBarWaterDrank.setMax(water.getWaterToDrink());
             progressBarWaterDrank.setProgress(water.getWaterDrank());
@@ -148,5 +190,13 @@ public class MainActivity extends AppCompatActivity {
             textViewWaterToDrink.setText(waterStatus);
             textViewDate.setText(water.getDate().toString());
         });
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (this.gestureDetector.onTouchEvent(event)) {
+            return true;
+        }
+        return super.onTouchEvent(event);
     }
 }

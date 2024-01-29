@@ -10,20 +10,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 
 public class CalendarViewHolder extends RecyclerView.ViewHolder{
 
-    private LocalDate date;
-    private TextView dateCell;
+    protected LocalDate date;
+    protected TextView dateCell;
 
-    private CalendarViewAdapter adapter;
-    private SelectedDataChangedListener selectedDataChangedListener;
-
-    public CalendarViewHolder(@NonNull View itemView, CalendarViewAdapter adapter) {
+    public CalendarViewHolder(@NonNull View itemView) {
         super(itemView);
-        this.adapter = adapter;
         dateCell = itemView.findViewById(R.id.day);
     }
+    
+    public void bind(DaysOfMonthView daysOfMonthView, CalendarViewAdapter adapter, int position) {}
 
     public LocalDate getDate() {
         return date;
@@ -31,20 +31,12 @@ public class CalendarViewHolder extends RecyclerView.ViewHolder{
 
     public void setDate(LocalDate date) {
         this.date = date;
-//        TODO: temporary, fix it, so that no null are passed here and that you set a formatter
-        if (date == null) {
-            dateCell.setText("");
-        } else {
-            dateCell.setText(String.valueOf(date.toString().split("-")[2]));
-        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd");
+        dateCell.setText(date.format(formatter));
     }
 
     @NotNull
     public TextView getDateCell() {
         return dateCell;
-    }
-
-    public void setSelectedDataChangedListener(SelectedDataChangedListener selectedDataChangedListener) {
-        this.selectedDataChangedListener = selectedDataChangedListener;
     }
 }

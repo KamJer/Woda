@@ -4,6 +4,7 @@ import android.view.View;
 
 import java.time.LocalDate;
 
+@FunctionalInterface
 public interface SelectedDataChangedListener {
-    public void dataChangedAction(View view, LocalDate localDate);
+    void dataChangedAction(View view, LocalDate localDate);
 }

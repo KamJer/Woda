@@ -5,11 +5,11 @@ import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 import androidx.room.Room;
 
-import com.kamjer.woda.dao.WaterDAO;
+import com.kamjer.woda.database.dao.WaterDAO;
 import com.kamjer.woda.database.WaterDatabase;
 import com.kamjer.woda.model.Water;
 
-import java.util.Optional;
+import java.util.List;
 
 public class WaterDataRepository {
 
@@ -23,6 +23,8 @@ public class WaterDataRepository {
     private Integer waterAmountToDrink;
 
     private MutableLiveData<Water> water = new MutableLiveData<>();
+
+    private MutableLiveData<List<Water>> watersForMonth = new MutableLiveData<>();
 
     private WaterDataRepository() {
     }
@@ -44,6 +46,10 @@ public class WaterDataRepository {
 
     public MutableLiveData<Water> getWater() {
         return water;
+    }
+
+    public MutableLiveData<List<Water>> getWatersForMonth() {
+        return watersForMonth;
     }
 
     public WaterDatabase getWaterDatabase() {
