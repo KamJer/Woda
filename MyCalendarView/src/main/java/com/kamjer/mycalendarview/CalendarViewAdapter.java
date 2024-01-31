@@ -68,10 +68,8 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewHolder
 //      internal processing of recyclerView demands it to be set every binding)
         if (!daysOfMonth.get(position).getMonth().equals(daysOfMonthView.getShownMonth())) {
             holder.getDateCell().setTextColor(OUT_OF_MOTH_DATE_COLOR);
-            holder.getDateCell().setAlpha(0.5f);
         } else {
             holder.getDateCell().setTextColor(Color.BLACK);
-            holder.getDateCell().setAlpha(1f);
         }
 //      checking if a holder is a selected date
         if (holder.getDate().equals(daysOfMonthView.getSelectedDate())) {

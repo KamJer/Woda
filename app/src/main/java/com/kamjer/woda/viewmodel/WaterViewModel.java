@@ -11,6 +11,7 @@ import com.kamjer.woda.R;
 import com.kamjer.woda.model.Water;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -66,7 +67,7 @@ public class WaterViewModel extends ViewModel {
     }
 
     public Disposable loadWatersFromMonth(LocalDate date) {
-        return WaterDataRepository.getInstance().getWaterDAO().getFromMonth(date.toString()).subscribeOn(Schedulers.io())
+        return WaterDataRepository.getInstance().getWaterDAO().getWatersFromMonth(date.toString()).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         waters -> {
@@ -76,7 +77,9 @@ public class WaterViewModel extends ViewModel {
     }
 
     public Disposable loadWatersFromMonth(LocalDate date, Consumer<List<Water>> onSuccess) {
-        return WaterDataRepository.getInstance().getWaterDAO().getFromMonth(date.toString()).subscribeOn(Schedulers.io())
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        String formattedDate = date.format(formatter);
+        return WaterDataRepository.getInstance().getWaterDAO().getWatersFromMonth(formattedDate).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         onSuccess,

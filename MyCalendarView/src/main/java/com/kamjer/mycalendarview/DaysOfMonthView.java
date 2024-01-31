@@ -2,12 +2,15 @@ package com.kamjer.mycalendarview;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,7 +50,6 @@ public class DaysOfMonthView extends RecyclerView {
 
     private void init() {
         selectedDate = LocalDate.now();
-        setMonthView();
     }
 
     public void setMonthView() {
@@ -104,12 +106,14 @@ public class DaysOfMonthView extends RecyclerView {
 
     public void setSelectedDateChangedListener(SelectedDataChangedListener selectedDataChangedListener) {
         this.selectedDataChangedListener = selectedDataChangedListener;
-        this.calendarAdapter.setSelectedDataChangedListener(selectedDataChangedListener);
+        if (calendarAdapter != null)
+            this.calendarAdapter.setSelectedDataChangedListener(selectedDataChangedListener);
     }
 
     public void setCustomHolderBehavior(CustomHolderBehavior customHolderBehavior) {
         this.customHolderBehavior = customHolderBehavior;
-        this.calendarAdapter.setCustomHolderBehavior(customHolderBehavior);
+        if (calendarAdapter != null)
+            this.calendarAdapter.setCustomHolderBehavior(customHolderBehavior);
     }
 
     public void previousMonthAction() {
@@ -146,7 +150,5 @@ public class DaysOfMonthView extends RecyclerView {
 //        setting new holder for a calendar
         this.calendarViewHolderConstructor = calendarViewHolderConstructor;
         this.layoutId = layoutId;
-//      setting new month view with new holder
-        setMonthView();
     }
 }

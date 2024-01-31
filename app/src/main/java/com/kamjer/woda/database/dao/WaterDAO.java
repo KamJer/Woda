@@ -21,13 +21,13 @@ public interface WaterDAO {
     @Query("SELECT * FROM water")
     Flowable<List<Water>> getAll();
 
-    @Query("SELECT * FROM water WHERE strftime('%Y-%m', date ==:date)")
-    Flowable<List<Water>> getFromMonth(String date);
+    @Query("SELECT * FROM water WHERE strftime('%Y-%m', date) =:date")
+    Flowable<List<Water>> getWatersFromMonth(String date);
 
-    @Query("SELECT * FROM water WHERE id == :waterId")
+    @Query("SELECT * FROM water WHERE id = :waterId")
     Single<Water> getWaterById(long waterId);
 
-    @Query("SELECT * FROM water WHERE date == :date")
+    @Query("SELECT * FROM water WHERE date = :date")
     Maybe<Water> getWaterByDate(String date);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

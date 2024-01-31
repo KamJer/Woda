@@ -44,11 +44,11 @@
         android:id="@+id/buttonCalendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/calendar"
         android:scaleType="fitCenter"
         app:layout_constraintStart_toStartOf="@+id/guideline1"
         app:layout_constraintTop_toTopOf="@+id/guideline2"
-        app:srcCompat="@drawable/calendar"
-        android:contentDescription="@string/calendar" />
+        app:srcCompat="@drawable/calendar" />
 
     <TextView
         android:id="@+id/textViewDate"
@@ -72,18 +72,14 @@
         app:srcCompat="@drawable/bullseye" />
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_above="@+id/relativeLayoutProgressBar"
         android:layout_centerHorizontal="true"
-        android:contentDescription="@string/glassDesc"
-        android:scaleX="0.5"
-        android:scaleY="0.5"
         app:layout_constraintBottom_toTopOf="@+id/guideline5"
         app:layout_constraintEnd_toStartOf="@+id/guideline4"
         app:layout_constraintStart_toStartOf="@+id/guideline1"
-        app:layout_constraintTop_toBottomOf="@+id/textViewDate"
+        app:layout_constraintTop_toBottomOf="@+id/buttonCalendar"
         app:srcCompat="@drawable/cartoon" />
 
     <RelativeLayout
@@ -115,25 +111,26 @@
 
     </RelativeLayout>
 
-    <Button
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/buttonAddWaterDrank"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/addWaterDrankButtonText"
+        android:clickable="true"
+        android:src="@drawable/plus"
+        android:layout_margin="10dp"
         app:layout_constraintBottom_toTopOf="@+id/buttonRemoveWaterDrank"
         app:layout_constraintEnd_toStartOf="@+id/guideline4"
-        app:layout_constraintStart_toStartOf="@+id/guideline1" />
+        />
 
-    <Button
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/buttonRemoveWaterDrank"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/removeWaterDrankButtonTex"
+        android:clickable="true"
+        android:src="@drawable/minus"
+        android:layout_margin="10dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
-        app:layout_constraintEnd_toStartOf="@+id/guideline4"
-        app:layout_constraintStart_toStartOf="@+id/guideline1" />
+        app:layout_constraintEnd_toStartOf="@+id/guideline4" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

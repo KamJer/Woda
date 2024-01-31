@@ -13,6 +13,6 @@
         <!-- Vertical line -->
         <path
             android:fillColor="@color/white"
-            android:pathData="M12,2v20h1V2z" />
+            android:pathData="M12,2v20 h1V2 z" />
 
 </vector>

@@ -1,48 +1,41 @@
 package com.kamjer.woda.activity;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
+import android.os.Bundle;
 import android.view.View;
-import android.widget.CalendarView;
-import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.kamjer.mycalendarview.CalendarViewAdapter;
 import com.kamjer.mycalendarview.CalendarViewHolder;
-import com.kamjer.mycalendarview.CustomHolderBehavior;
-import com.kamjer.mycalendarview.DaysOfMonthView;
-import com.kamjer.mycalendarview.MyCalendarView;
+import com.kamjer.mycalendarview.CalendarView;
 import com.kamjer.mycalendarview.SelectedDataChangedListener;
 import com.kamjer.woda.R;
 import com.kamjer.woda.activity.calendaractivity.WaterCalendarViewHolder;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.plugins.RxJavaPlugins;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class CalendarActivity extends AppCompatActivity {
 
     private WaterViewModel waterViewModel;
-    private MyCalendarView calendarView;
+    private CalendarView calendarView;
     private List<Water> waters;
+
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+    }
 
     @Override
     protected void onStart() {
@@ -55,37 +48,42 @@ public class CalendarActivity extends AppCompatActivity {
 //      getting date from active water
         LocalDate defaultSelectedDate = waterViewModel.getWaterValue().getDate();
 
+        //          after finding data creating calendar and operating on it
+        calendarView = findViewById(R.id.calendarViewSelectDate);
+
+
+//          setting loaded selected date
+        calendarView.setSelectedDate(defaultSelectedDate);
+        calendarView.setCustomCalendarViewHolder(WaterCalendarViewHolder.class, R.layout.water_calendar_cell);
+
+//          setting calendar listeners
+        calendarView.setSelectedDateChangedListener(this::dataChangedAction);
+        calendarView.setCustomHolderBehavior(holder -> colorDays(waters, holder));
+
+        SelectedDataChangedListener selectedDataChangedListener = (view, localDate) ->
+                waterViewModel.loadWatersFromMonth(calendarView.getSelectedDate(), waters1 -> {
+                            CalendarActivity.this.waters = waters1;
+//                          after complete setup show days of month
+                            calendarView.showMonthView();
+                        }
+                );
+
+        calendarView.setNextMonthChangeListener(selectedDataChangedListener);
+        calendarView.setPreviousMonthChangeListener(selectedDataChangedListener);
+
 //      fetching data from database
         waterViewModel.loadWatersFromMonth(defaultSelectedDate, waters -> {
             CalendarActivity.this.waters = waters;
-
-//          after finding data creating calendar and operating on it
-            calendarView = findViewById(R.id.calendarViewSelectDate);
-
-//          setting loaded selected date
-            calendarView.setSelectedDate(defaultSelectedDate);
-            calendarView.setCustomCalendarViewHolder(WaterCalendarViewHolder.class, R.layout.water_calendar_cell);
-
-
-//          setting calendar listeners
-            calendarView.setSelectedDateChangedListener(this::dataChangedAction);
-            calendarView.setCustomHolderBehavior(holder -> colorDays(waters, holder));
-
-            SelectedDataChangedListener selectedDataChangedListener = (view, localDate) ->
-                    waterViewModel.loadWatersFromMonth(calendarView.getSelectedDate(), waters1 ->
-                            CalendarActivity.this.waters = waters1);
-
-            calendarView.setNextMonthChangeListener(selectedDataChangedListener);
-            calendarView.setPreviousMonthChangeListener(selectedDataChangedListener);
+//          after complete setup show days of month
+            calendarView.showMonthView();
         });
-
 
     }
 
     /**
      * Colors dates in a calendar with a proper color corresponding to
      * water drank in a day (gradient from red when 0% water drank, green when 100%),
-     * if water does not exist in a day paint that day red.
+     * if water does not exist in a day paints that day red.
      * @param waters list of water from specific dates
      * @param holder to modify
      */
@@ -121,18 +119,6 @@ public class CalendarActivity extends AppCompatActivity {
         }
     }
 
-    private static int calculateGradient(int[] color1, int[] color2, float percent) {
-        int r = interpolate(color1[0], color2[0], percent);
-        int g = interpolate(color1[1], color2[1], percent);
-        int b = interpolate(color1[2], color2[2], percent);
-
-        return Color.argb(255, r, g, b);
-    }
-
-    private static int interpolate(float start, float end, float percent) {
-        return (int) (start + Math.round((end - start) * percent));
-    }
-
     /**
      * Action when data in a calendar changed
      * @param view itemView from a holder in a calendar that represents day
@@ -152,4 +138,5 @@ public class CalendarActivity extends AppCompatActivity {
     private Optional<Water> findWaterByDate(List<Water> waters, LocalDate date) {
         return waters.stream().filter(water -> water.getDate().equals(date)).findFirst();
     }
+
 }

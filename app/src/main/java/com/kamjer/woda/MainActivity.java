@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kamjer.woda.activity.AddWaterDialog;
 import com.kamjer.woda.activity.CalendarActivity;
 import com.kamjer.woda.activity.UserActivity;
@@ -41,9 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageButton calendarButton;
     private ImageButton userButton;
-    private Button addWaterDrankButton;
-    private Button removeWaterDrankButton;
-
+    private FloatingActionButton addWaterDrankButton;
+    private FloatingActionButton removeWaterDrankButton;
     private TextView textViewDate;
     private TextView textViewWaterToDrink;
     private ProgressBar progressBarWaterDrank;
