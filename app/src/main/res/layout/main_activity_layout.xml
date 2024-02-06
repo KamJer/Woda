@@ -80,7 +80,19 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline4"
         app:layout_constraintStart_toStartOf="@+id/guideline1"
         app:layout_constraintTop_toBottomOf="@+id/buttonCalendar"
-        app:srcCompat="@drawable/cartoon" />
+        android:background="@color/white"
+        app:srcCompat="@drawable/glass" />
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_above="@+id/relativeLayoutProgressBar"
+        android:layout_centerHorizontal="true"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        app:layout_constraintEnd_toStartOf="@+id/guideline4"
+        app:layout_constraintStart_toStartOf="@+id/guideline1"
+        app:layout_constraintTop_toBottomOf="@+id/buttonCalendar"
+        app:srcCompat="@drawable/water" />
 
     <RelativeLayout
         android:id="@+id/relativeLayoutProgressBar"

@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -15,19 +14,17 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.kamjer.woda.activity.AddWaterDialog;
+import com.kamjer.woda.activity.addwaterDialog.AddWaterDialog;
 import com.kamjer.woda.activity.CalendarActivity;
 import com.kamjer.woda.activity.UserActivity;
 import com.kamjer.woda.activity.listeners.ChangeWatersGestureListener;
 import com.kamjer.woda.model.Water;
-import com.kamjer.woda.viewmodel.WaterDataRepository;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.time.LocalDate;

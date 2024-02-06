@@ -12,5 +12,5 @@
     <color name="green">#FF00FF00</color>
     <color name="yellow">#FFFFFF00</color>
     <color name="dark_grey">#FF5A5A5A</color>
-    <color name="circle_color">#FFFF0000</color>
+    <color name="transparent">#00000000</color>
 </resources>

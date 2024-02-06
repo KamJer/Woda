@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.AddWaterDialog"
+            android:name=".activity.addwaterDialog.AddWaterDialog"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowIsFloating="true">
         </activity>

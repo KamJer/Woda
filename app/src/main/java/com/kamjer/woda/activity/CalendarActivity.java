@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -29,14 +30,6 @@ public class CalendarActivity extends AppCompatActivity {
     private CalendarView calendarView;
     private List<Water> waters;
 
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -48,36 +41,33 @@ public class CalendarActivity extends AppCompatActivity {
 //      getting date from active water
         LocalDate defaultSelectedDate = waterViewModel.getWaterValue().getDate();
 
-        //          after finding data creating calendar and operating on it
+//      after finding data creating calendar and operating on it
         calendarView = findViewById(R.id.calendarViewSelectDate);
 
 
-//          setting loaded selected date
+//      setting loaded selected date
         calendarView.setSelectedDate(defaultSelectedDate);
         calendarView.setCustomCalendarViewHolder(WaterCalendarViewHolder.class, R.layout.water_calendar_cell);
 
-//          setting calendar listeners
+//      setting calendar listeners
         calendarView.setSelectedDateChangedListener(this::dataChangedAction);
         calendarView.setCustomHolderBehavior(holder -> colorDays(waters, holder));
 
-        SelectedDataChangedListener selectedDataChangedListener = (view, localDate) ->
-                waterViewModel.loadWatersFromMonth(calendarView.getSelectedDate(), waters1 -> {
-                            CalendarActivity.this.waters = waters1;
-//                          after complete setup show days of month
-                            calendarView.showMonthView();
-                        }
-                );
+        SelectedDataChangedListener selectedDataChangedListener = (view, localDate) -> fetchData();
 
         calendarView.setNextMonthChangeListener(selectedDataChangedListener);
         calendarView.setPreviousMonthChangeListener(selectedDataChangedListener);
 
 //      fetching data from database
-        waterViewModel.loadWatersFromMonth(defaultSelectedDate, waters -> {
+        fetchData();
+    }
+
+    private void fetchData() {
+        waterViewModel.loadWaterAll(waters -> {
             CalendarActivity.this.waters = waters;
 //          after complete setup show days of month
             calendarView.showMonthView();
         });
-
     }
 
     /**
@@ -103,7 +93,7 @@ public class CalendarActivity extends AppCompatActivity {
                 int r = (int) (255 - g);
 
                 Drawable circle = ResourcesCompat.getDrawable(CalendarActivity.this.getResources(), R.drawable.circle, null);
-                circle.setColorFilter(Color.argb(a, r, g, 0), PorterDuff.Mode.SRC_IN);
+                circle.setColorFilter(Color.argb(a, r, g, 0), PorterDuff.Mode.SRC_OUT);
                 waterHolder.getCircle().setBackground(circle);
                 return waterFound;
             }).orElseGet(() -> {
@@ -112,7 +102,7 @@ public class CalendarActivity extends AppCompatActivity {
 //                  painting day in red (no value found, no water in a database, no water drank)
                 int r = 255;
                 Drawable circle = ResourcesCompat.getDrawable(CalendarActivity.this.getResources(), R.drawable.circle, null);
-                circle.setColorFilter(Color.argb(a, r, 0, 0), PorterDuff.Mode.SRC_IN);
+                circle.setColorFilter(Color.argb(a, r, 0, 0), PorterDuff.Mode.SRC_OUT);
                 waterHolder.getCircle().setBackground(circle);
                 return null;
             });
@@ -138,5 +128,4 @@ public class CalendarActivity extends AppCompatActivity {
     private Optional<Water> findWaterByDate(List<Water> waters, LocalDate date) {
         return waters.stream().filter(water -> water.getDate().equals(date)).findFirst();
     }
-
 }

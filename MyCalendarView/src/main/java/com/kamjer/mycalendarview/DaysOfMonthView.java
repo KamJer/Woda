@@ -83,8 +83,6 @@ public class DaysOfMonthView extends RecyclerView {
         int endDayOfWeek = lastOfMonth.getDayOfWeek().getValue();
         int endTemp = 7 - endDayOfWeek - 1;
 
-
-
 //                                  days in a month
         int maxDaysCount = yearMonth.getMonth().length(Year.isLeap(yearMonth.getYear())) +
 //      the number of days in a week before month begin

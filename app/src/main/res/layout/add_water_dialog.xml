@@ -3,15 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <AutoCompleteTextView
+    <EditText
         android:id="@+id/editTextAddWaterAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="number"
         android:completionThreshold="1"
-        android:focusableInTouchMode="false"
         android:hint="@string/edit_text_add_water_amount_hint"
         android:autofillHints=""
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttonGetWaterAmount"
         />
 
     <Button
