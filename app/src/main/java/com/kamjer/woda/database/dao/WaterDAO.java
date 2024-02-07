@@ -6,6 +6,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
+import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 
 import java.util.List;
@@ -18,8 +19,9 @@ import io.reactivex.rxjava3.core.Single;
 @Dao
 public interface WaterDAO {
 
+//    Water table methods
     @Query("SELECT * FROM water")
-    Flowable<List<Water>> getAll();
+    Flowable<List<Water>> getAllWaters();
 
     @Query("SELECT * FROM water WHERE strftime('%Y-%m', date) =:date")
     Flowable<List<Water>> getWatersFromMonth(String date);
@@ -36,6 +38,13 @@ public interface WaterDAO {
     @Delete
     Completable deleteWater(Water water);
 
+//    Type table methods
+    @Query("SELECT * FROM type")
+    Flowable<List<Type>> getAllTypes();
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    Maybe<Long> insertType(Type water);
 
+    @Delete
+    Completable deleteType(Type type);
 }

@@ -2,6 +2,8 @@ package com.kamjer.woda.database.converters;
 
 import androidx.room.TypeConverter;
 
+import com.kamjer.woda.model.Type;
+
 import java.time.LocalDate;
 
 public class Converter {

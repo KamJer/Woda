@@ -8,13 +8,17 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.kamjer.woda.R;
+import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.disposables.Disposable;
 
@@ -31,8 +35,17 @@ public class WaterViewModel extends ViewModel {
 
     public void createDataBase(Context context) {
         WaterDataRepository.getInstance().createWaterDatabase(context);
+        Disposable disposable = WaterDataRepository.getInstance().getWaterDAO().getAllTypes().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(types -> {
+                    WaterDataRepository.getInstance().setWaterTypes(new ArrayList<>(types));
+//                  if this map is empty it means something went wrong and values that are supposed to be in a database are not, fetching default values and inserting them there to be sure thay are there
+                    if (WaterDataRepository.getInstance().getWaterTypes().isEmpty()) {
+                        Arrays.stream(WaterDataRepository.DEFAULT_DRINKS_TYPES).
+                                forEach(s -> this.insertType(new Type(s)));
+                    }
+                });
     }
-    
+
     public void loadWaterAmount(AppCompatActivity activity) {
         SharedPreferences sharedPref = activity.getSharedPreferences(activity.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         int test = sharedPref.getInt(activity.getString(R.string.water_amount_to_drink), DEFAULT_WATER_TO_DRINK);
@@ -59,20 +72,10 @@ public class WaterViewModel extends ViewModel {
     }
 
     public Disposable loadWaterAll(Consumer<List<Water>> onSuccess) {
-        return WaterDataRepository.getInstance().getWaterDAO().getAll().subscribeOn(Schedulers.io())
+        return WaterDataRepository.getInstance().getWaterDAO().getAllWaters().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         onSuccess,
-                        RxJavaPlugins::onError);
-    }
-
-    public Disposable loadWatersFromMonth(LocalDate date) {
-        return WaterDataRepository.getInstance().getWaterDAO().getWatersFromMonth(date.toString()).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        waters -> {
-
-                        },
                         RxJavaPlugins::onError);
     }
 
@@ -89,11 +92,12 @@ public class WaterViewModel extends ViewModel {
     private void setWaterWhenNotFound(LocalDate date) {
 //      getting water amount to drink
         int waterAmountToDrink = getWaterAmountToDrink();
-//        creating water
-        Water waterCreated = new Water(date, waterAmountToDrink, 0);
-//        setting that water to the liveData
+        List<Type> types = WaterDataRepository.getInstance().getWaterTypes();
+//      creating water with default type (for now)
+        Water waterCreated = new Water(date, waterAmountToDrink, 0, types.get(0));
+//      setting that water to the liveData
         WaterDataRepository.getInstance().getWater().setValue(waterCreated);
-//        inserting that water to database
+//      inserting that water to database
         insertWater(waterCreated);
     }
 
@@ -106,18 +110,21 @@ public class WaterViewModel extends ViewModel {
                 );
     }
 
-    public MutableLiveData<List<Water>> getWatersForMonth() {
-        return WaterDataRepository.getInstance().getWatersForMonth();
+    public void insertType(Type type) {
+        Disposable disposable = WaterDataRepository.getInstance().getWaterDAO().insertType(type)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((typeId) -> {
+                            type.setId(typeId);
+                            putType(type);
+                        },
+                    RxJavaPlugins::onError
+                );
     }
 
-    public List<Water> getWatersForMonthValue() {
-        return Optional.ofNullable(WaterDataRepository.getInstance().getWatersForMonth().getValue()).orElseGet(ArrayList::new);
+    private void putType(Type type) {
+        WaterDataRepository.getInstance().putType(type);
     }
-
-    public void setWaterForMonthValue(List<Water> waters) {
-        WaterDataRepository.getInstance().getWatersForMonth().setValue(waters);
-    }
-
 
     public MutableLiveData<Water> getWater() {
         return WaterDataRepository.getInstance().getWater();
