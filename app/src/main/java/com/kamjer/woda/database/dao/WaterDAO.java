@@ -30,7 +30,7 @@ public interface WaterDAO {
     Single<Water> getWaterById(long waterId);
 
     @Query("SELECT * FROM water WHERE date = :date")
-    Maybe<Water> getWaterByDate(String date);
+    Flowable<List<Water>> getWaterByDate(String date);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insertWater(Water water);

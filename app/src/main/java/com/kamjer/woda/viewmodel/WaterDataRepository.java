@@ -10,15 +10,12 @@ import com.kamjer.woda.database.WaterDatabase;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import java.util.Map;
+import java.util.Optional;
 
 public class WaterDataRepository {
 
@@ -32,9 +29,11 @@ public class WaterDataRepository {
 
     private Integer waterAmountToDrink;
 
-    private MutableLiveData<Water> water = new MutableLiveData<>();
+    private LocalDate activeDate = LocalDate.now();
 
-    private List<Type> waterTypes = new ArrayList<>();
+    private MutableLiveData<List<Water>> waters = new MutableLiveData<>();
+
+    private HashMap<String, Type> waterTypes = new HashMap<>();
     private WaterDataRepository() {
     }
 
@@ -56,11 +55,25 @@ public class WaterDataRepository {
     }
 
     public void putType(Type type) {
-        waterTypes.add(type);
+        waterTypes.put(type.getType(), type);
     }
 
-    public MutableLiveData<Water> getWater() {
-        return water;
+    public void setWaters(List<Water> waters) {
+        this.waters.setValue(waters);
+    }
+
+    public MutableLiveData<List<Water>> getWaters() {
+        return waters;
+    }
+
+    public void deleteWater(Water water) {
+        waterDAO.deleteWater(water);
+    }
+
+    public void addWaterValue(Water water) {
+        List<Water> waters = Optional.ofNullable(this.waters.getValue()).orElseGet(ArrayList::new);
+        waters.add(water);
+        this.waters.setValue(waters);
     }
 
     public WaterDatabase getWaterDatabase() {
@@ -79,11 +92,19 @@ public class WaterDataRepository {
         this.waterAmountToDrink = waterAmountToDrink;
     }
 
-    public List<Type> getWaterTypes() {
+    public Map<String, Type> getWaterTypes() {
         return waterTypes;
     }
 
-    public void setWaterTypes(List<Type> waterTypes) {
-        this.waterTypes = waterTypes;
+    public void setWaterTypes(Map<String, Type> waterTypes) {
+        this.waterTypes = (HashMap<String, Type>) waterTypes;
+    }
+
+    public LocalDate getActiveDate() {
+        return activeDate;
+    }
+
+    public void setActiveDate(LocalDate activeDate) {
+        this.activeDate = activeDate;
     }
 }

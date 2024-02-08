@@ -50,7 +50,7 @@ public class ChangeWatersGestureListener implements GestureDetector.OnGestureLis
 
     @Override
     public boolean onFling(@Nullable MotionEvent e1, @NonNull MotionEvent e2, float velocityX, float velocityY) {
-        LocalDate currentDate = waterViewModel.getWaterValue().getDate();
+        LocalDate currentDate = waterViewModel.getActiveDate();
         float direction = e1.getX() - e2.getX();
         if (direction > 0) {
             waterViewModel.loadWaterByDate(currentDate.plusDays(1));

@@ -13,11 +13,13 @@
         android:autofillHints=""
         />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerButtons"
+    <Spinner
+        android:id="@+id/spinnerTypeList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/buttonGetWaterAmount"
+        android:background="@android:drawable/btn_dropdown"
+        android:spinnerMode="dropdown"
+        android:layout_below="@+id/editTextAddWaterAmount"
         />
 
     <Button
@@ -25,8 +27,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/app_name"
-        android:layout_below="@+id/editTextAddWaterAmount"
+        android:layout_below="@+id/spinnerTypeList"
         android:layout_centerHorizontal="true"
         />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttonGetWaterAmount"
+        />
+
+
 
 </RelativeLayout>

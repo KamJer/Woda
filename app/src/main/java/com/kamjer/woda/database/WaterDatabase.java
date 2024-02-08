@@ -21,17 +21,20 @@ public abstract class WaterDatabase extends RoomDatabase {
     public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS type (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                    "type TEXT)");
             database.execSQL("INSERT INTO type (type) VALUES ('Water'), ('Coffee'), ('Tea'), ('Soda')");
             database.execSQL("ALTER TABLE water RENAME TO water_old");
             database.execSQL("CREATE TABLE IF NOT EXISTS water (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "waterToDrink INTEGER," +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                     "waterDrank INTEGER," +
+                    "waterToDrink INTEGER," +
                     "date TEXT," +
-                    "typeId INTEGER," +
-                    "FOREIGN KEY (typeId) REFERENCES Type(id) ON DELETE CASCADE" +
+                    "typeId INTEGER NOT NULL," +
+                    "FOREIGN KEY (typeId) REFERENCES type(id) ON DELETE CASCADE" +
                     ")");
-            database.execSQL("INSERT INTO water SELECT * FROM water_old");
+                database.execSQL("INSERT INTO water (waterDrank, waterToDrink, date, typeId) SELECT waterDrank, waterToDrink, date, 1 FROM water_old");
             database.execSQL("DROP TABLE water_old");
         }
     };

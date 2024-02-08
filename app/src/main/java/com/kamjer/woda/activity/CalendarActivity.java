@@ -39,7 +39,7 @@ public class CalendarActivity extends AppCompatActivity {
         waterViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(WaterViewModel.class);
 
 //      getting date from active water
-        LocalDate defaultSelectedDate = waterViewModel.getWaterValue().getDate();
+        LocalDate defaultSelectedDate = waterViewModel.getActiveDate();
 
 //      after finding data creating calendar and operating on it
         calendarView = findViewById(R.id.calendarViewSelectDate);

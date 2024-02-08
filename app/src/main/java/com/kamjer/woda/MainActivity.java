@@ -24,10 +24,13 @@ import com.kamjer.woda.activity.addwaterDialog.AddWaterDialog;
 import com.kamjer.woda.activity.CalendarActivity;
 import com.kamjer.woda.activity.UserActivity;
 import com.kamjer.woda.activity.listeners.ChangeWatersGestureListener;
+import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 
@@ -68,10 +71,9 @@ public class MainActivity extends AppCompatActivity {
                         Intent data = result.getData();
                         if (data != null) {
                             int resultData = data.getIntExtra("waterAmount", WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO);
-                            Water waterToUpdate = waterViewModel.getWaterValue();
-                            waterToUpdate.setWaterDrank(waterToUpdate.getWaterDrank() + resultData);
-                            waterViewModel.setWater(waterToUpdate);
-                            waterViewModel.insertWater(waterToUpdate);
+                            String typeName = data.getStringExtra("type");
+                            Type type = waterViewModel.getWaterTypes().get(typeName);
+                            updateWaterFromDialogs(resultData, type);
                         }
                     }
                 });
@@ -83,10 +85,9 @@ public class MainActivity extends AppCompatActivity {
                         Intent data = result.getData();
                         if (data != null) {
                             int resultData = data.getIntExtra("waterAmount", WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO);
-                            Water waterToUpdate = waterViewModel.getWaterValue();
-                            waterToUpdate.setWaterDrank(waterToUpdate.getWaterDrank() - resultData);
-                            waterViewModel.setWater(waterToUpdate);
-                            waterViewModel.insertWater(waterToUpdate);
+                            String typeName = data.getStringExtra("type");
+                            Type type = waterViewModel.getWaterTypes().get(typeName);
+                            updateWaterFromDialogs(-resultData, type);
                         }
                     }
                 });
@@ -99,12 +100,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 //      creating observer for liveData in a ViewModel
-        waterViewModel.getWater().observe(this, water -> {
-            progressBarWaterDrank.setMax(water.getWaterToDrink());
-            progressBarWaterDrank.setProgress(water.getWaterDrank());
-            String waterStatus = water.getWaterDrank() + " / " + water.getWaterToDrink();
+        waterViewModel.getWater().observe(this, waters -> {
+            progressBarWaterDrank.setMax(waterViewModel.getWaterAmountToDrink());
+            int sum = waters.stream().mapToInt(
+                    Water::getWaterDrank
+            ).sum();
+            progressBarWaterDrank.setProgress(sum);
+            String waterStatus = sum + " / " + waterViewModel.getWaterAmountToDrink();
             textViewWaterToDrink.setText(waterStatus);
-            textViewDate.setText(water.getDate().toString());
+            textViewDate.setText(waterViewModel.getActiveDate().toString());
         });
 
 //      loading data for today
@@ -171,6 +175,26 @@ public class MainActivity extends AppCompatActivity {
         removeStartYourDialogLauncher.launch(addWaterToDrinkIntent);
     }
 
+    private void updateWaterFromDialogs(int result, Type type) {
+        Water waterUpdated = waterViewModel.getWaterValue()
+                .stream()
+                .filter(water ->
+                        water.getTypeId() == type.getId())
+                .findFirst()
+                .map(water -> {
+                    water.setWaterDrank(water.getWaterDrank() + result);
+                    return water;
+                })
+                .orElseGet(() ->
+                        new Water(waterViewModel.getActiveDate(), waterViewModel.getWaterAmountToDrink(), result, type)
+                );
+        if (waterUpdated.getWaterDrank() < 0) {
+            waterViewModel.deleteWater(waterUpdated);
+        } else {
+            waterViewModel.insertWater(waterUpdated);
+        }
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -180,12 +204,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        waterViewModel.getWater().observe(this, water -> {
-            progressBarWaterDrank.setMax(water.getWaterToDrink());
-            progressBarWaterDrank.setProgress(water.getWaterDrank());
-            String waterStatus = water.getWaterDrank() + " / " + water.getWaterToDrink();
+        waterViewModel.getWater().observe(this, waters -> {
+            progressBarWaterDrank.setMax(waterViewModel.getWaterAmountToDrink());
+            int sum = waters.stream().mapToInt(
+                    Water::getWaterDrank
+            ).sum();
+            progressBarWaterDrank.setProgress(sum);
+            String waterStatus = sum + " / " + waterViewModel.getWaterAmountToDrink();
             textViewWaterToDrink.setText(waterStatus);
-            textViewDate.setText(water.getDate().toString());
+            textViewDate.setText(waterViewModel.getActiveDate().toString());
         });
     }
 
