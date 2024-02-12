@@ -2,6 +2,7 @@ package com.kamjer.woda;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -30,6 +31,8 @@ import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
@@ -94,8 +97,9 @@ public class MainActivity extends AppCompatActivity {
 
 //      creating behavior for error in a RxJava
         RxJavaPlugins.setErrorHandler(e -> {
-            Log.e("errorHandler", e.getMessage());
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            String errorMessage = Optional.ofNullable(e.getMessage()).orElse("Error detected, source not known");
+            Log.e("errorHandler", errorMessage);
+            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
         });
 
 

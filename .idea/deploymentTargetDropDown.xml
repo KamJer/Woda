@@ -2,7 +2,19 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="WaterViewModelInstrumentedTest">
+        <State />
+      </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="testInsertType()">
+        <State />
+      </entry>
+      <entry key="testInsertWater()">
+        <State />
+      </entry>
+      <entry key="testLoadWaterFromMonth()">
         <State />
       </entry>
     </value>

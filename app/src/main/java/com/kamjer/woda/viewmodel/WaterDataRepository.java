@@ -34,7 +34,7 @@ public class WaterDataRepository {
     private MutableLiveData<List<Water>> waters = new MutableLiveData<>();
 
     private HashMap<String, Type> waterTypes = new HashMap<>();
-    private WaterDataRepository() {
+    public WaterDataRepository() {
     }
 
     public void createWaterDatabase(Context context) {
@@ -78,6 +78,14 @@ public class WaterDataRepository {
 
     public WaterDatabase getWaterDatabase() {
         return waterDatabase;
+    }
+
+    public void setWaterDatabase(WaterDatabase waterDatabase) {
+        this.waterDatabase = waterDatabase;
+    }
+
+    public void setWaterDAO(WaterDAO waterDAO) {
+        this.waterDAO = waterDAO;
     }
 
     public WaterDAO getWaterDAO() {

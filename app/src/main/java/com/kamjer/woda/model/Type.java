@@ -14,6 +14,10 @@ public class Type implements Serializable {
     private String type;
 
     @Ignore
+    public Type() {
+    }
+
+    @Ignore
     public Type (String type) {
         this.type = type;
     }

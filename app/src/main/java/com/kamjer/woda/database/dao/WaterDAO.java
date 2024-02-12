@@ -43,7 +43,7 @@ public interface WaterDAO {
     Flowable<List<Type>> getAllTypes();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    Maybe<Long> insertType(Type water);
+    Maybe<Long> insertType(Type type);
 
     @Delete
     Completable deleteType(Type type);
