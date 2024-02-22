@@ -59,11 +59,12 @@ public class WaterDataRepositoryInstrumentedTest {
 
     @Test
     public void testAddWaterValue() {
+        LocalDate date = LocalDate.now();
         Water water = new Water();
         List<Water> waters = new ArrayList<>();
         waters.add(water);
 
-        waterDataRepository.setWaters(waters);
+        waterDataRepository.setWatersValue(date, waters);
         waterDataRepository.getWaters().observeForever(mockObserver);
         waterDataRepository.addWaterValue(water);
 

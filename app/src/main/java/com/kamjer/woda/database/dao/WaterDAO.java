@@ -33,7 +33,7 @@ public interface WaterDAO {
     Flowable<List<Water>> getWaterByDate(String date);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    Completable insertWater(Water water);
+    Maybe<Long> insertWater(Water water);
 
     @Delete
     Completable deleteWater(Water water);

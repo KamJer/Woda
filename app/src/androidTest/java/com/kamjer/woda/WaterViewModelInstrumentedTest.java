@@ -6,19 +6,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import androidx.room.Room;
-import androidx.test.core.app.ApplicationProvider;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.kamjer.woda.database.WaterDatabase;
 import com.kamjer.woda.database.dao.WaterDAO;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
@@ -43,7 +37,6 @@ import java.util.Map;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Maybe;
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -78,7 +71,7 @@ public class WaterViewModelInstrumentedTest {
     public void testLoadWaterAmount() {
         int expectedAmount = 1500;
 //        mocking response from repository
-        when(mockRepository.getWaterAmountToDrink()).thenReturn(1500);
+        when(mockRepository.getWaterDayValue().getWaterAmountToDrink()).thenReturn(1500);
 //        mocking resources and activity behavior
         when(mockActivity.getResources()).thenReturn(mockResources);
         when(mockActivity.getString(R.string.shared_preferences)).thenReturn("test_key");
@@ -162,7 +155,7 @@ public class WaterViewModelInstrumentedTest {
         when(mockWaterDAO.insertWater(water1)).thenReturn(Completable.complete());
         when(mockRepository.getWaters()).thenReturn(mutableLiveData);
 
-        waterViewModel.insertWater(water1, () -> waterViewModel.addWater(water1));
+        waterViewModel.insertWater(water1, () -> waterViewModel.addWaterInDay(water1));
         assertTrue(waterViewModel.getWaterValue().contains(water1));
         verify(mockWaterDAO).insertWater(water1);
     }

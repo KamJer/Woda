@@ -2,7 +2,6 @@ package com.kamjer.woda;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.SQLException;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -27,13 +26,12 @@ import com.kamjer.woda.activity.UserActivity;
 import com.kamjer.woda.activity.listeners.ChangeWatersGestureListener;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
+import com.kamjer.woda.model.WaterDay;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 
@@ -102,21 +100,14 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
         });
 
-
 //      creating observer for liveData in a ViewModel
-        waterViewModel.getWater().observe(this, waters -> {
-            progressBarWaterDrank.setMax(waterViewModel.getWaterAmountToDrink());
-            int sum = waters.stream().mapToInt(
-                    Water::getWaterDrank
-            ).sum();
-            progressBarWaterDrank.setProgress(sum);
-            String waterStatus = sum + " / " + waterViewModel.getWaterAmountToDrink();
-            textViewWaterToDrink.setText(waterStatus);
-            textViewDate.setText(waterViewModel.getActiveDate().toString());
-        });
+        waterViewModel.getWater().observe(this, this::setObserverOnWaters);
 
-//      loading data for today
-        waterViewModel.loadWaterByDate(LocalDate.now());
+//      checking if it is a restart (rotation of a screen) or a app is starting
+        if (savedInstanceState == null) {
+//          loading data for today
+            waterViewModel.loadWaterByDate(LocalDate.now());
+        }
     }
 
     @Override
@@ -142,6 +133,17 @@ public class MainActivity extends AppCompatActivity {
 
         removeWaterDrankButton = findViewById(R.id.buttonRemoveWaterDrank);
         removeWaterDrankButton.setOnClickListener(this::onClickRemoveWaterDrankAction);
+    }
+
+    public void setObserverOnWaters(WaterDay waterDay) {
+        progressBarWaterDrank.setMax(waterViewModel.getWaterAmountToDrink());
+        int sum = waterDay.getWater().stream().mapToInt(
+                Water::getWaterDrank
+        ).sum();
+        progressBarWaterDrank.setProgress(sum);
+        String waterStatus = sum + " / " + waterViewModel.getWaterAmountToDrink();
+        textViewWaterToDrink.setText(waterStatus);
+        textViewDate.setText(waterViewModel.getActiveDate().toString());
     }
 
     /**
@@ -180,7 +182,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateWaterFromDialogs(int result, Type type) {
-        Water waterUpdated = waterViewModel.getWaterValue()
+        List<Water> watersUpdated = waterViewModel.getWaterValue().getWater();
+        Water waterUpdated = watersUpdated
                 .stream()
                 .filter(water ->
                         water.getTypeId() == type.getId())
@@ -192,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 .orElseGet(() ->
                         new Water(waterViewModel.getActiveDate(), waterViewModel.getWaterAmountToDrink(), result, type)
                 );
-        if (waterUpdated.getWaterDrank() < 0) {
+        if (waterUpdated.getWaterDrank() <= 0) {
             waterViewModel.deleteWater(waterUpdated);
         } else {
             waterViewModel.insertWater(waterUpdated);
@@ -208,16 +211,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        waterViewModel.getWater().observe(this, waters -> {
-            progressBarWaterDrank.setMax(waterViewModel.getWaterAmountToDrink());
-            int sum = waters.stream().mapToInt(
-                    Water::getWaterDrank
-            ).sum();
-            progressBarWaterDrank.setProgress(sum);
-            String waterStatus = sum + " / " + waterViewModel.getWaterAmountToDrink();
-            textViewWaterToDrink.setText(waterStatus);
-            textViewDate.setText(waterViewModel.getActiveDate().toString());
-        });
+        waterViewModel.getWater().observe(this, this::setObserverOnWaters);
     }
 
     @Override

@@ -10,12 +10,11 @@ import androidx.lifecycle.ViewModel;
 import com.kamjer.woda.R;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
+import com.kamjer.woda.model.WaterDay;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +23,7 @@ import java.util.stream.Collectors;
 import io.reactivex.rxjava3.disposables.Disposable;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.SerialDisposable;
 import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
@@ -35,6 +35,8 @@ public class WaterViewModel extends ViewModel {
     public static final int DEFAULT_WATER_DRANK_IN_ONE_GO = 250;
 
     private WaterDataRepository repository;
+
+    private final SerialDisposable disposable = new SerialDisposable();
 
     public void createDataBase(Context context) {
         getRepository().createWaterDatabase(context);
@@ -55,27 +57,38 @@ public class WaterViewModel extends ViewModel {
     public void loadWaterAmount(AppCompatActivity activity) {
         SharedPreferences sharedPref = activity.getSharedPreferences(activity.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         int test = sharedPref.getInt(activity.getString(R.string.water_amount_to_drink), DEFAULT_WATER_TO_DRINK);
-        getRepository().setWaterAmountToDrink(test);
+        getWaterValue().setWaterAmountToDrink(test);
     }
 
-    public Disposable loadWaterById(long id, Consumer<Water> onSuccess) {
-        return getRepository().getWaterDAO().getWaterById(id).subscribeOn(Schedulers.io())
+    public void loadWaterById(long id, Consumer<Water> onSuccess) {
+        disposable.set(getRepository().getWaterDAO().getWaterById(id).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         onSuccess,
                         RxJavaPlugins::onError
-                );
+                ));
     }
 
     public void loadWaterByDate(LocalDate date) {
-        setActiveDate(date);
-        Disposable waterByDateDisposable =  loadWaterByDate(date, this::setWaterValue);
+        loadWaterByDate(date, waters -> {
+            WaterDay waterDay = new WaterDay();
+            waterDay.setDate(date);
+            waterDay.setWater(waters);
+//            TODO: save waterDay to the database in a new Table where water
+//            if there are already waters in this day in a database get water amount from them
+            if (waters.size()>0) {
+                waterDay.setWaterAmountToDrink(waters.get(0).getWaterToDrink());
+            } else {
+                waterDay.setWaterAmountToDrink(getWaterAmountToDrink());
+            }
+            setWaterValue(waterDay);
+        });
     }
-    public Disposable loadWaterByDate(LocalDate date, Consumer<List<Water>> onSuccess) {
-        return getRepository().getWaterDAO().getWaterByDate(date.toString())
+    public void loadWaterByDate(LocalDate date, Consumer<List<Water>> onSuccess) {
+        disposable.set(getRepository().getWaterDAO().getWaterByDate(date.toString())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(onSuccess, RxJavaPlugins::onError);
+                .subscribe(onSuccess, RxJavaPlugins::onError));
     }
 
     public Disposable loadWaterAll(Consumer<List<Water>> onSuccess) {
@@ -97,83 +110,107 @@ public class WaterViewModel extends ViewModel {
     }
 
     public void insertWater(Water water) {
-        Disposable waterDisposable = insertWater(water, () -> addWater(water));
+        insertWater(water, aLong -> {
+            water.setId(aLong);
+            addWaterInDay(water);
+        });
     }
     
-    public Disposable insertWater(Water water, Action onSuccess) {
-        return getRepository().getWaterDAO().insertWater(water).subscribeOn(Schedulers.io())
+    public void insertWater(Water water, Consumer<Long> onSuccess) {
+        disposable.set(getRepository().getWaterDAO().insertWater(water).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).
                 subscribe(
                         onSuccess,
                         RxJavaPlugins::onError
-                );
+                ));
     }
 
     public void insertType(Type type) {
-        Disposable disposable = insertType(type, aLong -> {
+        insertType(type, aLong -> {
             type.setId(aLong);
             putType(type);
         });
     }
 
-    public Disposable insertType(Type type, Consumer<Long> onSuccess) {
-        return getRepository().getWaterDAO().insertType(type)
+    public void insertType(Type type, Consumer<Long> onSuccess) {
+        disposable.set(getRepository().getWaterDAO().insertType(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         onSuccess,
                         RxJavaPlugins::onError
-                );
+                ));
     }
 
     private void putType(Type type) {
         getRepository().putType(type);
     }
 
-    public MutableLiveData<List<Water>> getWater() {
+    public MutableLiveData<WaterDay> getWater() {
         return getRepository().getWaters();
     }
 
-    public void addWater(Water water) {
+    public void addWaterInDay(Water water) {
         getRepository().addWaterValue(water);
     }
 
-    public void setWaterValue(List<Water> waters) {
+    public void removeWaterInDay(Water water) {
+        getRepository().removeWaterValue(water);
+    }
+
+    public void setWatersInDay(List<Water> watersInDay) {
+        WaterDay waterDay = getRepository().getWaterDayValue();
+        waterDay.setWater(watersInDay);
+        getRepository().getWaters().setValue(waterDay);
+    }
+
+    public void setWaterValue(WaterDay waters) {
         getRepository().getWaters().setValue(waters);
     }
 
-    public List<Water> getWaterValue() {
-        return Optional.ofNullable(getRepository().getWaters().getValue()).orElseGet(ArrayList::new);
+    public WaterDay getWaterValue() {
+        return Optional.ofNullable(getRepository().getWaters().getValue()).orElseGet(WaterDay::new);
     }
 
     public int getWaterAmountToDrink() {
-        return Optional.ofNullable(getRepository().getWaterAmountToDrink()).orElse(DEFAULT_WATER_TO_DRINK);
+        return Optional.ofNullable(getRepository().getWaterDayValue().getWaterAmountToDrink()).orElse(DEFAULT_WATER_TO_DRINK);
     }
 
     public void setWaterAmountToDrink(int waterAmountToDrink) {
-        getRepository().setWaterAmountToDrink(waterAmountToDrink);
-        getRepository().setWaters(getWaterValue().stream()
-                .peek(water -> {
-                    water.setWaterToDrink(waterAmountToDrink);
-                    this.insertWater(water);
-                })
-                .collect(Collectors.toList()));
+        getRepository().getWaterDayValue().setWaterAmountToDrink(waterAmountToDrink);
+        insertWatersInADay();
+    }
+
+    /**
+     * Inserts waters from active day to the database (updates them if already there)
+     */
+    public void insertWatersInADay() {
+        getRepository().getWaterDayValue()
+                .getWater()
+                .forEach(water -> {
+                    insertWater(water);
+                });
     }
 
     public void deleteWater(Water water) {
-        getRepository().deleteWater(water);
+        deleteWater(water, () -> removeWaterInDay(water));
+    }
+
+    public void deleteWater(Water water, Action action) {
+        disposable.set(getRepository().getWaterDAO().deleteWater(water).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        action,
+                        RxJavaPlugins.getErrorHandler()
+                ));
     }
 
     public Map<String, Type> getWaterTypes() {
         return getRepository().getWaterTypes();
     }
 
-    public void setActiveDate(LocalDate date) {
-        WaterDataRepository.getInstance().setActiveDate(date);
-    }
-
     public LocalDate getActiveDate() {
-        return getRepository().getActiveDate();
+        return getWaterValue().getDate();
     }
 
     public WaterDataRepository getRepository() {
