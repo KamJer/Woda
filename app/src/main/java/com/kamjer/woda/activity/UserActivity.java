@@ -2,18 +2,14 @@ package com.kamjer.woda.activity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kamjer.woda.R;
-import com.kamjer.woda.viewmodel.WaterDataRepository;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 public class UserActivity extends AppCompatActivity {
@@ -42,7 +38,7 @@ public class UserActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(getString(R.string.water_amount_to_drink), waterAmountToDrink);
         editor.apply();
-        waterViewModel.setWaterAmountToDrink(waterAmountToDrink);
+        waterViewModel.setWaterToDrink(waterAmountToDrink);
         this.finish();
     }
 }

@@ -1,15 +1,19 @@
 package com.kamjer.woda.viewmodel;
 
 import android.content.Context;
+import android.graphics.Path;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.RoomSQLiteQuery;
 
 import com.kamjer.woda.database.dao.WaterDAO;
 import com.kamjer.woda.database.WaterDatabase;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.model.WaterDay;
+import com.kamjer.woda.model.WaterDayWithWaters;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,12 +31,7 @@ public class WaterDataRepository {
 
     private WaterDatabase waterDatabase;
     private WaterDAO waterDAO;
-
-//    private Integer waterAmountToDrink;
-
-//    private LocalDate activeDate = LocalDate.now();
-
-    private MutableLiveData<WaterDay> waters = new MutableLiveData<>();
+    private MutableLiveData<WaterDayWithWaters> waters = new MutableLiveData<>();
 
     private HashMap<String, Type> waterTypes = new HashMap<>();
     public WaterDataRepository() {
@@ -43,6 +42,7 @@ public class WaterDataRepository {
         if (waterDatabase == null) {
             this.waterDatabase = Room.databaseBuilder(context, WaterDatabase.class, WaterDataRepository.DATABASE_NAME)
                     .addMigrations(WaterDatabase.MIGRATION_1_2)
+                    .addMigrations(WaterDatabase.MIGRATION_2_3)
                     .build();
             this.waterDAO = waterDatabase.waterDAO();
         }
@@ -59,33 +59,32 @@ public class WaterDataRepository {
         waterTypes.put(type.getType(), type);
     }
 
-    public void setWatersValue(WaterDay waters) {
+    public void setWatersValue(WaterDayWithWaters waters) {
         this.waters.setValue(waters);
     }
 
-    public MutableLiveData<WaterDay> getWaters() {
+    public MutableLiveData<WaterDayWithWaters> getWaters() {
         return waters;
     }
 
     public void addWaterValue(Water water) {
-//        creates new waterDay value if waterDay is null
-        WaterDay waters = Optional.ofNullable(this.waters.getValue()).orElseGet(WaterDay::new);
-        if (!waters.getWater().contains(water)) {
-            waters.getWater().add(water);
+//      getting waterDayWithWaters or creating it
+        WaterDayWithWaters waterDayWithWaters = Optional.ofNullable(this.waters.getValue()).orElseGet(() -> new WaterDayWithWaters(LocalDate.now(), 1500));
+//      getting waterDay from WaterDayWithWaters or creating it
+        WaterDay waterDay = waterDayWithWaters.getWaterDay();
+//      getting waters from WaterDayWithWaters or creating it
+        List<Water> waters = waterDayWithWaters.getWaters();
+        water.setWaterDayId(waterDay.getId());
+        if (!waters.contains(water)) {
+            waters.add(water);
         }
-        this.waters.setValue(waters);
+        this.waters.setValue(waterDayWithWaters);
     }
 
     public void removeWaterValue(Water water) {
-        WaterDay waters = Optional.ofNullable(this.waters.getValue()).orElseGet(WaterDay::new);
-        waters.getWater().remove(water);
-        this.waters.setValue(waters);
-    }
-
-    public void setActiveDate(LocalDate date) {
-        WaterDay waters = Optional.ofNullable(this.waters.getValue()).orElseGet(WaterDay::new);
-        waters.setDate(date);
-        this.waters.setValue(waters);
+        WaterDayWithWaters waterDayWithWaters = Optional.ofNullable(this.waters.getValue()).orElseGet(() -> new WaterDayWithWaters(LocalDate.now(), WaterViewModel.DEFAULT_WATER_TO_DRINK));
+        waterDayWithWaters.getWaters().remove(water);
+        this.waters.setValue(waterDayWithWaters);
     }
 
     public WaterDatabase getWaterDatabase() {
@@ -104,12 +103,12 @@ public class WaterDataRepository {
         return waterDAO;
     }
 
-    public void setWaterDayValue(WaterDay waterDay) {
-        waters.setValue(waterDay);
+    public void setWaterDayValue(WaterDayWithWaters waterDayWithWaters) {
+        waters.setValue(waterDayWithWaters);
     }
 
-    public WaterDay getWaterDayValue() {
-        return Optional.ofNullable(waters.getValue()).orElse(new WaterDay());
+    public WaterDayWithWaters getWaterDayValue() {
+        return Optional.ofNullable(waters.getValue()).orElse(new WaterDayWithWaters(LocalDate.now(), WaterViewModel.DEFAULT_WATER_TO_DRINK));
     }
     public Map<String, Type> getWaterTypes() {
         return waterTypes;
@@ -117,5 +116,13 @@ public class WaterDataRepository {
 
     public void setWaterTypes(Map<String, Type> waterTypes) {
         this.waterTypes = (HashMap<String, Type>) waterTypes;
+    }
+
+    public int getWaterToDrink() {
+        return getWaterDayValue().getWaterDay().getWaterToDrink();
+    }
+
+    public void setWaterToDrink(int waterToDrink) {
+        getWaterDayValue().getWaterDay().setWaterToDrink(waterToDrink);
     }
 }

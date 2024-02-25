@@ -3,11 +3,8 @@ package com.kamjer.woda.activity;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.ViewModelProvider;
@@ -18,6 +15,7 @@ import com.kamjer.mycalendarview.SelectedDataChangedListener;
 import com.kamjer.woda.R;
 import com.kamjer.woda.activity.calendaractivity.WaterCalendarViewHolder;
 import com.kamjer.woda.model.Water;
+import com.kamjer.woda.model.WaterDayWithWaters;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.time.LocalDate;
@@ -28,7 +26,7 @@ public class CalendarActivity extends AppCompatActivity {
 
     private WaterViewModel waterViewModel;
     private CalendarView calendarView;
-    private List<Water> waters;
+    private List<WaterDayWithWaters> waters;
 
     @Override
     protected void onStart() {
@@ -63,7 +61,7 @@ public class CalendarActivity extends AppCompatActivity {
     }
 
     private void fetchData() {
-        waterViewModel.loadWaterAll(waters -> {
+        waterViewModel.loadAllWaterDayWithWaters(waters -> {
             CalendarActivity.this.waters = waters;
 //          after complete setup show days of month
             calendarView.showMonthView();
@@ -77,14 +75,14 @@ public class CalendarActivity extends AppCompatActivity {
      * @param waters list of water from specific dates
      * @param holder to modify
      */
-    private void colorDays(List<Water> waters, CalendarViewHolder holder) {
+    private void colorDays(List<WaterDayWithWaters> waters, CalendarViewHolder holder) {
         if (holder instanceof WaterCalendarViewHolder) {
             WaterCalendarViewHolder waterHolder = (WaterCalendarViewHolder) holder;
 
             findWaterByDate(waters, holder.getDate()).map(waterFound -> {
 //                  painting elements for a found water
 //                  normalizing water drank
-                float normalizedWater = Math.min(1.0f, (float) waterFound.getWaterDrank() / (float) waterFound.getWaterToDrink());
+                float normalizedWater = Math.min(1.0f, (float) waterFound.getWaterDaySum() / (float) waterFound.getWaterDay().getWaterToDrink());
 //                  we want it to be half see through (a = 255/2)
                 int a = 255;
 //                  calculating green value
@@ -93,8 +91,10 @@ public class CalendarActivity extends AppCompatActivity {
                 int r = (int) (255 - g);
 
                 Drawable circle = ResourcesCompat.getDrawable(CalendarActivity.this.getResources(), R.drawable.circle, null);
-                circle.setColorFilter(Color.argb(a, r, g, 0), PorterDuff.Mode.SRC_OUT);
-                waterHolder.getCircle().setBackground(circle);
+                if (circle != null) {
+                    circle.setColorFilter(Color.argb(a, r, g, 0), PorterDuff.Mode.SRC_OUT);
+                    waterHolder.getCircle().setBackground(circle);
+                }
                 return waterFound;
             }).orElseGet(() -> {
 //                  we want it to be half see through
@@ -102,8 +102,10 @@ public class CalendarActivity extends AppCompatActivity {
 //                  painting day in red (no value found, no water in a database, no water drank)
                 int r = 255;
                 Drawable circle = ResourcesCompat.getDrawable(CalendarActivity.this.getResources(), R.drawable.circle, null);
-                circle.setColorFilter(Color.argb(a, r, 0, 0), PorterDuff.Mode.SRC_OUT);
-                waterHolder.getCircle().setBackground(circle);
+                if (circle != null) {
+                    circle.setColorFilter(Color.argb(a, r, 0, 0), PorterDuff.Mode.SRC_OUT);
+                    waterHolder.getCircle().setBackground(circle);
+                }
                 return null;
             });
         }
@@ -115,7 +117,7 @@ public class CalendarActivity extends AppCompatActivity {
      * @param localDate new date
      */
     private void dataChangedAction(View view, LocalDate localDate) {
-        waterViewModel.loadWaterByDate(localDate);
+        waterViewModel.loadWaterDayWithWatersByDate(localDate);
         this.finish();
     }
 
@@ -125,7 +127,7 @@ public class CalendarActivity extends AppCompatActivity {
      * @param date to fond
      * @return Optional of a found water
      */
-    private Optional<Water> findWaterByDate(List<Water> waters, LocalDate date) {
-        return waters.stream().filter(water -> water.getDate().equals(date)).findFirst();
+    private Optional<WaterDayWithWaters> findWaterByDate(List<WaterDayWithWaters> waters, LocalDate date) {
+        return waters.stream().filter(water -> water.getWaterDay().getDate().equals(date)).findFirst();
     }
 }

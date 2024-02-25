@@ -13,7 +13,6 @@ public class Type implements Serializable {
     private long id;
     private String type;
 
-    @Ignore
     public Type() {
     }
 

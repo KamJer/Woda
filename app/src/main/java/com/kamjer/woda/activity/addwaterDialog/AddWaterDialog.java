@@ -78,30 +78,4 @@ public class AddWaterDialog extends AppCompatActivity {
         setResult(Activity.RESULT_OK, getIntent());
         this.finish();
     }
-
-    public int getWaterAmount() {
-        return waterAmount;
-    }
-
-    private static Path createWaterPath(Path glassPath, float waterLevel) {
-        Path waterPath = new Path(glassPath);
-
-        android.graphics.RectF bounds = new android.graphics.RectF();
-        glassPath.computeBounds(bounds, true);
-
-        // Interpolate the water level based on the bounds of the glass
-        float waterTop = bounds.top + (1 - waterLevel) * bounds.height();
-
-        // Clear the existing path data and move to the starting point
-        waterPath.reset();
-        waterPath.moveTo(bounds.left, waterTop);
-
-        // Draw the water path
-        waterPath.lineTo(bounds.right, waterTop);
-        waterPath.lineTo(bounds.right, bounds.bottom);
-        waterPath.lineTo(bounds.left, bounds.bottom);
-        waterPath.close();
-
-        return waterPath;
-    }
 }

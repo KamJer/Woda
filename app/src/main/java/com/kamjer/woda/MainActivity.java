@@ -26,7 +26,7 @@ import com.kamjer.woda.activity.UserActivity;
 import com.kamjer.woda.activity.listeners.ChangeWatersGestureListener;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
-import com.kamjer.woda.model.WaterDay;
+import com.kamjer.woda.model.WaterDayWithWaters;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.time.LocalDate;
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 //      checking if it is a restart (rotation of a screen) or a app is starting
         if (savedInstanceState == null) {
 //          loading data for today
-            waterViewModel.loadWaterByDate(LocalDate.now());
+            waterViewModel.loadWaterDayWithWatersByDate(LocalDate.now());
         }
     }
 
@@ -135,11 +135,9 @@ public class MainActivity extends AppCompatActivity {
         removeWaterDrankButton.setOnClickListener(this::onClickRemoveWaterDrankAction);
     }
 
-    public void setObserverOnWaters(WaterDay waterDay) {
+    public void setObserverOnWaters(WaterDayWithWaters waterDayWithWaters) {
         progressBarWaterDrank.setMax(waterViewModel.getWaterAmountToDrink());
-        int sum = waterDay.getWater().stream().mapToInt(
-                Water::getWaterDrank
-        ).sum();
+        int sum = waterDayWithWaters.getWaterDaySum();
         progressBarWaterDrank.setProgress(sum);
         String waterStatus = sum + " / " + waterViewModel.getWaterAmountToDrink();
         textViewWaterToDrink.setText(waterStatus);
@@ -182,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateWaterFromDialogs(int result, Type type) {
-        List<Water> watersUpdated = waterViewModel.getWaterValue().getWater();
+        List<Water> watersUpdated = waterViewModel.getWaterValue().getWaters();
         Water waterUpdated = watersUpdated
                 .stream()
                 .filter(water ->
@@ -192,25 +190,37 @@ public class MainActivity extends AppCompatActivity {
                     water.setWaterDrank(water.getWaterDrank() + result);
                     return water;
                 })
-                .orElseGet(() ->
-                        new Water(waterViewModel.getActiveDate(), waterViewModel.getWaterAmountToDrink(), result, type)
+                .orElseGet(() -> new Water(result, type, waterViewModel.getWaterValue().getWaterDay())
                 );
         if (waterUpdated.getWaterDrank() <= 0) {
             waterViewModel.deleteWater(waterUpdated);
         } else {
-            waterViewModel.insertWater(waterUpdated);
+//          checking if waterDay is already in a database and if it is not insert it
+            if (!waterViewModel.getWaterValue().getWaterDay().isInserted()) {
+                waterViewModel.insertWaterDay(waterViewModel.getWaterValue().getWaterDay(), aLong -> {
+//                  sets new id for a waterDay
+                    waterViewModel.getWaterValue().getWaterDay().setId(aLong);
+                    waterViewModel.getWaterValue().getWaterDay().setInserted(true);
+//                  triggers insertion of a water if insertion of a day was successful
+                    waterViewModel.insertWater(waterUpdated);
+                });
+            } else {
+                waterViewModel.insertWater(waterUpdated);
+            }
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        waterViewModel.clearDisposable();
         waterViewModel.getWater().removeObservers(this);
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
+        waterViewModel.clearDisposable();
         waterViewModel.getWater().observe(this, this::setObserverOnWaters);
     }
 

@@ -7,11 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.kamjer.woda.MainActivity;
-import com.kamjer.woda.model.Water;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 public class ChangeWatersGestureListener implements GestureDetector.OnGestureListener {
 
@@ -53,9 +51,9 @@ public class ChangeWatersGestureListener implements GestureDetector.OnGestureLis
         LocalDate currentDate = waterViewModel.getActiveDate();
         float direction = e1.getX() - e2.getX();
         if (direction > 0) {
-            waterViewModel.loadWaterByDate(currentDate.plusDays(1));
+            waterViewModel.loadWaterDayWithWatersByDate(currentDate.plusDays(1));
         } else {
-            waterViewModel.loadWaterByDate(currentDate.minusDays(1));
+            waterViewModel.loadWaterDayWithWatersByDate(currentDate.minusDays(1));
         }
         return true;
     }

@@ -1,27 +1,30 @@
 package com.kamjer.woda.model;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
+@Entity(tableName = "water_day")
 public class WaterDay {
+    @PrimaryKey(autoGenerate = true)
+    private long id;
     private LocalDate date;
 
-    private Integer waterAmountToDrink;
+    private Integer waterToDrink;
 
-    private List<Water> water = new ArrayList<>();
+    @Ignore
+    private boolean inserted;
 
     public WaterDay() {
+        this.inserted = false;
     }
 
-    public WaterDay(LocalDate date, int waterAmountToDrink, List<Water> water) {
+    public WaterDay(LocalDate date, int waterAmountToDrink, boolean inserted) {
         this.date = date;
-        this.waterAmountToDrink = waterAmountToDrink;
-        this.water = water;
+        this.waterToDrink = waterAmountToDrink;
+        this.inserted = inserted;
     }
 
     public LocalDate getDate() {
@@ -32,21 +35,27 @@ public class WaterDay {
         this.date = date;
     }
 
-    public List<Water> getWater() {
-        return water;
+    public Integer getWaterToDrink() {
+        return waterToDrink;
     }
 
-    public void setWater(List<Water> water) {
-        this.water = water;
+    public void setWaterToDrink(Integer waterToDrink) {
+        this.waterToDrink = waterToDrink;
     }
 
-    public Integer getWaterAmountToDrink() {
-        return waterAmountToDrink;
+    public long getId() {
+        return id;
     }
 
-    public void setWaterAmountToDrink(int waterAmountToDrink) {
-        this.waterAmountToDrink = waterAmountToDrink;
+    public void setId(long id) {
+        this.id = id;
+    }
 
-        water.forEach(water -> water.setWaterToDrink(waterAmountToDrink));
+    public boolean isInserted() {
+        return inserted;
+    }
+
+    public void setInserted(boolean inserted) {
+        this.inserted = inserted;
     }
 }
