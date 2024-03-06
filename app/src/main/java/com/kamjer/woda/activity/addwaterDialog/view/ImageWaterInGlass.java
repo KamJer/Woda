@@ -2,7 +2,6 @@ package com.kamjer.woda.activity.addwaterDialog.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -12,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.core.graphics.PathParser;
 
 import com.google.android.material.imageview.ShapeableImageView;
+import com.kamjer.woda.utils.FloatPoint;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.util.Arrays;
@@ -22,15 +22,10 @@ public class ImageWaterInGlass extends ShapeableImageView {
 
     private Path customPath;
 //    image size in pd
-    private int imageSizeX = 200;
-    private int imageSizeY = 200;
-
-    float scaleX;
-    float scaleY;
-
-    private Paint paint = new Paint();
-    private Matrix matrix = new Matrix();
-    int amount = 0;
+    private static final int IMAGE_SIZE_X = 200;
+    private static final int IMAGE_SIZE_Y = 200;
+    private final Paint paint = new Paint();
+    private final Matrix matrix = new Matrix();
 
     public ImageWaterInGlass(Context context) {
         super(context);
@@ -45,7 +40,6 @@ public class ImageWaterInGlass extends ShapeableImageView {
     }
 
     public void setAmount(int amount) {
-        this.amount = amount;
         StringBuilder bd = new StringBuilder();
 
         if (amount<= WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO) {
@@ -99,8 +93,10 @@ public class ImageWaterInGlass extends ShapeableImageView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        scaleX = (float) getWidth() / imageSizeX;
-        scaleY = (float) getHeight() / imageSizeY;
+        matrix.reset();
+
+        float scaleX = (float) getWidth() / IMAGE_SIZE_X;
+        float scaleY = (float) getHeight() / IMAGE_SIZE_Y;
 
         matrix.postScale(scaleX, scaleY);
 
@@ -113,15 +109,6 @@ public class ImageWaterInGlass extends ShapeableImageView {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
 
         canvas.drawPath(customPath, paint);
-    }
-
-    private List<FloatPoint> separatePathData(String path) {
-        return Arrays.stream(path.split(" ")).map(s -> {
-            String[] coordinates = s.split(",");
-            float x = Integer.parseInt(coordinates[0]);
-            float y = Integer.parseInt(coordinates[1]);
-            return new FloatPoint(x, y);}
-        ).collect(Collectors.toList());
     }
 
     private FloatPoint newLeftPointInGlass(float amount) {
@@ -189,36 +176,5 @@ public class ImageWaterInGlass extends ShapeableImageView {
         float b = 2089.552239f;
 
         return (amount - b) / a;
-    }
-
-    public static double roundAvoid(float value, int places) {
-        double scale = Math.pow(10, places);
-        return Math.round(value * scale) / scale;
-    }
-
-    private static class FloatPoint {
-        private float x;
-        private float y;
-
-        public FloatPoint(float x, float y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public float getX() {
-            return x;
-        }
-
-        public void setX(float x) {
-            this.x = x;
-        }
-
-        public float getY() {
-            return y;
-        }
-
-        public void setY(float y) {
-            this.y = y;
-        }
     }
 }

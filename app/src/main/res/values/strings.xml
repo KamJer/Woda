@@ -10,7 +10,17 @@
     <string name="water_goal">Woda do wypicia [ml]</string>
     <string name="water_amount_to_drink">waterAmountToDrink</string>
     <string name="shared_preferences">com.kamjer.woda.SHARED_PREFERENCES</string>
-    <string name="removeWaterDrankButtonTex">-</string>
+    <string name="remove_water_drank_button_tex">-</string>
     <string name="goal">Cel</string>
-
+    <string name="add_water_button_text">Dodaj</string>
+    <string name="remove_water_button_text">Odejmij</string>
+    <string name="error_message">Coś poszło nie tak!</string>
+    <string name="user_activity_background_description">background</string>
+    <string name="user_activity_accept_values_description">accept values</string>
+    <string-array name="default_types">
+        <item>Woda</item>
+        <item>Kawa</item>
+        <item>Herbata</item>
+        <item>Napój gazowany</item>
+    </string-array>
 </resources>

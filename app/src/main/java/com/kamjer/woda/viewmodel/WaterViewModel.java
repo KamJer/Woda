@@ -2,7 +2,6 @@ package com.kamjer.woda.viewmodel;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
@@ -15,7 +14,7 @@ import com.kamjer.woda.model.WaterDay;
 import com.kamjer.woda.model.WaterDayWithWaters;
 
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,25 +37,27 @@ public class WaterViewModel extends ViewModel {
 
     public void createDataBase(Context context) {
         getRepository().createWaterDatabase(context);
+        getRepository().loadDefaultTypes(context);
+
         disposable.add(getRepository().getWaterDAO().getAllTypes()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(types -> {
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(types -> {
                     getRepository().setWaterTypes(types.stream().collect(Collectors.toMap(
-                            Type::getType,
+                            Type::getId,
                             type -> type)));
-//                  if this map is empty it means something went wrong and values that are supposed to be in a database are not,
-//                  fetching default values and inserting them there to be sure they are there
-                    if (getRepository().getWaterTypes().isEmpty()) {
-                        Arrays.stream(WaterDataRepository.DEFAULT_DRINKS_TYPES).
-                                forEach(s -> this.insertType(new Type(s)));
-                    }
+//                  fetching default values
+//                  check if all default types are in a database and if some are not insert them
+                    WaterDataRepository.containsDefaultTypes(getRepository().getDefaultDrinksTypes(), getRepository().getWaterTypes()).forEach(this::insertType);
                 }));
     }
+    
+    
 
     public void loadWaterAmount(AppCompatActivity activity) {
         SharedPreferences sharedPref = activity.getSharedPreferences(activity.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-        int test = sharedPref.getInt(activity.getString(R.string.water_amount_to_drink), DEFAULT_WATER_TO_DRINK);
-        getWaterValue().getWaterDay().setWaterToDrink(test);
+        int waterToDrink = sharedPref.getInt(activity.getString(R.string.water_amount_to_drink), DEFAULT_WATER_TO_DRINK);
+        getRepository().setWaterToDrink(waterToDrink);
     }
 
     public void loadWaterById(long id, Consumer<Water> onSuccess) {
@@ -208,7 +209,7 @@ public class WaterViewModel extends ViewModel {
     }
 
     public int getWaterAmountToDrink() {
-        return getRepository().getWaterToDrink();
+        return getRepository().getWaterToDrinkSaved();
     }
 
     public void setWaterToDrink(int waterToDrink) {
@@ -238,7 +239,7 @@ public class WaterViewModel extends ViewModel {
                 ));
     }
 
-    public Map<String, Type> getWaterTypes() {
+    public Map<Long, Type> getWaterTypes() {
         return getRepository().getWaterTypes();
     }
 
@@ -260,4 +261,12 @@ public class WaterViewModel extends ViewModel {
     public void clearDisposable() {
         disposable.clear();
     }
+
+    /**
+     * Chcekcs if past array is contained in a map, if it is not type is saved in a list and returned
+     * @param typeArray - array to check
+     * @param typeMap - map to compare too
+     * @return list of types not found
+     */
+
 }

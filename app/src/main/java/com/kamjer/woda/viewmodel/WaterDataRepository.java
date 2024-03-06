@@ -1,13 +1,11 @@
 package com.kamjer.woda.viewmodel;
 
 import android.content.Context;
-import android.graphics.Path;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.room.Room;
-import androidx.room.RoomDatabase;
-import androidx.room.RoomSQLiteQuery;
 
+import com.kamjer.woda.R;
 import com.kamjer.woda.database.dao.WaterDAO;
 import com.kamjer.woda.database.WaterDatabase;
 import com.kamjer.woda.model.Type;
@@ -21,28 +19,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class WaterDataRepository {
 
     private static WaterDataRepository instance;
 
     public static final String DATABASE_NAME = "water";
-    public static final String[] DEFAULT_DRINKS_TYPES = new String[] {"Water", "Coffee", "Tea", "Soda"};
 
     private WaterDatabase waterDatabase;
     private WaterDAO waterDAO;
-    private MutableLiveData<WaterDayWithWaters> waters = new MutableLiveData<>();
+    private int waterToDrink;
+    private final MutableLiveData<WaterDayWithWaters> waters = new MutableLiveData<>();
 
-    private HashMap<String, Type> waterTypes = new HashMap<>();
+    private HashMap<Long, Type> waterTypes = new HashMap<>();
+
+    private Type[] defaultDrinksTypes;
+
     public WaterDataRepository() {
+    }
+
+    public void loadDefaultTypes(Context context) {
+        String[] defaultDrinksTypesText = context.getResources().getStringArray(R.array.default_types);
+        int[] defaultDrinksTypesColor = context.getResources().getIntArray(R.array.types_default_color);
+        defaultDrinksTypes = new Type[defaultDrinksTypesText.length];
+        for (int i = 0; i < defaultDrinksTypesText.length; i++) {
+            defaultDrinksTypes[i] = new Type(defaultDrinksTypesText[i], defaultDrinksTypesColor[i]);
+        }
     }
 
     public void createWaterDatabase(Context context) {
 //        if database does not exists already create a new one
         if (waterDatabase == null) {
             this.waterDatabase = Room.databaseBuilder(context, WaterDatabase.class, WaterDataRepository.DATABASE_NAME)
-                    .addMigrations(WaterDatabase.MIGRATION_1_2)
-                    .addMigrations(WaterDatabase.MIGRATION_2_3)
                     .build();
             this.waterDAO = waterDatabase.waterDAO();
         }
@@ -56,7 +65,7 @@ public class WaterDataRepository {
     }
 
     public void putType(Type type) {
-        waterTypes.put(type.getType(), type);
+        waterTypes.put(type.getId(), type);
     }
 
     public void setWatersValue(WaterDayWithWaters waters) {
@@ -87,42 +96,53 @@ public class WaterDataRepository {
         this.waters.setValue(waterDayWithWaters);
     }
 
-    public WaterDatabase getWaterDatabase() {
-        return waterDatabase;
-    }
-
-    public void setWaterDatabase(WaterDatabase waterDatabase) {
-        this.waterDatabase = waterDatabase;
-    }
-
-    public void setWaterDAO(WaterDAO waterDAO) {
-        this.waterDAO = waterDAO;
-    }
-
     public WaterDAO getWaterDAO() {
         return waterDAO;
-    }
-
-    public void setWaterDayValue(WaterDayWithWaters waterDayWithWaters) {
-        waters.setValue(waterDayWithWaters);
     }
 
     public WaterDayWithWaters getWaterDayValue() {
         return Optional.ofNullable(waters.getValue()).orElse(new WaterDayWithWaters(LocalDate.now(), WaterViewModel.DEFAULT_WATER_TO_DRINK));
     }
-    public Map<String, Type> getWaterTypes() {
+    public Map<Long, Type> getWaterTypes() {
         return waterTypes;
     }
 
-    public void setWaterTypes(Map<String, Type> waterTypes) {
-        this.waterTypes = (HashMap<String, Type>) waterTypes;
+    public void setWaterTypes(Map<Long, Type> waterTypes) {
+        this.waterTypes = (HashMap<Long, Type>) waterTypes;
     }
 
-    public int getWaterToDrink() {
-        return getWaterDayValue().getWaterDay().getWaterToDrink();
+    public int getWaterToDrinkSaved() {
+        return waterToDrink;
+    }
+
+    private void setWaterToDrinkWaterDay(int waterToDrink) {
+        WaterDayWithWaters waterDayWithWatersToUpdate = getWaterDayValue();
+        waterDayWithWatersToUpdate.getWaterDay().setWaterToDrink(waterToDrink);
+        waters.setValue(waterDayWithWatersToUpdate);
     }
 
     public void setWaterToDrink(int waterToDrink) {
-        getWaterDayValue().getWaterDay().setWaterToDrink(waterToDrink);
+        this.waterToDrink = waterToDrink;
+        setWaterToDrinkWaterDay(waterToDrink);
+    }
+
+    public static List<Type> containsDefaultTypes(Type[] typeArray, Map<Long, Type> typeMap) {
+        List<Type> test = new ArrayList<>();
+//      loop through default drink types and check if it is in a database if it is not, add not found type to the list
+        for (Type type : typeArray) {
+            if (!typeMap.containsValue(type)) {
+                test.add(type);
+            }
+        }
+//      if types in a database does not contain default ones return those types that are not in a database, if database contains all of a default types list will have length of 0
+        return test;
+    }
+
+    public Type[] getDefaultDrinksTypes() {
+        return defaultDrinksTypes;
+    }
+
+    public List<Type> getUsedTypes(List<Water> waters) {
+        return waters.stream().map(water -> getWaterTypes().get(water.getTypeId())).collect(Collectors.toList());
     }
 }

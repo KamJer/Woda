@@ -6,7 +6,7 @@ import android.view.MotionEvent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.kamjer.woda.MainActivity;
+import com.kamjer.woda.activity.mainactivity.MainActivity;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.time.LocalDate;

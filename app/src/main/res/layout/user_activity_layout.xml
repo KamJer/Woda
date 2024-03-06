@@ -2,8 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -33,9 +32,17 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.98" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.10" />
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription="@string/user_activity_background_description"
         android:scaleType="centerCrop"
         android:src="@drawable/backgraound"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -44,8 +51,9 @@
 
     <EditText
         android:id="@+id/editTextNumber"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:autofillHints=""
         android:hint="@string/water_goal"
         android:inputType="number"
         android:textColor="@color/dark_grey"
@@ -53,15 +61,27 @@
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewTypeList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline8"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="@+id/guideline6"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
+        />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButtonSetWaterAmount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:clickable="true"
+        android:contentDescription="@string/user_activity_accept_values_description"
         android:src="@drawable/plus"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
-        app:layout_constraintEnd_toStartOf="@+id/guideline8"
-        android:layout_margin="10dp"
-        />
+        app:layout_constraintEnd_toStartOf="@+id/guideline8" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

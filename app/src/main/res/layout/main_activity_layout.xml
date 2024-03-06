@@ -71,28 +71,17 @@
         app:layout_constraintTop_toTopOf="@+id/guideline2"
         app:srcCompat="@drawable/bullseye" />
 
-    <ImageView
+    <com.kamjer.woda.activity.mainactivity.waterimage.WaterImage
+        android:id="@+id/imageWater"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:srcCompat="@drawable/glass"
         android:layout_above="@+id/relativeLayoutProgressBar"
-        android:layout_centerHorizontal="true"
         app:layout_constraintBottom_toTopOf="@+id/guideline5"
         app:layout_constraintEnd_toStartOf="@+id/guideline4"
         app:layout_constraintStart_toStartOf="@+id/guideline1"
         app:layout_constraintTop_toBottomOf="@+id/buttonCalendar"
-        android:background="@color/white"
-        app:srcCompat="@drawable/glass" />
-
-    <ImageView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_above="@+id/relativeLayoutProgressBar"
-        android:layout_centerHorizontal="true"
-        app:layout_constraintBottom_toTopOf="@+id/guideline5"
-        app:layout_constraintEnd_toStartOf="@+id/guideline4"
-        app:layout_constraintStart_toStartOf="@+id/guideline1"
-        app:layout_constraintTop_toBottomOf="@+id/buttonCalendar"
-        app:srcCompat="@drawable/water" />
+        />
 
     <RelativeLayout
         android:id="@+id/relativeLayoutProgressBar"

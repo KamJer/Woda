@@ -21,17 +21,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kamjer.mycalendarview.CalendarViewAdapter;
 import com.kamjer.woda.R;
+import com.kamjer.woda.model.Type;
 import com.kamjer.woda.recyclerWater.adapter.WaterAmountAdapter;
 import com.kamjer.woda.viewmodel.WaterDataRepository;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AddWaterDialog extends AppCompatActivity {
 
     private int waterAmount = WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO;
+    private boolean isRemove;
 
     public AddWaterDialog() {
 
@@ -47,13 +50,31 @@ public class AddWaterDialog extends AppCompatActivity {
         super.onStart();
         setContentView(R.layout.add_water_dialog);
 
+        String buttonText = getIntent().getStringExtra("buttonText");
+        isRemove = getIntent().getBooleanExtra("isRemove", false);
+
         EditText editTextAddWaterAmount = findViewById(R.id.editTextAddWaterAmount);
 
         Spinner spinnerTypeSList = findViewById(R.id.spinnerTypeList);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+
+        List<Type> typeNames;
+
+        if (isRemove) {
+//      getting used types in an active day to the list of types
+            typeNames = new ArrayList<>(WaterDataRepository.getInstance().getUsedTypes
+                    (WaterDataRepository.getInstance().getWaterDayValue().getWaters()));
+        } else {
+//      converting map of types to the list of types
+            typeNames = new ArrayList<>(WaterDataRepository
+                    .getInstance()
+                    .getWaterTypes()
+                    .values());
+        }
+
+        ArrayAdapter<Type> spinnerAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_dropdown_item,
-                new ArrayList<>(WaterDataRepository.getInstance().getWaterTypes().keySet()));
+                typeNames);
         spinnerTypeSList.setAdapter(spinnerAdapter);
         
         RecyclerView buttonsRecycler = findViewById(R.id.recyclerButtons);
@@ -65,6 +86,7 @@ public class AddWaterDialog extends AppCompatActivity {
         buttonsRecycler.setAdapter(adapter);
 
         Button buttonGetWaterAmount = findViewById(R.id.buttonGetWaterAmount);
+        buttonGetWaterAmount.setText(buttonText);
         buttonGetWaterAmount.setOnClickListener(v -> onClickGetWaterAction(v, editTextAddWaterAmount, spinnerTypeSList));
     }
 
@@ -74,7 +96,7 @@ public class AddWaterDialog extends AppCompatActivity {
             waterAmount = Integer.parseInt(waterAmountText);
         }
         getIntent().putExtra("waterAmount", waterAmount);
-        getIntent().putExtra("type", spinnerTypeSList.getSelectedItem().toString());
+        getIntent().putExtra("type", Optional.ofNullable((Type) spinnerTypeSList.getSelectedItem()).orElse(new Type("", 0)).getId());
         setResult(Activity.RESULT_OK, getIntent());
         this.finish();
     }
