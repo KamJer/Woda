@@ -163,19 +163,34 @@ public class WaterViewModel extends ViewModel {
 
     public void insertType(Type type) {
         insertType(type, aLong -> {
-            type.setId(aLong);
-            putType(type);
-        });
+                type.setId(aLong);
+                putType(type);
+            },
+                () -> {
+
+                });
     }
 
-    public void insertType(Type type, Consumer<Long> onSuccess) {
+    public void insertType(Type type, Consumer<Long> onSuccess, Action action) {
         disposable.add(getRepository().getWaterDAO().insertType(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         onSuccess,
-                        RxJavaPlugins::onError
+                        RxJavaPlugins::onError,
+                        action
                 ));
+    }
+
+    public void removeType(Type type) {
+        removeType(type, () -> getRepository().getWaterTypes().remove(type.getId()));
+    }
+
+    public void removeType(Type type, Action action) {
+        disposable.add(getRepository().getWaterDAO().deleteType(type)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(action));
     }
 
     private void putType(Type type) {
@@ -261,12 +276,4 @@ public class WaterViewModel extends ViewModel {
     public void clearDisposable() {
         disposable.clear();
     }
-
-    /**
-     * Chcekcs if past array is contained in a map, if it is not type is saved in a list and returned
-     * @param typeArray - array to check
-     * @param typeMap - map to compare too
-     * @return list of types not found
-     */
-
 }

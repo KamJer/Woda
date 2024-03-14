@@ -1,4 +1,4 @@
-package com.kamjer.woda.activity.listeners;
+package com.kamjer.woda.activity.mainactivity.listeners;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;

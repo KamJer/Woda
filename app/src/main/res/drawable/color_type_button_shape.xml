@@ -6,13 +6,8 @@
         android:width="200dp"
         android:height="200dp" />
     <!-- Solid color for the rectangle -->
-    <solid android:color="#FF00FF00" />
+    <solid android:color="#FF000000" />
 
     <!-- Corner radius for rounded corners -->
-    <corners android:radius="20dp" />
-
-    <!-- Border for the rectangle -->
-    <stroke
-        android:width="5dp"
-        android:color="#FF000000" />
+    <corners android:radius="10dp" />
 </shape>

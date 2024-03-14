@@ -1,25 +1,18 @@
-package com.kamjer.woda.activity.addwaterDialog;
+package com.kamjer.woda.activity.mainactivity.addwaterdialog;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.content.Intent;
-import android.graphics.Path;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.kamjer.mycalendarview.CalendarViewAdapter;
 import com.kamjer.woda.R;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.recyclerWater.adapter.WaterAmountAdapter;
@@ -29,21 +22,10 @@ import com.kamjer.woda.viewmodel.WaterViewModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class AddWaterDialog extends AppCompatActivity {
 
     private int waterAmount = WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO;
-    private boolean isRemove;
-
-    public AddWaterDialog() {
-
-    }
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     protected void onStart() {
@@ -51,7 +33,7 @@ public class AddWaterDialog extends AppCompatActivity {
         setContentView(R.layout.add_water_dialog);
 
         String buttonText = getIntent().getStringExtra("buttonText");
-        isRemove = getIntent().getBooleanExtra("isRemove", false);
+        boolean isRemove = getIntent().getBooleanExtra("isRemove", false);
 
         EditText editTextAddWaterAmount = findViewById(R.id.editTextAddWaterAmount);
 

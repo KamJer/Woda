@@ -1,4 +1,4 @@
-package com.kamjer.woda.activity.addwaterDialog.view;
+package com.kamjer.woda.activity.mainactivity.addwaterdialog.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,10 +13,6 @@ import androidx.core.graphics.PathParser;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.kamjer.woda.utils.FloatPoint;
 import com.kamjer.woda.viewmodel.WaterViewModel;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ImageWaterInGlass extends ShapeableImageView {
 

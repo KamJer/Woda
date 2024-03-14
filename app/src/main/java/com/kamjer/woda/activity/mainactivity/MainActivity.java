@@ -20,10 +20,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kamjer.woda.R;
-import com.kamjer.woda.activity.addwaterDialog.AddWaterDialog;
-import com.kamjer.woda.activity.CalendarActivity;
-import com.kamjer.woda.activity.UserActivity;
-import com.kamjer.woda.activity.listeners.ChangeWatersGestureListener;
+import com.kamjer.woda.activity.mainactivity.addwaterdialog.AddWaterDialog;
+import com.kamjer.woda.activity.calendaractivity.CalendarActivity;
+import com.kamjer.woda.activity.useractivity.UserActivity;
+import com.kamjer.woda.activity.mainactivity.listeners.ChangeWatersGestureListener;
 import com.kamjer.woda.activity.mainactivity.waterimage.WaterImage;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
@@ -32,7 +32,6 @@ import com.kamjer.woda.model.WaterDayWithWaters;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,10 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> addStartYourDialogLauncher;
     private ActivityResultLauncher<Intent> removeStartYourDialogLauncher;
 
-    private ImageButton calendarButton;
-    private ImageButton userButton;
-    private FloatingActionButton addWaterDrankButton;
-    private FloatingActionButton removeWaterDrankButton;
     private TextView textViewDate;
     private TextView textViewWaterToDrink;
     private ProgressBar progressBarWaterDrank;
@@ -125,12 +120,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_activity_layout);
 
 //      handling UI elements
-        calendarButton = findViewById(R.id.buttonCalendar);
+        ImageButton calendarButton = findViewById(R.id.buttonCalendar);
         calendarButton.setOnClickListener(this::onClickCalendarButtonAction);
 
         textViewDate = findViewById(R.id.textViewDate);
 
-        userButton = findViewById(R.id.buttonUser);
+        ImageButton userButton = findViewById(R.id.buttonUser);
         userButton.setOnClickListener(this::onClickUserButtonAction);
 
         waterImage = findViewById(R.id.imageWater);
@@ -139,10 +134,10 @@ public class MainActivity extends AppCompatActivity {
 
         progressBarWaterDrank = findViewById(R.id.progressBarWaterDrank);
 
-        addWaterDrankButton = findViewById(R.id.buttonAddWaterDrank);
+        FloatingActionButton addWaterDrankButton = findViewById(R.id.buttonAddWaterDrank);
         addWaterDrankButton.setOnClickListener(this::onClickAddWaterDrankAction);
 
-        removeWaterDrankButton = findViewById(R.id.buttonRemoveWaterDrank);
+        FloatingActionButton removeWaterDrankButton = findViewById(R.id.buttonRemoveWaterDrank);
         removeWaterDrankButton.setOnClickListener(this::onClickRemoveWaterDrankAction);
     }
 

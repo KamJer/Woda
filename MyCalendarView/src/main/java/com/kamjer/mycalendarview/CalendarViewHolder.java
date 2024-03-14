@@ -22,8 +22,16 @@ public class CalendarViewHolder extends RecyclerView.ViewHolder{
         super(itemView);
         dateCell = itemView.findViewById(R.id.day);
     }
-    
-    public void bind(DaysOfMonthView daysOfMonthView, CalendarViewAdapter adapter, int position) {}
+
+    /**
+     * This method is here so custom implementation of it is possible
+     * @param daysOfMonthView
+     * @param adapter
+     * @param position
+     */
+    public void bind(DaysOfMonthView daysOfMonthView, CalendarViewAdapter adapter, int position) {
+
+    }
 
     public LocalDate getDate() {
         return date;

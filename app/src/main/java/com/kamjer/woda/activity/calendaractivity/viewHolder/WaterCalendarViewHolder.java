@@ -1,4 +1,4 @@
-package com.kamjer.woda.activity.calendaractivity;
+package com.kamjer.woda.activity.calendaractivity.viewHolder;
 
 import android.graphics.Color;
 import android.view.View;

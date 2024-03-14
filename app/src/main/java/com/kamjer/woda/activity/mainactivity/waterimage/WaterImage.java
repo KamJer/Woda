@@ -1,33 +1,22 @@
 package com.kamjer.woda.activity.mainactivity.waterimage;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.graphics.drawable.ShapeDrawable;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.core.graphics.PathParser;
 
-import com.google.android.material.imageview.ShapeableImageView;
-import com.kamjer.woda.activity.addwaterDialog.view.ImageWaterInGlass;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.WaterDayWithWaters;
 import com.kamjer.woda.utils.FloatPoint;
 import com.kamjer.woda.viewmodel.WaterDataRepository;
-import com.kamjer.woda.viewmodel.WaterViewModel;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 

@@ -1,4 +1,4 @@
-package com.kamjer.woda.activity;
+package com.kamjer.woda.activity.calendaractivity;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -13,8 +13,7 @@ import com.kamjer.mycalendarview.CalendarViewHolder;
 import com.kamjer.mycalendarview.CalendarView;
 import com.kamjer.mycalendarview.SelectedDataChangedListener;
 import com.kamjer.woda.R;
-import com.kamjer.woda.activity.calendaractivity.WaterCalendarViewHolder;
-import com.kamjer.woda.model.Water;
+import com.kamjer.woda.activity.calendaractivity.viewHolder.WaterCalendarViewHolder;
 import com.kamjer.woda.model.WaterDayWithWaters;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
@@ -72,7 +71,7 @@ public class CalendarActivity extends AppCompatActivity {
      * Colors dates in a calendar with a proper color corresponding to
      * water drank in a day (gradient from red when 0% water drank, green when 100%),
      * if water does not exist in a day paints that day red.
-     * @param waters list of water from specific dates
+     * @param waters list of waters from specific dates
      * @param holder to modify
      */
     private void colorDays(List<WaterDayWithWaters> waters, CalendarViewHolder holder) {

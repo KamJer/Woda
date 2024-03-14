@@ -65,7 +65,14 @@ public class DaysOfMonthView extends RecyclerView {
             }
         }
 
-        calendarAdapter = new CalendarViewAdapter(calendarViewHolderConstructor, layoutId, selectedDataChangedListener, customHolderBehavior, this, daysInMonth, getContext());
+        calendarAdapter = new CalendarViewAdapter(
+                calendarViewHolderConstructor,
+                layoutId,
+                selectedDataChangedListener,
+                customHolderBehavior,
+                this,
+                daysInMonth,
+                getContext());
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 7);
         setLayoutManager(layoutManager);
         setAdapter(calendarAdapter);

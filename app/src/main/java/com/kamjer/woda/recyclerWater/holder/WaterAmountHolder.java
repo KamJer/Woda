@@ -1,20 +1,14 @@
 package com.kamjer.woda.recyclerWater.holder;
 
-import android.content.Context;
-import android.graphics.Path;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.graphics.PathParser;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import com.google.android.material.imageview.ShapeableImageView;
 import com.kamjer.woda.R;
-import com.kamjer.woda.activity.addwaterDialog.view.ImageWaterInGlass;
-import com.kamjer.woda.recyclerWater.adapter.WaterAmountAdapter;
+import com.kamjer.woda.activity.mainactivity.addwaterdialog.view.ImageWaterInGlass;
 import com.kamjer.woda.recyclerWater.interfacewater.WaterAmountInterface;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 

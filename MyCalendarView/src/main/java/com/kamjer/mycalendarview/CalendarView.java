@@ -20,8 +20,6 @@ public class CalendarView extends RelativeLayout {
 
     private TextView textViewYear;
     private TextView textViewMonth;
-    private ImageButton buttonPreviousMonth;
-    private ImageButton buttonNextMonth;
     private DaysOfMonthView daysOfMonthView;
     private SelectedDataChangedListener previousMonthChangeListener;
     private SelectedDataChangedListener nextMonthChangeListener;
@@ -73,8 +71,8 @@ public class CalendarView extends RelativeLayout {
         textViewMonth = findViewById(R.id.textViewMonth);
         textViewYear = findViewById(R.id.textViewYear);
 
-        buttonPreviousMonth = findViewById(R.id.buttonPreviousMonth);
-        buttonNextMonth = findViewById(R.id.buttonNextMonth);
+        ImageButton buttonPreviousMonth = findViewById(R.id.buttonPreviousMonth);
+        ImageButton buttonNextMonth = findViewById(R.id.buttonNextMonth);
 
         daysOfMonthView = findViewById(R.id.daysOfMonth);
 

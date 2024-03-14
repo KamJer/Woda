@@ -22,17 +22,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.addwaterDialog.AddWaterDialog"
+            android:name=".activity.mainactivity.addwaterdialog.AddWaterDialog"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowIsFloating="true">
         </activity>
         <activity
-            android:name=".activity.CalendarActivity"
+            android:name=".activity.calendaractivity.CalendarActivity"
             android:exported="true">
         </activity>
         <activity
-            android:name=".activity.UserActivity"
+            android:name=".activity.useractivity.UserActivity"
             android:exported="true">
+        </activity>
+        <activity
+            android:name=".activity.useractivity.coloreditdialog.ColorPickerDialog"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:windowIsFloating="true">
         </activity>
     </application>
 </manifest>

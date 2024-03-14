@@ -33,12 +33,11 @@
         app:layout_constraintGuide_percent="0.98" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline6"
+        android:id="@+id/guideline1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.10" />
-
+        app:layout_constraintGuide_percent="0.75" />
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -65,11 +64,10 @@
         android:id="@+id/recyclerViewTypeList"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline1"
         app:layout_constraintEnd_toStartOf="@+id/guideline8"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="@+id/guideline6"
-        app:layout_constraintBottom_toTopOf="@+id/guideline3"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/editTextNumber" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButtonSetWaterAmount"
@@ -82,6 +80,15 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toStartOf="@+id/guideline8" />
 
+    <ImageButton
+        android:id="@+id/imageButtonAddWaterType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/baseline_add_circle_24"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewTypeList"
+        app:layout_constraintEnd_toStartOf="@+id/guideline8"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        android:contentDescription="TODO" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

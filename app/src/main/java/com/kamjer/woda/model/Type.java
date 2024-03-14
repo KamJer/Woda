@@ -64,7 +64,7 @@ public class Type implements Serializable {
 
     @Override
     public int hashCode() {
-        return type.hashCode() + color;
+        return type.hashCode();
     }
 
     @Override

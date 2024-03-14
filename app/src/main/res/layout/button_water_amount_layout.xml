@@ -14,7 +14,7 @@
         android:scaleType="fitCenter"
         app:shapeAppearanceOverlay="@style/circle" />
 
-    <com.kamjer.woda.activity.addwaterDialog.view.ImageWaterInGlass
+    <com.kamjer.woda.activity.mainactivity.addwaterdialog.view.ImageWaterInGlass
         android:id="@+id/buttonShapeableWater"
         android:layout_width="50dp"
         android:layout_height="50dp"

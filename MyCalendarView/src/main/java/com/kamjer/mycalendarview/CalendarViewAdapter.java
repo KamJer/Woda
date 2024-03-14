@@ -20,11 +20,11 @@ public class CalendarViewAdapter extends RecyclerView.Adapter<CalendarViewHolder
     private final ArrayList<LocalDate> daysOfMonth;
     private final DaysOfMonthView daysOfMonthView;
     private int selectedPosition = RecyclerView.NO_POSITION;
-    private LayoutInflater mInflater;
+    private final LayoutInflater mInflater;
     private SelectedDataChangedListener selectedDataChangedListener;
     private CustomHolderBehavior customHolderBehavior;
     private Constructor<? extends CalendarViewHolder> calendarViewHolderConstructor;
-    private int layoutId;
+    private final int layoutId;
 
     public CalendarViewAdapter(Constructor<? extends CalendarViewHolder> calendarViewHolderConstructor, int layoutId, SelectedDataChangedListener selectedDataChangedListener, CustomHolderBehavior customHolderBehavior, DaysOfMonthView daysOfMonthView, ArrayList<LocalDate> daysOfMonth, Context context) {
         this.calendarViewHolderConstructor = calendarViewHolderConstructor;
