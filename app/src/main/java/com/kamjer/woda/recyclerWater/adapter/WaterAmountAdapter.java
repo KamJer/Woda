@@ -14,9 +14,9 @@ import com.kamjer.woda.recyclerWater.interfacewater.WaterAmountInterface;
 
 public class WaterAmountAdapter extends RecyclerView.Adapter<WaterAmountHolder> {
 
-    private LayoutInflater mInflater;
-    private WaterAmountInterface waterAmountInterface;
-    private int size;
+    private final LayoutInflater mInflater;
+    private final WaterAmountInterface waterAmountInterface;    
+    private final int size;
 
     public WaterAmountAdapter(Context context, WaterAmountInterface waterAmountInterface, int size) {
         this.waterAmountInterface = waterAmountInterface;

@@ -49,7 +49,7 @@ public class ImageWaterInGlass extends ShapeableImageView {
                     append(stLeftPoint.getY()).
                     append(" ");
 //          creating bottom of a water in a glass and appending it
-            String path = "C75.12,139.75 78.38,147.9 85.2,149.26 92.01,150.62 115.28,149.17 115.37,149.17 115.46,149.17 120.62,149.3 123.8,141.39 ";
+            String path = "L75.48,140.02C75.95,142.47 78.01,148.98 85.17,149.02 85.17,149.02 115.36,149.04 115.36,149.04 122.04,149.02 124,142.55 124.52,140.05 ";
             bd.append(path);
 //          creating last point for water, the one on a right side and appending it
             FloatPoint rightPoint = newRightPointInGlass(amount);
