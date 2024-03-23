@@ -1,7 +1,10 @@
 package com.kamjer.woda.activity.mainactivity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -15,11 +18,14 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kamjer.woda.R;
+import com.kamjer.woda.activity.alarmactivity.AlarmActivity;
+import com.kamjer.woda.utils.NotificationHelper;
 import com.kamjer.woda.activity.mainactivity.addwaterdialog.AddWaterDialog;
 import com.kamjer.woda.activity.calendaractivity.CalendarActivity;
 import com.kamjer.woda.activity.useractivity.UserActivity;
@@ -42,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> addStartYourDialogLauncher;
     private ActivityResultLauncher<Intent> removeStartYourDialogLauncher;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     private TextView textViewDate;
     private TextView textViewWaterToDrink;
@@ -53,13 +60,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 //      creating View model and setting data base to it
         waterViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(WaterViewModel.class);
-//      creating database
-        waterViewModel.createDataBase(this);
-//      loading waterSaved
-        waterViewModel.loadWaterAmount(this);
+//      initializing app
+        waterViewModel.initialize(getApplicationContext());
 
         gestureDetector = new GestureDetectorCompat(this, new ChangeWatersGestureListener(this, waterViewModel));
 
@@ -94,6 +98,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) {
+                onClickNotificationActivityButtonAction();
+            } else {
+                Toast.makeText(this, getString(R.string.test), Toast.LENGTH_LONG).show();
+            }
+        });
 
 //      creating behavior for error in a RxJava
         RxJavaPlugins.setErrorHandler(e -> {
@@ -139,6 +151,9 @@ public class MainActivity extends AppCompatActivity {
 
         FloatingActionButton removeWaterDrankButton = findViewById(R.id.buttonRemoveWaterDrank);
         removeWaterDrankButton.setOnClickListener(this::onClickRemoveWaterDrankAction);
+
+        ImageButton test = findViewById(R.id.buttonNotification);
+        test.setOnClickListener(v -> showNotificationsActivityAction());
     }
 
     public void setObserverOnWaters(WaterDayWithWaters waterDayWithWaters) {
@@ -223,6 +238,21 @@ public class MainActivity extends AppCompatActivity {
                 });
             } else {
                 waterViewModel.insertWater(waterUpdated);
+            }
+        }
+    }
+
+    private void onClickNotificationActivityButtonAction(){
+        Intent userIntent = new Intent(this, AlarmActivity.class);
+        this.startActivity(userIntent);
+    }
+
+    private  void showNotificationsActivityAction() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            onClickNotificationActivityButtonAction();
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
         }
     }

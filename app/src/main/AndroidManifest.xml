@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,6 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Woda"
         tools:targetApi="34" >
+
+        <receiver android:name="com.kamjer.woda.activity.alarmactivity.alarm.AlarmReceiver"/>
 
         <activity
             android:name=".activity.mainactivity.MainActivity"
@@ -32,6 +38,10 @@
         </activity>
         <activity
             android:name=".activity.useractivity.UserActivity"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".activity.alarmactivity.AlarmActivity"
             android:exported="true">
         </activity>
         <activity

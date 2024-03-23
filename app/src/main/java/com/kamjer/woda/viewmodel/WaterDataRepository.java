@@ -14,6 +14,7 @@ import com.kamjer.woda.model.WaterDay;
 import com.kamjer.woda.model.WaterDayWithWaters;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +30,16 @@ public class WaterDataRepository {
 
     private WaterDatabase waterDatabase;
     private WaterDAO waterDAO;
-    private int waterToDrink;
+    private int waterAmountToDrink;
     private final MutableLiveData<WaterDayWithWaters> waters = new MutableLiveData<>();
 
     private HashMap<Long, Type> waterTypes = new HashMap<>();
 
     private Type[] defaultDrinksTypes;
+    private boolean notificationsActive;
+    private LocalTime selectedNotificationsTime;
+    private LocalTime constraintNotificationTimeStart;
+    private LocalTime constraintNotificationTimeEnd;
 
     public WaterDataRepository() {
     }
@@ -111,8 +116,8 @@ public class WaterDataRepository {
         this.waterTypes = (HashMap<Long, Type>) waterTypes;
     }
 
-    public int getWaterToDrinkSaved() {
-        return waterToDrink;
+    public int getWaterAmountToDrink() {
+        return waterAmountToDrink;
     }
 
     private void setWaterToDrinkWaterDay(int waterToDrink) {
@@ -121,9 +126,9 @@ public class WaterDataRepository {
         waters.setValue(waterDayWithWatersToUpdate);
     }
 
-    public void setWaterToDrink(int waterToDrink) {
-        this.waterToDrink = waterToDrink;
-        setWaterToDrinkWaterDay(waterToDrink);
+    public void setWaterAmountToDrink(int waterAmountToDrink) {
+        this.waterAmountToDrink = waterAmountToDrink;
+        setWaterToDrinkWaterDay(waterAmountToDrink);
     }
 
     public static List<Type> containsDefaultTypes(Type[] typeArray, Map<Long, Type> typeMap) {
@@ -144,5 +149,37 @@ public class WaterDataRepository {
 
     public List<Type> getUsedTypes(List<Water> waters) {
         return waters.stream().map(water -> getWaterTypes().get(water.getTypeId())).collect(Collectors.toList());
+    }
+
+    public void setNotificationsActive(boolean isNotificationsActive) {
+        this.notificationsActive = isNotificationsActive;
+    }
+
+    public boolean isNotificationsActive() {
+        return notificationsActive;
+    }
+
+    public LocalTime getSelectedNotificationsTime() {
+        return selectedNotificationsTime;
+    }
+
+    public void setSelectedNotificationsTime(LocalTime selectedNotificationsTime) {
+        this.selectedNotificationsTime = selectedNotificationsTime;
+    }
+
+    public LocalTime getConstraintNotificationTimeStart() {
+        return constraintNotificationTimeStart;
+    }
+
+    public void setConstraintNotificationTimeStart(LocalTime constraintNotificationTimeStart) {
+        this.constraintNotificationTimeStart = constraintNotificationTimeStart;
+    }
+
+    public LocalTime getConstraintNotificationTimeEnd() {
+        return constraintNotificationTimeEnd;
+    }
+
+    public void setConstraintNotificationTimeEnd(LocalTime constraintNotificationTimeEnd) {
+        this.constraintNotificationTimeEnd = constraintNotificationTimeEnd;
     }
 }

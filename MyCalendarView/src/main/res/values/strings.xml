@@ -1,9 +1,3 @@
 <resources>
-    <string name="monday">Po</string>
-    <string name="tuesday">Wt</string>
-    <string name="wednesday">Śr</string>
-    <string name="thursday">Cz</string>
-    <string name="friday">Pi</string>
-    <string name="saturday">So</string>
-    <string name="sunday">Ni</string>
+
 </resources>

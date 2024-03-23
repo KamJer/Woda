@@ -36,7 +36,7 @@ public class UserActivity extends AppCompatActivity {
     private WaterViewModel waterViewModel;
 
     private TypeListViewAdapter adapter;
-//    private ActivityResultLauncher<Intent> colorEditStartYourDialogLauncher;
+
     private ColorSelectorAction colorSelectorAction;
     private ColorSelectorAction buttonRemoveTypeAction;
 
@@ -116,18 +116,13 @@ public class UserActivity extends AppCompatActivity {
 
     private void floatingActionButtonSetWaterAmountAction(View view) {
         int waterAmountToDrink = Integer.parseInt(textViewWaterAmount.getText().toString());
-        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.shared_preferences),Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(getString(R.string.water_amount_to_drink), waterAmountToDrink);
-        editor.apply();
-        waterViewModel.setWaterToDrink(waterAmountToDrink);
+        waterViewModel.setWaterAmount(getApplicationContext(), waterAmountToDrink);
         this.finish();
     }
 
     private void addNewTypeAction() {
         Type newType = new Type("", Color.BLACK);
         adapter.addType(newType);
-//        waterViewModel.insertType(newType);
     }
 
     private void addTypeAction(Type newType){

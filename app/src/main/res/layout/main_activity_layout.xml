@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -57,11 +56,20 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:background="@drawable/border"
-        android:text="test"
+        android:text="@string/test"
         android:textSize="25sp"
         app:layout_constraintEnd_toEndOf="@+id/buttonUser"
         app:layout_constraintStart_toStartOf="@+id/guideline1"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
+
+    <ImageButton
+        android:id="@+id/buttonNotification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/button_user_action_description"
+        app:layout_constraintEnd_toStartOf="@+id/guideline4"
+        app:layout_constraintTop_toBottomOf="@+id/buttonUser"
+        app:srcCompat="@drawable/baseline_access_time_24" />
 
     <ImageButton
         android:id="@+id/buttonUser"
@@ -69,7 +77,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toTopOf="@+id/guideline2"
-        app:srcCompat="@drawable/bullseye" />
+        app:srcCompat="@drawable/bullseye"
+        android:contentDescription="@string/button_user_action_description" />
 
     <com.kamjer.woda.activity.mainactivity.waterimage.WaterImage
         android:id="@+id/imageWater"
@@ -107,9 +116,8 @@
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/progressBarWaterDrank"
             android:layout_centerHorizontal="true"
-            android:text="test"
+            android:text="@string/test"
             android:textColor="@color/dark_grey" />
-
     </RelativeLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -119,9 +127,10 @@
         android:clickable="true"
         android:src="@drawable/plus"
         android:layout_margin="10dp"
+        android:backgroundTint="@color/gray80"
         app:layout_constraintBottom_toTopOf="@+id/buttonRemoveWaterDrank"
         app:layout_constraintEnd_toStartOf="@+id/guideline4"
-        />
+        android:contentDescription="@string/button_add_water_drank_description" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/buttonRemoveWaterDrank"
@@ -130,8 +139,9 @@
         android:clickable="true"
         android:src="@drawable/minus"
         android:layout_margin="10dp"
+        android:backgroundTint="@color/gray80"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
-        app:layout_constraintEnd_toStartOf="@+id/guideline4" />
-
+        app:layout_constraintEnd_toStartOf="@+id/guideline4"
+        android:contentDescription="@string/button_remove_water_drank_description" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

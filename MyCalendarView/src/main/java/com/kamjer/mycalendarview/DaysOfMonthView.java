@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.GestureDetectorCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,7 +25,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class DaysOfMonthView extends RecyclerView {
-
     private Month shownMonth;
     private LocalDate selectedDate;
     private CalendarViewAdapter calendarAdapter;

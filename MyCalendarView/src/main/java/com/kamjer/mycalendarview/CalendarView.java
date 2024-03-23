@@ -12,18 +12,20 @@ import android.widget.TextView;
 
 import androidx.core.view.GestureDetectorCompat;
 
+import java.text.DateFormatSymbols;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
+import java.util.Calendar;
 import java.util.Locale;
 
 public class CalendarView extends RelativeLayout {
-
     private TextView textViewYear;
     private TextView textViewMonth;
     private DaysOfMonthView daysOfMonthView;
     private SelectedDataChangedListener previousMonthChangeListener;
     private SelectedDataChangedListener nextMonthChangeListener;
 
+    private TextView[] textDaysNames = new TextView[7];
     private GestureDetectorCompat gestureDetector;
 
     @Override
@@ -78,6 +80,24 @@ public class CalendarView extends RelativeLayout {
 
         buttonPreviousMonth.setOnClickListener(v -> previousMonthAction());
         buttonNextMonth.setOnClickListener(v -> nextMonthAction());
+
+        textDaysNames[0] = findViewById(R.id.textMonday);
+        textDaysNames[1] = findViewById(R.id.textTuesday);
+        textDaysNames[2] = findViewById(R.id.textWednesday);
+        textDaysNames[3] = findViewById(R.id.textThursday);
+        textDaysNames[4] = findViewById(R.id.textFriday);
+        textDaysNames[5] = findViewById(R.id.textSaturday);
+        textDaysNames[6] = findViewById(R.id.textSunday);
+
+        String[] shortWeekDays = DateFormatSymbols.getInstance(Locale.getDefault()).getShortWeekdays();
+
+        for (int i = 0; i < textDaysNames.length; i++) {
+            if (i == textDaysNames.length - 1){
+                textDaysNames[i].setText(shortWeekDays[1]);
+            } else {
+                textDaysNames[i].setText(shortWeekDays[i + 2]);
+            }
+        }
 
         setTextYearMonth();
     }

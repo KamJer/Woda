@@ -18,6 +18,18 @@
     <string name="user_activity_background_description">background</string>
     <string name="user_activity_accept_values_description">accept values</string>
     <string name="error_message_can_not_load">Coś poszło nie tak, nie można załadować koniecznych plików</string>
+    <string name="button_add_water_drank_description">Button for adding drinks to a day</string>
+    <string name="test">test</string>
+    <string name="button_remove_water_drank_description">Button for removing drinks from a day</string>
+    <string name="button_user_action_description">Button for activating user activity</string>
+    <string name="drink_water_notification_title">Napij się!</string>
+    <string name="drink_water_notification_message">Przypominamy o wypiciu wody \n Dzienne zapotrzebowanie wody dla dorosłego człowieka to 1,5 do 2 litrów wody! \n wg. https://pacjent.gov.pl/aktualnosc/pij-wiecej-wody </string>
+    <string name="notification_reminder_text">Włacz przypomnienie \no wypiciu wody</string>
+    <string name="text_how_often_reminder_explainer">Co ile godzin ma ci przypominać?</string>
+    <string name="text_start_hour_notification">Godzina startowa</string>
+    <string name="text_constraint_notification_end">Koniec godzin nocnych</string>
+    <string name="text_constraint_notification_start">Początek godzin nocnych</string>
+    <string name="text_constraint_notification_explain">Notyfikacje nie będą wysyłane w godzinach nocnych</string>
     <string-array name="default_types">
         <item>Woda</item>
         <item>Kawa</item>

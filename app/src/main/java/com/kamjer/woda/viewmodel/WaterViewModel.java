@@ -3,20 +3,21 @@ package com.kamjer.woda.viewmodel;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.kamjer.woda.R;
+import com.kamjer.woda.activity.alarmactivity.AlarmActivity;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.model.WaterDay;
 import com.kamjer.woda.model.WaterDayWithWaters;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -31,11 +32,29 @@ public class WaterViewModel extends ViewModel {
     public static final int DEFAULT_WATER_TO_DRINK = 1500;
     public static final int DEFAULT_WATER_DRANK_IN_ONE_GO = 250;
 
+    private static final String WATER_AMOUNT_TO_DRINK_NAME = "waterAmountToDrink";
+    private static final String NOTIFICATIONS_ACTIVE_NAME = "isNotificationsActive";
+    private static final String SELECTED_NOTIFICATIONS_TIME_NAME = "selectedNotificationsTime";
+    private static final String CONSTRAINT_NOTIFICATIONS_TIME_START_NAME = "constraintNotificationsTimeStart";
+    private static final String CONSTRAINT_NOTIFICATIONS_TIME_END_NAME = "constraintNotificationsTimeEnd";
+
     private WaterDataRepository repository;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
 
-    public void createDataBase(Context context) {
+
+    public void initialize(Context applicationContext) {
+//      creating database;
+        createDataBase(applicationContext);
+//      loading preferences
+        loadWaterAmount(applicationContext);
+        loadActiveNotification(applicationContext);
+        loadSelectedNotificationTime(applicationContext);
+        loadConstraintNotificationTimeStart(applicationContext);
+        loadConstraintNotificationTimeEnd(applicationContext);
+    }
+
+    private void createDataBase(Context context) {
         getRepository().createWaterDatabase(context);
         getRepository().loadDefaultTypes(context);
 
@@ -51,13 +70,93 @@ public class WaterViewModel extends ViewModel {
                     WaterDataRepository.containsDefaultTypes(getRepository().getDefaultDrinksTypes(), getRepository().getWaterTypes()).forEach(this::insertType);
                 }));
     }
-    
-    
 
-    public void loadWaterAmount(AppCompatActivity activity) {
-        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-        int waterToDrink = sharedPref.getInt(activity.getString(R.string.water_amount_to_drink), DEFAULT_WATER_TO_DRINK);
-        getRepository().setWaterToDrink(waterToDrink);
+    private void loadWaterAmount(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        int waterToDrink = sharedPref.getInt(WATER_AMOUNT_TO_DRINK_NAME, DEFAULT_WATER_TO_DRINK);
+        getRepository().setWaterAmountToDrink(waterToDrink);
+    }
+
+    public void setWaterAmount(Context context, int waterAmountToDrink) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(WATER_AMOUNT_TO_DRINK_NAME, waterAmountToDrink);
+        editor.apply();
+        setWaterAmountToDrink(waterAmountToDrink);
+    }
+
+    private void loadActiveNotification(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        boolean notificationsActive = sharedPref.getBoolean(NOTIFICATIONS_ACTIVE_NAME, false);
+        getRepository().setNotificationsActive(notificationsActive);
+    }
+
+
+
+    public boolean isNotificationsActive() {
+        return getRepository().isNotificationsActive();
+    }
+
+    public void setNotificationsActive(Context context, boolean notificationsActive) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(NOTIFICATIONS_ACTIVE_NAME, notificationsActive);
+        editor.apply();
+        getRepository().setNotificationsActive(notificationsActive);
+    }
+
+    private void loadSelectedNotificationTime(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        LocalTime selectedNotificationTime = LocalTime.parse(sharedPref.getString(SELECTED_NOTIFICATIONS_TIME_NAME, LocalTime.now().toString()));
+        getRepository().setSelectedNotificationsTime(selectedNotificationTime);
+    }
+
+    public void setSelectedNotificationsTime(Context context, LocalTime selectedNotificationsTime) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(SELECTED_NOTIFICATIONS_TIME_NAME, selectedNotificationsTime.toString());
+        editor.apply();
+        getRepository().setSelectedNotificationsTime(selectedNotificationsTime);
+    }
+
+    public LocalTime getSelectedNotificationsTime() {
+        return getRepository().getSelectedNotificationsTime();
+    }
+
+    private void loadConstraintNotificationTimeStart(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        LocalTime constraintNotificationsTimeStart = LocalTime.parse(sharedPref.getString(CONSTRAINT_NOTIFICATIONS_TIME_START_NAME, AlarmActivity.TIME_CONSTRAINT_START_DEFAULT.toString()));
+        getRepository().setConstraintNotificationTimeStart(constraintNotificationsTimeStart);
+    }
+
+    public void setConstraintNotificationTimeStart(Context context, LocalTime constraintNotificationTimeStart) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(CONSTRAINT_NOTIFICATIONS_TIME_START_NAME, constraintNotificationTimeStart.toString());
+        editor.apply();
+        this.getRepository().setConstraintNotificationTimeStart(constraintNotificationTimeStart);
+    }
+
+    public LocalTime getConstraintNotificationTimeStart() {
+        return getRepository().getConstraintNotificationTimeStart();
+    }
+
+    public void setConstraintNotificationTimeEnd(Context context, LocalTime constraintNotificationTimeEnd) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(CONSTRAINT_NOTIFICATIONS_TIME_END_NAME, constraintNotificationTimeEnd.toString());
+        editor.apply();
+        this.getRepository().setConstraintNotificationTimeEnd(constraintNotificationTimeEnd);
+    }
+
+    private void loadConstraintNotificationTimeEnd(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        LocalTime constraintNotificationsTimeEnd = LocalTime.parse(sharedPref.getString(WaterViewModel.CONSTRAINT_NOTIFICATIONS_TIME_END_NAME, AlarmActivity.TIME_CONSTRAINT_END_DEFAULT.toString()));
+        getRepository().setConstraintNotificationTimeEnd(constraintNotificationsTimeEnd);
+    }
+
+    public LocalTime getConstraintNotificationTimeEnd() {
+        return getRepository().getConstraintNotificationTimeEnd();
     }
 
     public void loadWaterById(long id, Consumer<Water> onSuccess) {
@@ -224,11 +323,11 @@ public class WaterViewModel extends ViewModel {
     }
 
     public int getWaterAmountToDrink() {
-        return getRepository().getWaterToDrinkSaved();
+        return getRepository().getWaterAmountToDrink();
     }
 
-    public void setWaterToDrink(int waterToDrink) {
-        getRepository().setWaterToDrink(waterToDrink);
+    public void setWaterAmountToDrink(int waterToDrink) {
+        getRepository().setWaterAmountToDrink(waterToDrink);
         insertWaterDay(getRepository().getWaterDayValue().getWaterDay());
     }
 
@@ -276,4 +375,5 @@ public class WaterViewModel extends ViewModel {
     public void clearDisposable() {
         disposable.clear();
     }
+
 }
