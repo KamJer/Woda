@@ -38,15 +38,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.75" />
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="@string/user_activity_background_description"
-        android:scaleType="centerCrop"
-        android:src="@drawable/backgraound"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/editTextNumber"
@@ -55,12 +46,11 @@
         android:autofillHints=""
         android:hint="@string/water_goal"
         android:inputType="number"
-        android:textColor="@color/dark_grey"
         app:layout_constraintEnd_toStartOf="@+id/guideline8"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.kamjer.woda.activity.useractivity.typeView.TypeRecyclerView
         android:id="@+id/recyclerViewTypeList"
         android:layout_width="0dp"
         android:layout_height="0dp"

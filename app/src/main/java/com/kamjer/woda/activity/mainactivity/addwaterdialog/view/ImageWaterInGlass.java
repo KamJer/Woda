@@ -17,6 +17,7 @@ import com.kamjer.woda.viewmodel.WaterViewModel;
 public class ImageWaterInGlass extends ShapeableImageView {
 
     private Path customPath;
+    private StringBuilder cutomPathStringBuilder;
 //    image size in pd
     private static final int IMAGE_SIZE_X = 200;
     private static final int IMAGE_SIZE_Y = 200;
@@ -36,24 +37,24 @@ public class ImageWaterInGlass extends ShapeableImageView {
     }
 
     public void setAmount(int amount) {
-        StringBuilder bd = new StringBuilder();
+        cutomPathStringBuilder = new StringBuilder();
 
         if (amount<= WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO) {
 //          creating string builder for a path
 //          initial point to move mouse to
             FloatPoint stLeftPoint = newLeftPointInGlass(amount);
 //          appending initial point
-            bd.append("M").
+            cutomPathStringBuilder.append("M").
                     append(stLeftPoint.getX()).
                     append(",").
                     append(stLeftPoint.getY()).
                     append(" ");
 //          creating bottom of a water in a glass and appending it
             String path = "L75.48,140.02C75.95,142.47 78.01,148.98 85.17,149.02 85.17,149.02 115.36,149.04 115.36,149.04 122.04,149.02 124,142.55 124.52,140.05 ";
-            bd.append(path);
+            cutomPathStringBuilder.append(path);
 //          creating last point for water, the one on a right side and appending it
             FloatPoint rightPoint = newRightPointInGlass(amount);
-            bd.append("L").
+            cutomPathStringBuilder.append("L").
                     append(rightPoint.getX()).
                     append(",").
                     append(rightPoint.getY()).
@@ -63,26 +64,23 @@ public class ImageWaterInGlass extends ShapeableImageView {
 //          initial point to move mouse to
             FloatPoint stLeftPoint = newLeftPointInPitcher(amount);
 //          appending initial point
-            bd.append("M").
+            cutomPathStringBuilder.append("M").
                     append(stLeftPoint.getX()).
                     append(",").
                     append(stLeftPoint.getY()).
                     append(" ");
 
             String path = "C127.05,135.75 126.75,138.74 124.94,139.8 124.94,139.8 78.91,139.9 78.88,139.8 77.12,139.61 76.5,135.8 76.5,135.8 ";
-            bd.append(path);
+            cutomPathStringBuilder.append(path);
 
 //          creating last point for water, the one on a right side and appending it
             FloatPoint rightPoint = newRightPointInPitcher(amount);
-            bd.append("L").
+            cutomPathStringBuilder.append("L").
                     append(rightPoint.getX()).
                     append(",").
                     append(rightPoint.getY()).
                     append(" Z");
         }
-
-//      parsing path
-        customPath = PathParser.createPathFromPathData(bd.toString());
     }
 
     @Override
@@ -97,6 +95,7 @@ public class ImageWaterInGlass extends ShapeableImageView {
         matrix.postScale(scaleX, scaleY);
 
         // Apply scaling to the path
+        customPath = PathParser.createPathFromPathData(cutomPathStringBuilder.toString());
         customPath.transform(matrix);
 
         int color = 0xFF337cf2;

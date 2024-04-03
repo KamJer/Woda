@@ -13,6 +13,7 @@
     <color name="yellow">#FFFFFF00</color>
     <color name="dark_grey">#FF5A5A5A</color>
     <color name="transparent">#00000000</color>
+    <color name="blue">#FF0000FF</color>
     <array name="types_default_color">
         <item>#FF337cf2</item>
         <item>#FF906030</item>

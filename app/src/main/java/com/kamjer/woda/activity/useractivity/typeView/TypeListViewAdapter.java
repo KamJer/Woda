@@ -49,22 +49,12 @@ public class TypeListViewAdapter extends RecyclerView.Adapter<TypeViewHolder> {
         return typeList.size();
     }
 
-    public void addType(Type type) {
-        typeList.add(type);
-        notifyDataSetChanged();
-    }
-
-    public void removeType(Type type) {
-        typeList.remove(type);
-        notifyDataSetChanged();
-    }
-
     public void setTypeList(ArrayList<Type> typeList) {
         this.typeList = typeList;
         this.notifyDataSetChanged();
     }
 
-    public ArrayList<Type> getTypeList() {
-        return typeList;
+    public void notifyFocusCleared() {
+
     }
 }

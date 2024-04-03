@@ -3,7 +3,9 @@ package com.kamjer.woda.viewmodel;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.kamjer.woda.R;
@@ -15,12 +17,13 @@ import com.kamjer.woda.model.WaterDayWithWaters;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.functions.Consumer;
@@ -43,9 +46,14 @@ public class WaterViewModel extends ViewModel {
     private final CompositeDisposable disposable = new CompositeDisposable();
 
 
+    /**
+     * Initializes all of necessary data for the app
+     * @param applicationContext context of an app
+     */
     public void initialize(Context applicationContext) {
+        initializeSql(applicationContext);
 //      creating database;
-        createDataBase(applicationContext);
+        createDatabase(applicationContext);
 //      loading preferences
         loadWaterAmount(applicationContext);
         loadActiveNotification(applicationContext);
@@ -54,15 +62,27 @@ public class WaterViewModel extends ViewModel {
         loadConstraintNotificationTimeEnd(applicationContext);
     }
 
-    private void createDataBase(Context context) {
-        getRepository().createWaterDatabase(context);
-        getRepository().loadDefaultTypes(context);
+    /**
+     * Loads custom sql queries
+     * @param applicationContext context of an app
+     */
+    private void initializeSql(Context applicationContext) {
+        SqlRepository.getInstance().loadSqlQuery(applicationContext);
+    }
+
+    /**
+     * Creates database, loads default types of water
+     * @param applicationContext context of an app
+     */
+    private void createDatabase(Context applicationContext) {
+        getRepository().createWaterDatabase(applicationContext);
+        getRepository().loadDefaultTypes(applicationContext);
 
         disposable.add(getRepository().getWaterDAO().getAllTypes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(types -> {
-                    getRepository().setWaterTypes(types.stream().collect(Collectors.toMap(
+                    getRepository().setWaterTypes((HashMap<Long, Type>) types.stream().collect(Collectors.toMap(
                             Type::getId,
                             type -> type)));
 //                  fetching default values
@@ -71,42 +91,66 @@ public class WaterViewModel extends ViewModel {
                 }));
     }
 
-    private void loadWaterAmount(Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+    /**
+     * Loads water amount to drink from SharedPreferences
+     * @param applicationContext context of an app
+     */
+    private void loadWaterAmount(Context applicationContext) {
+        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         int waterToDrink = sharedPref.getInt(WATER_AMOUNT_TO_DRINK_NAME, DEFAULT_WATER_TO_DRINK);
         getRepository().setWaterAmountToDrink(waterToDrink);
     }
 
-    public void setWaterAmount(Context context, int waterAmountToDrink) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+    /**
+     * Sets water amount to drink into SharedPreferences and in an data repository
+     * @param applicationContext context of an app
+     * @param waterAmountToDrink new water amount to drink
+     */
+    public void setWaterAmountToDrink(Context applicationContext, int waterAmountToDrink) {
+        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(WATER_AMOUNT_TO_DRINK_NAME, waterAmountToDrink);
         editor.apply();
         setWaterAmountToDrink(waterAmountToDrink);
     }
 
-    private void loadActiveNotification(Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+    public int getWaterAmountToDrink() {
+        return getRepository().getWaterAmountToDrink();
+    }
+
+    private void setWaterAmountToDrink(int waterToDrink) {
+        getRepository().setWaterAmountToDrink(waterToDrink);
+        insertWaterDay(getRepository().getWaterDayValue().getWaterDay());
+    }
+
+    /**
+     * Loads if notifications are active from SharedPreferences
+     * @param applicationContext context of an app
+     */
+    private void loadActiveNotification(Context applicationContext) {
+        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         boolean notificationsActive = sharedPref.getBoolean(NOTIFICATIONS_ACTIVE_NAME, false);
         getRepository().setNotificationsActive(notificationsActive);
     }
-
-
 
     public boolean isNotificationsActive() {
         return getRepository().isNotificationsActive();
     }
 
-    public void setNotificationsActive(Context context, boolean notificationsActive) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+    public void setNotificationsActive(Context applicationContext, boolean notificationsActive) {
+        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putBoolean(NOTIFICATIONS_ACTIVE_NAME, notificationsActive);
         editor.apply();
         getRepository().setNotificationsActive(notificationsActive);
     }
 
-    private void loadSelectedNotificationTime(Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+    /**
+     * Loads selected time for notifications to start
+     * @param applicationContext context of an app
+     */
+    private void loadSelectedNotificationTime(Context applicationContext) {
+        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         LocalTime selectedNotificationTime = LocalTime.parse(sharedPref.getString(SELECTED_NOTIFICATIONS_TIME_NAME, LocalTime.now().toString()));
         getRepository().setSelectedNotificationsTime(selectedNotificationTime);
     }
@@ -123,8 +167,12 @@ public class WaterViewModel extends ViewModel {
         return getRepository().getSelectedNotificationsTime();
     }
 
-    private void loadConstraintNotificationTimeStart(Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+    /**
+     * Loads selected start time for notifications to not fire
+     * @param applicationContext context of an app
+     */
+    private void loadConstraintNotificationTimeStart(Context applicationContext) {
+        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         LocalTime constraintNotificationsTimeStart = LocalTime.parse(sharedPref.getString(CONSTRAINT_NOTIFICATIONS_TIME_START_NAME, AlarmActivity.TIME_CONSTRAINT_START_DEFAULT.toString()));
         getRepository().setConstraintNotificationTimeStart(constraintNotificationsTimeStart);
     }
@@ -141,6 +189,16 @@ public class WaterViewModel extends ViewModel {
         return getRepository().getConstraintNotificationTimeStart();
     }
 
+    /**
+     * Loads selected end time for notifications to not fire
+     * @param applicationContext context of an app
+     */
+    private void loadConstraintNotificationTimeEnd(Context applicationContext) {
+        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        LocalTime constraintNotificationsTimeEnd = LocalTime.parse(sharedPref.getString(WaterViewModel.CONSTRAINT_NOTIFICATIONS_TIME_END_NAME, AlarmActivity.TIME_CONSTRAINT_END_DEFAULT.toString()));
+        getRepository().setConstraintNotificationTimeEnd(constraintNotificationsTimeEnd);
+    }
+
     public void setConstraintNotificationTimeEnd(Context context, LocalTime constraintNotificationTimeEnd) {
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -149,24 +207,11 @@ public class WaterViewModel extends ViewModel {
         this.getRepository().setConstraintNotificationTimeEnd(constraintNotificationTimeEnd);
     }
 
-    private void loadConstraintNotificationTimeEnd(Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-        LocalTime constraintNotificationsTimeEnd = LocalTime.parse(sharedPref.getString(WaterViewModel.CONSTRAINT_NOTIFICATIONS_TIME_END_NAME, AlarmActivity.TIME_CONSTRAINT_END_DEFAULT.toString()));
-        getRepository().setConstraintNotificationTimeEnd(constraintNotificationsTimeEnd);
-    }
-
     public LocalTime getConstraintNotificationTimeEnd() {
         return getRepository().getConstraintNotificationTimeEnd();
     }
 
-    public void loadWaterById(long id, Consumer<Water> onSuccess) {
-        disposable.add(getRepository().getWaterDAO().getWaterById(id).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        onSuccess,
-                        RxJavaPlugins::onError
-                ));
-    }
+//    DATABASE OPERATIONS
 
     public void loadWaterDayWithWatersByDate(LocalDate date) {
         loadWaterDayWithWatersByDate(
@@ -192,22 +237,11 @@ public class WaterViewModel extends ViewModel {
                         onComplete
                 ));
     }
-    public void loadWatersByDate(LocalDate date, Consumer<List<Water>> onSuccess) {
-        disposable.add(getRepository().getWaterDAO().getWaterByDate(date.toString())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(onSuccess, RxJavaPlugins::onError));
-    }
 
-    public void loadWaterDayByDate(LocalDate date, Consumer<WaterDay> onSuccess) {
-        disposable.add(getRepository().getWaterDAO().getWaterDayByDate(date.toString())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(onSuccess, RxJavaPlugins::onError));
-    }
 
     public void loadAllWaterDayWithWaters(Consumer<List<WaterDayWithWaters>> onSuccess) {
-        disposable.add((getRepository().getWaterDAO().getAllWaterDayWitWatersByDate())
+        disposable.add((getRepository().getWaterDAO()
+                .getAllWaterDayWitWatersByDate())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -216,13 +250,7 @@ public class WaterViewModel extends ViewModel {
                 ));
     }
 
-    public void loadWaterAll(Consumer<List<Water>> onSuccess) {
-        disposable.add(getRepository().getWaterDAO().getAllWaters().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        onSuccess,
-                        RxJavaPlugins::onError));
-    }
+
 
     public void insertWaterDay(WaterDay waterDay) {
         insertWaterDay(waterDay, aLong -> {
@@ -244,15 +272,52 @@ public class WaterViewModel extends ViewModel {
 
     }
 
+    /**
+     * Custom sql transaction that inserts passed waters to the database,
+     * sums all waters in a database and after all of that deletes passed type
+     * @param waters list of waters to insert
+     * @param type type to delete
+     */
+    public void insertWatersSumWatersDeleteType(List<Water> waters, Type type) {
+        List<String> sql = new ArrayList<>();
+//        preparing sql statmants
+        waters.forEach(water -> sql.add(SqlRepository.getInstance().getSqlInsertIntoWaterValues(water)));
+        sql.add(SqlRepository.getInstance().getSqlDropTable());
+        sql.add(SqlRepository.getInstance().getSqlCreateTempTable());
+        sql.add(SqlRepository.getInstance().getSqlDeleteFromWater());
+        sql.add(SqlRepository.getInstance().getSqlInsertIntoWaterFromTemp());
+        sql.add(SqlRepository.getInstance().getSqlDropTable());
+        sql.add(SqlRepository.getInstance().getSqlDeleteTypeWhereId(type.getId()));
+        disposable.add(Completable.fromAction(() -> getRepository().getWaterDatabase().customQuery(sql))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        () -> getRepository().removeWaterType(type.getId()),
+                        RxJavaPlugins::onError
+                ));
+    }
+
     public void insertWater(Water water) {
         insertWater(water, aLong -> {
             water.setId(aLong);
             addWaterInDay(water);
         });
     }
+
+
     
     public void insertWater(Water water, Consumer<Long> onSuccess) {
         disposable.add(getRepository().getWaterDAO().insertWater(water).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).
+                subscribe(
+                        onSuccess,
+                        RxJavaPlugins::onError
+                ));
+    }
+
+    public void loadWaterByType(Type type, Consumer<List<Water>> onSuccess) {
+        disposable.add(getRepository().getWaterDAO().getWaterByType(type.getId())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).
                 subscribe(
                         onSuccess,
@@ -264,25 +329,25 @@ public class WaterViewModel extends ViewModel {
         insertType(type, aLong -> {
                 type.setId(aLong);
                 putType(type);
-            },
-                () -> {
-
-                });
+            });
     }
 
-    public void insertType(Type type, Consumer<Long> onSuccess, Action action) {
+    public void insertType(Type type, Consumer<Long> onSuccess) {
         disposable.add(getRepository().getWaterDAO().insertType(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         onSuccess,
-                        RxJavaPlugins::onError,
-                        action
+                        RxJavaPlugins::onError
                 ));
     }
 
+    private void putType(Type type) {
+        getRepository().putType(type);
+    }
+
     public void removeType(Type type) {
-        removeType(type, () -> getRepository().getWaterTypes().remove(type.getId()));
+        removeType(type, () -> getRepository().removeWaterType(type.getId()));
     }
 
     public void removeType(Type type, Action action) {
@@ -292,9 +357,13 @@ public class WaterViewModel extends ViewModel {
                 .subscribe(action));
     }
 
-    private void putType(Type type) {
-        getRepository().putType(type);
+    public void removeWaters(List<Water>waters) {
+        disposable.add(getRepository().getWaterDAO().deleteWaters(waters)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe());
     }
+
 
     public MutableLiveData<WaterDayWithWaters> getWater() {
         return getRepository().getWaters();
@@ -308,12 +377,6 @@ public class WaterViewModel extends ViewModel {
         getRepository().removeWaterValue(water);
     }
 
-    public void setWatersInDay(List<Water> watersInDay) {
-        WaterDayWithWaters waterDay = getRepository().getWaterDayValue();
-        waterDay.setWaters(watersInDay);
-        getRepository().getWaters().setValue(waterDay);
-    }
-
     public void setWaterValue(WaterDayWithWaters waters) {
         getRepository().getWaters().setValue(waters);
     }
@@ -322,23 +385,6 @@ public class WaterViewModel extends ViewModel {
         return getRepository().getWaterDayValue();
     }
 
-    public int getWaterAmountToDrink() {
-        return getRepository().getWaterAmountToDrink();
-    }
-
-    public void setWaterAmountToDrink(int waterToDrink) {
-        getRepository().setWaterAmountToDrink(waterToDrink);
-        insertWaterDay(getRepository().getWaterDayValue().getWaterDay());
-    }
-
-    /**
-     * Inserts waters from active day to the database (updates them if already there)
-     */
-    public void insertWatersInADay() {
-        getRepository().getWaterDayValue()
-                .getWaters()
-                .forEach(this::insertWater);
-    }
 
     public void deleteWater(Water water) {
         deleteWater(water, () -> removeWaterInDay(water));
@@ -353,8 +399,20 @@ public class WaterViewModel extends ViewModel {
                 ));
     }
 
-    public Map<Long, Type> getWaterTypes() {
+    /**
+     * Returns new HashMap of Types, changing it does not effect original Map
+     * @return new map of Types
+     */
+    public HashMap<Long, Type> getTypes() {
         return getRepository().getWaterTypes();
+    }
+
+    public void setTypesObserver(LifecycleOwner owner, Observer<HashMap<Long, Type>> observer) {
+        getRepository().setTypesLiveDataObserver(owner, observer);
+    }
+
+    public void removeTypeLiveDataObserver(LifecycleOwner owner) {
+        getRepository().removeTypeLiveDataObserver(owner);
     }
 
     public LocalDate getActiveDate() {
@@ -366,10 +424,6 @@ public class WaterViewModel extends ViewModel {
             repository = WaterDataRepository.getInstance();
         }
         return repository;
-    }
-
-    public void setRepository(WaterDataRepository repository) {
-        this.repository = repository;
     }
 
     public void clearDisposable() {

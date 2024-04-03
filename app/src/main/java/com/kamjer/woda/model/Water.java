@@ -74,4 +74,10 @@
         public void setWaterDayId(long waterDayId) {
             this.waterDayId = waterDayId;
         }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return getId() + ", " + getWaterDrank() + ", " + getTypeId() + ", " + getWaterDayId();
+        }
     }

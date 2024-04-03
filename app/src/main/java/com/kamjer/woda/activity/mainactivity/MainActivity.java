@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
@@ -25,7 +24,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kamjer.woda.R;
 import com.kamjer.woda.activity.alarmactivity.AlarmActivity;
-import com.kamjer.woda.utils.NotificationHelper;
 import com.kamjer.woda.activity.mainactivity.addwaterdialog.AddWaterDialog;
 import com.kamjer.woda.activity.calendaractivity.CalendarActivity;
 import com.kamjer.woda.activity.useractivity.UserActivity;
@@ -35,11 +33,11 @@ import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.model.WaterDay;
 import com.kamjer.woda.model.WaterDayWithWaters;
+import com.kamjer.woda.utils.WaterAppErrorHandler;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 
@@ -62,8 +60,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 //      creating View model and setting data base to it
         waterViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(WaterViewModel.class);
-//      initializing app
-        waterViewModel.initialize(getApplicationContext());
+//      checking if it is a restart (rotation of a screen) or a app is starting
+        if (savedInstanceState == null) {
+//          initializing app
+            waterViewModel.initialize(getApplicationContext());
+//          loading data for today
+            waterViewModel.loadWaterDayWithWatersByDate(LocalDate.now());
+        }
 
         gestureDetector = new GestureDetectorCompat(this, new ChangeWatersGestureListener(this, waterViewModel));
 
@@ -76,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                             int resultData = data.getIntExtra("waterAmount", WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO);
                             long typeId = data.getLongExtra("type", 0);
                             if (typeId != 0) {
-                                Type type = waterViewModel.getWaterTypes().get(typeId);
+                                Type type = waterViewModel.getTypes().get(typeId);
                                 updateWaterFromDialogs(resultData, type);
                             }
                         }
@@ -92,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                             int resultData = data.getIntExtra("waterAmount", WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO);
                             long typeId = data.getLongExtra("type", 0);
                             if (typeId != 0) {
-                                Type type = waterViewModel.getWaterTypes().get(typeId);
+                                Type type = waterViewModel.getTypes().get(typeId);
                                 updateWaterFromDialogs(-resultData, type);
                             }
                         }
@@ -103,26 +106,17 @@ public class MainActivity extends AppCompatActivity {
             if (isGranted) {
                 onClickNotificationActivityButtonAction();
             } else {
-                Toast.makeText(this, getString(R.string.test), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.text_notification_permission_not_granted), Toast.LENGTH_LONG).show();
             }
         });
 
 //      creating behavior for error in a RxJava
-        RxJavaPlugins.setErrorHandler(e -> {
-            if (e != null) {
-                String errorMessage = Optional.ofNullable(e.getMessage()).orElse("Error detected, source not known");
-                Log.e("errorHandler", errorMessage);
-                Toast.makeText(this, getResources().getString(R.string.error_message), Toast.LENGTH_LONG).show();
-            }
-        });
+        RxJavaPlugins.setErrorHandler(new WaterAppErrorHandler(this));
 
 //      creating observer for liveData in a ViewModel
-        waterViewModel.getWater().observe(this, this::setObserverOnWaters);
+                waterViewModel.getWater().observe(this, this::setObserverOnWaters);
 
-//      checking if it is a restart (rotation of a screen) or a app is starting
         if (savedInstanceState == null) {
-//          loading data for today
-            waterViewModel.loadWaterDayWithWatersByDate(LocalDate.now());
         }
     }
 
@@ -224,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
         if (waterUpdated.getWaterDrank() <= 0) {
             waterViewModel.deleteWater(waterUpdated);
         } else {
-//          checking if waterDay is already in a database and if it is not insert it
+//          checking if waterDay is already in a database and if it is don't insert it
             if (!waterViewModel.getWaterValue().getWaterDay().isInserted()) {
                 waterViewModel.insertWaterDay(waterViewModel.getWaterValue().getWaterDay(), aLong -> {
 //                  sets new id for a waterDay
@@ -269,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRestart();
         waterViewModel.clearDisposable();
         waterViewModel.getWater().observe(this, this::setObserverOnWaters);
+        waterViewModel.loadWaterDayWithWatersByDate(waterViewModel.getActiveDate());
     }
 
     @Override

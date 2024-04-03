@@ -98,8 +98,6 @@ public class CalendarView extends RelativeLayout {
                 textDaysNames[i].setText(shortWeekDays[i + 2]);
             }
         }
-
-        setTextYearMonth();
     }
 
 
@@ -172,5 +170,6 @@ public class CalendarView extends RelativeLayout {
 
     public void showMonthView() {
         daysOfMonthView.setMonthView();
+        setTextYearMonth();
     }
 }

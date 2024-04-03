@@ -1,27 +1,18 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">Woda</string>
-    <string name="water_to_drink">do wypicia</string>
-    <string name="drank_water">wypita woda</string>
-    <string name="calendar">Kal</string>
-    <string name="glassDesc">Szklanka, czego się spodziewasz?</string>
-    <string name="addWaterDrankButtonText">+</string>
-    <string name="edit_text_add_water_amount_hint">250 ml</string>
-    <string name="water_type">Typ napoju</string>
-    <string name="water_goal">Woda do wypicia [ml]</string>
-    <string name="water_amount_to_drink">waterAmountToDrink</string>
-    <string name="shared_preferences">com.kamjer.woda.SHARED_PREFERENCES</string>
-    <string name="remove_water_drank_button_tex">-</string>
-    <string name="goal">Cel</string>
-    <string name="add_water_button_text">Dodaj</string>
-    <string name="remove_water_button_text">Odejmij</string>
-    <string name="error_message">Coś poszło nie tak!</string>
-    <string name="user_activity_background_description">background</string>
-    <string name="user_activity_accept_values_description">accept values</string>
-    <string name="error_message_can_not_load">Coś poszło nie tak, nie można załadować koniecznych plików</string>
-    <string name="button_add_water_drank_description">Button for adding drinks to a day</string>
     <string name="test">test</string>
+    <string name="calendarDesc">Calendar button</string>
     <string name="button_remove_water_drank_description">Button for removing drinks from a day</string>
     <string name="button_user_action_description">Button for activating user activity</string>
+    <string name="button_add_water_drank_description">Button for adding drinks to a day</string>
+    <string name="user_activity_accept_values_description">accept values</string>
+    <string name="shared_preferences">com.kamjer.woda.SHARED_PREFERENCES</string>
+    <string name="error_message">Coś poszło nie tak!</string>
+    <string name="edit_text_add_water_amount_hint">250 ml</string>
+    <string name="water_goal">Woda do wypicia [ml]</string>
+    <string name="add_water_button_text">Dodaj</string>
+    <string name="remove_water_button_text">Odejmij</string>
+    <string name="error_message_can_not_load">Coś poszło nie tak, nie można załadować koniecznych plików</string>
     <string name="drink_water_notification_title">Napij się!</string>
     <string name="drink_water_notification_message">Przypominamy o wypiciu wody \n Dzienne zapotrzebowanie wody dla dorosłego człowieka to 1,5 do 2 litrów wody! \n wg. https://pacjent.gov.pl/aktualnosc/pij-wiecej-wody </string>
     <string name="notification_reminder_text">Włacz przypomnienie \no wypiciu wody</string>
@@ -29,7 +20,12 @@
     <string name="text_start_hour_notification">Godzina startowa</string>
     <string name="text_constraint_notification_end">Koniec godzin nocnych</string>
     <string name="text_constraint_notification_start">Początek godzin nocnych</string>
-    <string name="text_constraint_notification_explain">Notyfikacje nie będą wysyłane w godzinach nocnych</string>
+    <string name="text_constraint_notification_explain">Powiadomienia nie będą wysyłane w godzinach nocnych</string>
+    <string name="text_notification_permission_not_granted">Bez pozwolenia na używanie powiadomień nie będzie możliwości przypomnienia ci o wypiciu wody!</string>
+    <string name="text_info_delete_type_conflict_dialog">Próbujesz usunąć typ napoju gdy istnieją zapisane napoje o tym typie, co mamy zrobić?</string>
+    <string name="text_delete_button_delete_type_conflict_dialog">Usuń napoje</string>
+    <string name="text_change_button_delete_type_conflict_dialog">Zmień typ napojów</string>
+    <string name="text_nothing_button_delete_type_conflict_dialog">Nic</string>
     <string-array name="default_types">
         <item>Woda</item>
         <item>Kawa</item>

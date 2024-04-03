@@ -13,6 +13,8 @@
         android:layout_height="wrap_content"
         android:max="255"
         android:padding="10dp"
+        android:progressTint="@color/red"
+        android:thumbTint="@color/red"
         />
 
     <SeekBar
@@ -21,7 +23,8 @@
         android:layout_height="wrap_content"
         android:max="255"
         android:padding="10dp"
-
+        android:progressTint="@color/green"
+        android:thumbTint="@color/green"
         />
 
     <SeekBar
@@ -30,6 +33,8 @@
         android:layout_height="wrap_content"
         android:max="255"
         android:padding="10dp"
+        android:progressTint="@color/blue"
+        android:thumbTint="@color/blue"
         />
 
     <ImageButton

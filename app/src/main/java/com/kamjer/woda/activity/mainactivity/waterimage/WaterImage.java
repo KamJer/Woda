@@ -22,7 +22,6 @@ import java.util.Queue;
 
 public class WaterImage extends androidx.appcompat.widget.AppCompatImageView {
 
-    private Queue<WaterImageDrawable> waterImageDrawables = new LinkedList<>();
     //    image size in pd
     private static final int IMAGE_SIZE_X = 200;
     private static final int IMAGE_SIZE_Y = 200;
@@ -96,15 +95,16 @@ public class WaterImage extends androidx.appcompat.widget.AppCompatImageView {
 
             Path path1 = (PathParser.createPathFromPathData(bd.toString()));
 //          since for the rest of a code it is necessary for type to exists get default one (Water) if for some reason there is no type for water
-            Type type = Optional.ofNullable(WaterDataRepository.getInstance().
+            Type type = WaterDataRepository.getInstance().
                     getWaterTypes().
-                    get(waterDayWithWaters.getWaters().get(i).getTypeId()))
-                    .orElse(WaterDataRepository.getInstance().getDefaultDrinksTypes()[0]);
-            WaterImageDrawable waterImageDrawable = new WaterImageDrawable(path1, type, waterDayWithWaters.getWaters().get(i).getWaterDrank());
+                    get(waterDayWithWaters.getWaters().get(i).getTypeId());
+            if (type != null) {
+                WaterImageDrawable waterImageDrawable = new WaterImageDrawable(path1, type, waterDayWithWaters.getWaters().get(i).getWaterDrank());
 
-            waterImageDrawable.setMatrix(matrix1);
-            layers[i + 1] = waterImageDrawable;
-            waterImageDrawables.add(waterImageDrawable);
+                waterImageDrawable.setMatrix(matrix1);
+                layers[i + 1] = waterImageDrawable;
+            }
+
         }
         setImageDrawable(new LayerDrawable(layers));
     }

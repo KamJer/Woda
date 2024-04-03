@@ -1,4 +1,4 @@
-package com.kamjer.woda.recyclerWater.interfacewater;
+package com.kamjer.woda.activity.mainactivity.addwaterdialog.recyclerWater.interfacewater;
 
 @FunctionalInterface
 public interface WaterAmountInterface {

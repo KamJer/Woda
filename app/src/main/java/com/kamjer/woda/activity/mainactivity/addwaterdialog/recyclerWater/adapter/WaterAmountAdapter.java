@@ -1,4 +1,4 @@
-package com.kamjer.woda.recyclerWater.adapter;
+package com.kamjer.woda.activity.mainactivity.addwaterdialog.recyclerWater.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,8 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kamjer.woda.R;
-import com.kamjer.woda.recyclerWater.holder.WaterAmountHolder;
-import com.kamjer.woda.recyclerWater.interfacewater.WaterAmountInterface;
+import com.kamjer.woda.activity.mainactivity.addwaterdialog.recyclerWater.holder.WaterAmountHolder;
+import com.kamjer.woda.activity.mainactivity.addwaterdialog.recyclerWater.interfacewater.WaterAmountInterface;
 
 public class WaterAmountAdapter extends RecyclerView.Adapter<WaterAmountHolder> {
 

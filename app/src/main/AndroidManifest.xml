@@ -49,5 +49,10 @@
             android:theme="@style/Theme.AppCompat.Dialog"
             android:windowIsFloating="true">
         </activity>
+        <activity
+            android:name=".activity.useractivity.deletetypeconflictdialog.DeleteTypeConflictDialog"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:windowIsFloating="true">
+        </activity>
     </application>
 </manifest>

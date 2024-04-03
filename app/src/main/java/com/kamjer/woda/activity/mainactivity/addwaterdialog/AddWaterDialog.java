@@ -1,21 +1,19 @@
 package com.kamjer.woda.activity.mainactivity.addwaterdialog;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kamjer.woda.R;
 import com.kamjer.woda.model.Type;
-import com.kamjer.woda.recyclerWater.adapter.WaterAmountAdapter;
+import com.kamjer.woda.activity.mainactivity.addwaterdialog.recyclerWater.adapter.WaterAmountAdapter;
 import com.kamjer.woda.viewmodel.WaterDataRepository;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 

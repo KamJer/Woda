@@ -26,6 +26,7 @@ public class Type implements Serializable {
         this.color = color;
     }
 
+    @Ignore
     public Type(long id, String type, int color) {
         this.id = id;
         this.type = type;

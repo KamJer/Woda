@@ -25,7 +25,6 @@ import com.kamjer.woda.viewmodel.WaterViewModel;
 import java.util.Optional;
 
 public class ColorPickerDialog extends AppCompatActivity {
-
     private final MutableLiveData<Integer> color = new MutableLiveData<>();
 
     private SeekBar redSeekBar;
@@ -35,17 +34,12 @@ public class ColorPickerDialog extends AppCompatActivity {
     private ImageButton colorIndicator;
 
     private Type type;
-    private int holderPosition;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        type = new Type();
-        type.setId(getIntent().getLongExtra("id", 0));
-        type.setColor(getIntent().getIntExtra("color", Color.BLACK));
-        type.setType(getIntent().getStringExtra("type"));
-        holderPosition = getIntent().getIntExtra("position", 0);
+        type = (Type) Optional.ofNullable(getIntent().getSerializableExtra("type")).orElse(new Type());
     }
 
     @Override
@@ -82,7 +76,7 @@ public class ColorPickerDialog extends AppCompatActivity {
 
         Drawable buttonShape = ResourcesCompat.getDrawable(getResources(), R.drawable.color_type_button_shape, null);
         if (buttonShape != null) {
-            buttonShape.setColorFilter(rgb, PorterDuff.Mode.SRC_IN);
+            buttonShape.setColorFilter(rgb, PorterDuff.Mode.SRC_OVER);
             colorIndicator.setBackground(buttonShape);
         } else {
             Toast.makeText(this, getResources().getText(R.string.error_message_can_not_load), Toast.LENGTH_LONG).show();
@@ -91,12 +85,7 @@ public class ColorPickerDialog extends AppCompatActivity {
     }
 
     private void acceptAction(View v) {
-        int color = Optional.ofNullable(this.color.getValue()).orElse(Color.BLACK);
-        getIntent().putExtra("id", type.getId());
-        getIntent().putExtra("color", color);
-        getIntent().putExtra("type", type.getType());
-        getIntent().putExtra("position", holderPosition);
-
+        getIntent().putExtra("type", type);
         setResult(Activity.RESULT_OK, getIntent());
         this.finish();
     }

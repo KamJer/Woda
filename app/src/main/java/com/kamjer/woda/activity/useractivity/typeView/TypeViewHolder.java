@@ -2,6 +2,9 @@ package com.kamjer.woda.activity.useractivity.typeView;
 
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -49,12 +52,21 @@ public class TypeViewHolder extends RecyclerView.ViewHolder{
         } else {
             Toast.makeText(itemView.getContext(), itemView.getContext().getResources().getText(R.string.error_message_can_not_load), Toast.LENGTH_LONG).show();
         }
-        buttonColorPicker.setOnClickListener(v -> colorSelectorAction.action(type, position));
+        buttonColorPicker.setOnClickListener(v -> {
+//          becuse how android manges focus i need to switch focus by hand when opening
+            notifyFocusedCleared();
+            colorSelectorAction.action(type, position);
+        });
+
         editTextType.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
                 typeNameChangedAction.action(type, editTextType.getText());
             }
         });
         buttonRemoveType.setOnClickListener(v -> removeTypeAction.action(type, position));
+    }
+
+    public void notifyFocusedCleared() {
+        editTextType.clearFocus();
     }
 }
