@@ -26,7 +26,7 @@ import com.kamjer.woda.activity.useractivity.typeView.TypeNameChangedAction;
 import com.kamjer.woda.activity.useractivity.typeView.TypeRecyclerView;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
-import com.kamjer.woda.viewmodel.WaterViewModel;
+import com.kamjer.woda.viewmodel.UserViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ import java.util.Optional;
 public class UserActivity extends AppCompatActivity {
 
     private EditText textViewWaterAmount;
-    private WaterViewModel waterViewModel;
+    private UserViewModel userViewModel;
 
     private TypeListViewAdapter adapter;
 
@@ -49,7 +49,7 @@ public class UserActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        waterViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(WaterViewModel.class);
+        userViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(UserViewModel.class);
 
         ActivityResultLauncher<Intent> removeTypeConflictDialogLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -67,11 +67,11 @@ public class UserActivity extends AppCompatActivity {
                                     Type typeSelected = Optional.ofNullable((Type) data.getSerializableExtra(DeleteTypeConflictDialog.TYPE_SELECTED_NAME)).orElse(new Type());
                                     long typeIdSelected = typeSelected.getId();
                                     waterList.forEach(water -> water.setTypeId(typeIdSelected));
-                                    waterViewModel.insertWatersSumWatersDeleteType(waterList, typeToDelete);
+                                    userViewModel.insertWatersSumWatersDeleteType(waterList, typeToDelete);
                                     break;
                                 case DELETE:
-                                    waterViewModel.removeWaters(waterList);
-                                    waterViewModel.removeType(typeToDelete);
+                                    userViewModel.removeWaters(waterList);
+                                    userViewModel.removeType(typeToDelete);
                                     break;
                                 case NOTHING:
                                     break;
@@ -80,16 +80,16 @@ public class UserActivity extends AppCompatActivity {
                     }
                 });
 
-        buttonRemoveTypeAction = (type, position) -> waterViewModel.loadWaterByType(type, waters -> {
+        buttonRemoveTypeAction = (type, position) -> userViewModel.loadWatersByType(type, waters -> {
             ArrayList<Water> waterList = new ArrayList<>(waters);
 
-//                if there are no waters with this type delete that ype
+//                if there are no waters with this type delete that type
             if (waters.isEmpty()) {
-                waterViewModel.removeType(type);
+                userViewModel.removeType(type);
 //                    if there are waters with this type ask user what to do
             } else {
                 Intent deleteTypeConflictDialogIntent = new Intent(this, DeleteTypeConflictDialog.class);
-                deleteTypeConflictDialogIntent.putExtra(DeleteTypeConflictDialog.TYPE_LIST_NAME, new ArrayList<>(waterViewModel.getTypes().values()));
+                deleteTypeConflictDialogIntent.putExtra(DeleteTypeConflictDialog.TYPE_LIST_NAME, new ArrayList<>(userViewModel.getTypes().values()));
                 deleteTypeConflictDialogIntent.putExtra(DeleteTypeConflictDialog.WATER_LIST_NAME, waterList);
                 deleteTypeConflictDialogIntent.putExtra(DeleteTypeConflictDialog.TYPE_TO_DELETE_NAME, type);
                 removeTypeConflictDialogLauncher.launch(deleteTypeConflictDialogIntent);
@@ -104,7 +104,7 @@ public class UserActivity extends AppCompatActivity {
                         if (data != null) {
                             Type typeToUpdate = Optional.ofNullable((Type) data.getSerializableExtra("type"))
                                     .orElse(new Type());
-                            waterViewModel.insertType(typeToUpdate);
+                            userViewModel.insertType(typeToUpdate);
                         }
                     }
                 });
@@ -117,11 +117,11 @@ public class UserActivity extends AppCompatActivity {
 
         typeNameChangedAction = (type, newName) -> {
             type.setType(newName.toString());
-            waterViewModel.insertType(type);
+            userViewModel.insertType(type);
         };
 
-        waterViewModel.setTypesObserver(this, longTypeHashMap ->
-                adapter.setTypeList(new ArrayList<>(waterViewModel.getTypes().values())));
+        userViewModel.setTypesObserver(this, longTypeHashMap ->
+                adapter.setTypeList(new ArrayList<>(userViewModel.getTypes().values())));
     }
 
     @Override
@@ -137,8 +137,8 @@ public class UserActivity extends AppCompatActivity {
         addWaterTypeButton.setOnClickListener(v -> addNewTypeAction());
 
         textViewWaterAmount = findViewById(R.id.editTextNumber);
-        textViewWaterAmount.setText(String.valueOf(waterViewModel.getWaterAmountToDrink()));
-        adapter = createNewTypeAdapter(new ArrayList<>(waterViewModel.getTypes().values()));
+        textViewWaterAmount.setText(String.valueOf(userViewModel.getWaterAmountToDrink()));
+        adapter = createNewTypeAdapter(new ArrayList<>(userViewModel.getTypes().values()));
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         typeListRecycler = findViewById(R.id.recyclerViewTypeList);
         typeListRecycler.setLayoutManager(layoutManager);
@@ -147,13 +147,13 @@ public class UserActivity extends AppCompatActivity {
 
     private void floatingActionButtonSetWaterAmountAction(View view) {
         int waterAmountToDrink = Integer.parseInt(textViewWaterAmount.getText().toString());
-        waterViewModel.setWaterAmountToDrink(getApplicationContext(), waterAmountToDrink);
+        userViewModel.setWaterAmountToDrink(getApplicationContext(), waterAmountToDrink);
         this.finish();
     }
 
     private void addNewTypeAction() {
         Type newType = new Type("", Color.BLACK);
-        waterViewModel.insertType(newType);
+        userViewModel.insertType(newType);
     }
 
     private TypeListViewAdapter createNewTypeAdapter(ArrayList<Type> typeList) {
@@ -167,8 +167,15 @@ public class UserActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        waterViewModel.removeTypeLiveDataObserver(this);
+        userViewModel.removeTypeLiveDataObserver(this);
 //        clears focus on all elements in a recyclerView, necessary to fire focus listener on ViewHolder
         typeListRecycler.notifyFocusCleared();
+        userViewModel.clearDisposable();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        userViewModel.clearDisposable();
     }
 }

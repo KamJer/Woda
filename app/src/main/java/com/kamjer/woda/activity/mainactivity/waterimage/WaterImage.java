@@ -14,11 +14,7 @@ import androidx.core.graphics.PathParser;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.WaterDayWithWaters;
 import com.kamjer.woda.utils.FloatPoint;
-import com.kamjer.woda.viewmodel.WaterDataRepository;
-
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.Queue;
+import com.kamjer.woda.repository.WaterDataRepository;
 
 public class WaterImage extends androidx.appcompat.widget.AppCompatImageView {
 

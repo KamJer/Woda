@@ -7,7 +7,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,42 +15,54 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.kamjer.woda.R;
 import com.kamjer.woda.utils.NotificationHelper;
-import com.kamjer.woda.viewmodel.WaterViewModel;
+import com.kamjer.woda.viewmodel.AlarmViewModel;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 public class AlarmActivity extends AppCompatActivity {
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("H : mm");
 
-    public static final LocalTime TIME_CONSTRAINT_START_DEFAULT = LocalTime.of(8, 0);
-    public static final LocalTime TIME_CONSTRAINT_END_DEFAULT = LocalTime.of(22, 0);
-
     private SwitchCompat switchCompatNotifications;
     private Button buttonSelectHourStart;
+    private Button buttonConstraintTimeStart;
+    private Button buttonConstraintTimeEnd;
+
     private Spinner spinnerHourSelectNotification;
 
-    private LocalTime selectedTime;
+//    private LocalTime selectedTime;
     private int selectedHourRepeating = 1;
 
-    private LocalTime timeConstraintStart = TIME_CONSTRAINT_START_DEFAULT;
-    private LocalTime timeConstraintEnd = TIME_CONSTRAINT_END_DEFAULT;
-
-    private WaterViewModel waterViewModel;
+    private AlarmViewModel alarmViewModel;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        waterViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(WaterViewModel.class);
+        alarmViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(AlarmViewModel.class);
 
         if (savedInstanceState == null) {
-            selectedTime = waterViewModel.getSelectedNotificationsTime();
-            timeConstraintStart = waterViewModel.getConstraintNotificationTimeStart();
-            timeConstraintEnd = waterViewModel.getConstraintNotificationTimeEnd();
+//            selectedTime = alarmViewModel.getSelectedNotificationsTimeLiveData();
+//            timeConstraintStart = alarmViewModel.getConstraintNotificationTimeStartLiveData();
+//            timeConstraintEnd = alarmViewModel.getConstraintNotificationTimeEndLiveData();
         }
+
+        alarmViewModel.isNotificationsActiveObserver(this, isChecked -> {
+            switchCompatNotifications.setChecked(isChecked);
+        });
+
+        alarmViewModel.setSelectedNotificationsTimeObserver(this, time -> {
+            buttonSelectHourStart.setText(time.format(TIME_FORMATTER));
+        });
+
+        alarmViewModel.setConstraintNotificationsTimeStartObserver(this, time -> {
+            buttonConstraintTimeStart.setText(time.format(TIME_FORMATTER));
+        });
+
+        alarmViewModel.setConstraintNotificationsTimeEndObserver(this, time -> {
+            buttonConstraintTimeEnd.setText(time.format(TIME_FORMATTER));
+        });
     }
 
     @Override
@@ -60,17 +71,16 @@ public class AlarmActivity extends AppCompatActivity {
         setContentView(R.layout.alarm_activity_layout);
 
         switchCompatNotifications = findViewById(R.id.switchNotifications);
-        switchCompatNotifications.setChecked(waterViewModel.isNotificationsActive());
 
         switchCompatNotifications.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> setNotificationsActions(isChecked));
+                (buttonView, isChecked) -> {
+                    setNotificationsActions(isChecked);
+                });
 
         buttonSelectHourStart = findViewById(R.id.buttonSelectHourStart);
-        if (waterViewModel.isNotificationsActive()) {
-            buttonSelectHourStart.setText(selectedTime.format(TIME_FORMATTER));
-        } else {
-            selectedTime= LocalTime.now();
-            buttonSelectHourStart.setText(selectedTime.format(TIME_FORMATTER));
+
+        if (!alarmViewModel.isNotificationsActive()) {
+            alarmViewModel.setSelectedNotificationsTime(getApplicationContext(), LocalTime.now());
         }
         spinnerHourSelectNotification = findViewById(R.id.spinnerHourSelectNotification);
 
@@ -97,19 +107,15 @@ public class AlarmActivity extends AppCompatActivity {
         });
 
         buttonSelectHourStart.setOnClickListener(v -> showTimePickerDialog((view, hour, minute) -> {
-            this.selectedTime = LocalTime.of(hour, minute);
-            waterViewModel.setSelectedNotificationsTime(getApplicationContext(), selectedTime);
-            buttonSelectHourStart.setText(selectedTime.format(TIME_FORMATTER));
+            alarmViewModel.setSelectedNotificationsTime(getApplicationContext(), LocalTime.of(hour, minute));
             resetNotifications();
         }));
 
-        Button buttonConstraintTimeStart = findViewById(R.id.buttonConstraintTimeStart);
-        buttonConstraintTimeStart.setText(timeConstraintStart.format(TIME_FORMATTER));
+        buttonConstraintTimeStart = findViewById(R.id.buttonConstraintTimeStart);
         buttonConstraintTimeStart.setOnClickListener(v ->
                 showTimePickerDialog(buttonConstraintTimeStartAction(buttonConstraintTimeStart)));
 
-        Button buttonConstraintTimeEnd = findViewById(R.id.buttonConstraintTimeEnd);
-        buttonConstraintTimeEnd.setText(timeConstraintEnd.format(TIME_FORMATTER));
+        buttonConstraintTimeEnd = findViewById(R.id.buttonConstraintTimeEnd);
         buttonConstraintTimeEnd.setOnClickListener(v ->
                 showTimePickerDialog(buttonConstraintTimeEndAction(buttonConstraintTimeEnd)
         ));
@@ -117,24 +123,22 @@ public class AlarmActivity extends AppCompatActivity {
 
     private TimePickerDialog.OnTimeSetListener buttonConstraintTimeStartAction(Button buttonConstraintTimeStart) {
         return (view, hourOfDay, minute) -> {
-            timeConstraintStart = LocalTime.of(hourOfDay, minute);
-            waterViewModel.setConstraintNotificationTimeStart(getApplicationContext(), timeConstraintStart);
-            buttonConstraintTimeStart.setText(timeConstraintStart.format(TIME_FORMATTER));
+            LocalTime timeConstraintStart = LocalTime.of(hourOfDay, minute);
+            alarmViewModel.setConstraintNotificationTimeStart(getApplicationContext(), timeConstraintStart);
             resetNotifications();
         };
     }
 
     private TimePickerDialog.OnTimeSetListener buttonConstraintTimeEndAction(Button buttonConstraintTimeEnd) {
         return (view, hourOfDay, minute) -> {
-            timeConstraintEnd = LocalTime.of(hourOfDay, minute);
-            waterViewModel.setConstraintNotificationTimeEnd(getApplicationContext(), timeConstraintEnd);
-            buttonConstraintTimeEnd.setText(timeConstraintEnd.format(TIME_FORMATTER));
+            LocalTime timeConstraintEnd = LocalTime.of(hourOfDay, minute);
+            alarmViewModel.setConstraintNotificationTimeEnd(getApplicationContext(), timeConstraintEnd);
             resetNotifications();
         };
     }
 
     private void setNotificationsActions(boolean isChecked) {
-        waterViewModel.setNotificationsActive(getApplicationContext(), isChecked);
+        alarmViewModel.setNotificationsActive(getApplicationContext(), isChecked);
         if (isChecked) {
             setNotifications();
         } else {
@@ -154,13 +158,12 @@ public class AlarmActivity extends AppCompatActivity {
     }
 
     private void setNotifications() {
-        waterViewModel.setSelectedNotificationsTime(getApplicationContext(), selectedTime);
         NotificationHelper.setNotificationRepeatableAlarm(
                 getApplicationContext(),
-                selectedTime,
+                alarmViewModel.getSelectedNotificationsTime(),
                 selectedHourRepeating,
-                timeConstraintStart,
-                timeConstraintEnd);
+                alarmViewModel.getConstraintNotificationTimeStart(),
+                alarmViewModel.getConstraintNotificationTimeEnd());
     }
 
     private void resetNotifications() {

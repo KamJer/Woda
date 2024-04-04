@@ -3,8 +3,10 @@ package com.kamjer.woda.activity.calendaractivity;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.ViewModelProvider;
@@ -28,32 +30,33 @@ public class CalendarActivity extends AppCompatActivity {
     private List<WaterDayWithWaters> waters;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        setContentView(R.layout.calendar_activity_layout);
-
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 //      getting viewModel
         waterViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(WaterViewModel.class);
 
-//      getting date from active water
-        LocalDate defaultSelectedDate = waterViewModel.getActiveDate();
+        waterViewModel.setWaterDayWithWatersObserver(this,
+                waterDayWithWaters -> calendarView.setSelectedDate(waterDayWithWaters.getWaterDay().getDate()));
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setContentView(R.layout.calendar_activity_layout);
 //      after finding data creating calendar and operating on it
         calendarView = findViewById(R.id.calendarViewSelectDate);
 
-
 //      setting loaded selected date
-        calendarView.setSelectedDate(defaultSelectedDate);
         calendarView.setCustomCalendarViewHolder(WaterCalendarViewHolder.class, R.layout.water_calendar_cell);
 
 //      setting calendar listeners
-        calendarView.setSelectedDateChangedListener(this::dataChangedAction);
+        calendarView.setSelectedDateChangedListener(this::dateChangedAction);
         calendarView.setCustomHolderBehavior(holder -> colorDays(waters, holder));
 
-        SelectedDataChangedListener selectedDataChangedListener = (view, localDate) -> fetchData();
+        SelectedDataChangedListener selectedDateChangedListener = (view, localDate) -> fetchData();
 
-        calendarView.setNextMonthChangeListener(selectedDataChangedListener);
-        calendarView.setPreviousMonthChangeListener(selectedDataChangedListener);
+        calendarView.setNextMonthChangeListener(selectedDateChangedListener);
+        calendarView.setPreviousMonthChangeListener(selectedDateChangedListener);
 
 //      fetching data from database
         fetchData();
@@ -115,7 +118,7 @@ public class CalendarActivity extends AppCompatActivity {
      * @param view itemView from a holder in a calendar that represents day
      * @param localDate new date
      */
-    private void dataChangedAction(View view, LocalDate localDate) {
+    private void dateChangedAction(View view, LocalDate localDate) {
         waterViewModel.loadWaterDayWithWatersByDate(localDate);
         this.finish();
     }
@@ -128,5 +131,11 @@ public class CalendarActivity extends AppCompatActivity {
      */
     private Optional<WaterDayWithWaters> findWaterByDate(List<WaterDayWithWaters> waters, LocalDate date) {
         return waters.stream().filter(water -> water.getWaterDay().getDate().equals(date)).findFirst();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        waterViewModel.clearDisposable();
     }
 }

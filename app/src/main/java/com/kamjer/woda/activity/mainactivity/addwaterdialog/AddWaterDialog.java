@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.kamjer.woda.R;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.activity.mainactivity.addwaterdialog.recyclerWater.adapter.WaterAmountAdapter;
-import com.kamjer.woda.viewmodel.WaterDataRepository;
+import com.kamjer.woda.repository.WaterDataRepository;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.util.ArrayList;
@@ -39,6 +39,7 @@ public class AddWaterDialog extends AppCompatActivity {
 
         List<Type> typeNames;
 
+//        TODO:Wrong pass data from parent activity
         if (isRemove) {
 //      getting used types in an active day to the list of types
             typeNames = new ArrayList<>(WaterDataRepository.getInstance().getUsedTypes

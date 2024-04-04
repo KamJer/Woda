@@ -1,4 +1,4 @@
-package com.kamjer.woda.viewmodel;
+package com.kamjer.woda.repository;
 
 import android.content.Context;
 
@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.room.Room;
 
-import com.kamjer.woda.R;
 import com.kamjer.woda.database.dao.WaterDAO;
 import com.kamjer.woda.database.WaterDatabase;
 import com.kamjer.woda.model.Type;
@@ -16,13 +15,18 @@ import com.kamjer.woda.model.WaterDay;
 import com.kamjer.woda.model.WaterDayWithWaters;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.DisposableContainer;
+import io.reactivex.rxjava3.disposables.SerialDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class WaterDataRepository {
 
@@ -36,20 +40,7 @@ public class WaterDataRepository {
 
     private final MutableLiveData<HashMap<Long, Type>> waterTypes = new MutableLiveData<>();
 
-    private Type[] defaultDrinksTypes;
-    private boolean notificationsActive;
-    private LocalTime selectedNotificationsTime;
-    private LocalTime constraintNotificationTimeStart;
-    private LocalTime constraintNotificationTimeEnd;
-
-    public void loadDefaultTypes(Context context) {
-        String[] defaultDrinksTypesText = context.getResources().getStringArray(R.array.default_types);
-        int[] defaultDrinksTypesColor = context.getResources().getIntArray(R.array.types_default_color);
-        defaultDrinksTypes = new Type[defaultDrinksTypesText.length];
-        for (int i = 0; i < defaultDrinksTypesText.length; i++) {
-            defaultDrinksTypes[i] = new Type(defaultDrinksTypesText[i], defaultDrinksTypesColor[i]);
-        }
-    }
+    SerialDisposable serialDisposable = new SerialDisposable();
 
     public void createWaterDatabase(Context context) {
 //        if database does not exists already create a new one
@@ -58,6 +49,22 @@ public class WaterDataRepository {
                     .build();
             this.waterDAO = waterDatabase.waterDAO();
         }
+
+        serialDisposable.set(getWaterDAO().getAllTypes()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(types -> {
+                    setWaterTypes((HashMap<Long, Type>) types.stream().collect(Collectors.toMap(
+                            Type::getId,
+                            type -> type)));
+//                  fetching default values
+//                  check if all default types are in a database and if some are not insert them
+                    WaterDataRepository.containsDefaultTypes(ResourcesRepository
+                                    .getInstance()
+                                    .getDefaultDrinksTypes(),
+                                    getWaterTypes())
+                            .forEach(type -> getWaterDAO().insertType(type));
+                }));
     }
 
     public static WaterDataRepository getInstance() {
@@ -91,7 +98,7 @@ public class WaterDataRepository {
 
     public void removeWaterValue(Water water) {
         WaterDayWithWaters waterDayWithWaters = Optional.ofNullable(this.waters.getValue())
-                .orElseGet(() -> new WaterDayWithWaters(LocalDate.now(), WaterViewModel.DEFAULT_WATER_TO_DRINK));
+                .orElseGet(() -> new WaterDayWithWaters(LocalDate.now(), SharedPreferencesRepository.DEFAULT_WATER_TO_DRINK));
         waterDayWithWaters.getWaters().remove(water);
         this.waters.setValue(waterDayWithWaters);
     }
@@ -108,7 +115,7 @@ public class WaterDataRepository {
 
     public WaterDayWithWaters getWaterDayValue() {
         return Optional.ofNullable(waters.getValue())
-                .orElse(new WaterDayWithWaters(LocalDate.now(), WaterViewModel.DEFAULT_WATER_TO_DRINK));
+                .orElse(new WaterDayWithWaters(LocalDate.now(), SharedPreferencesRepository.DEFAULT_WATER_TO_DRINK));
     }
 
     /**
@@ -194,14 +201,6 @@ public class WaterDataRepository {
     }
 
     /**
-     * Returns default types of water
-     * @return default types loaded on start of an app, if there are no default types loaded, returns empty array of types
-     */
-    public Type[] getDefaultDrinksTypes() {
-        return Optional.ofNullable(defaultDrinksTypes).orElse(new Type[0]);
-    }
-
-    /**
      * Finds all of used types in a passed list of waters
      * @param waters list of waters to check
      * @return list of maps
@@ -228,39 +227,8 @@ public class WaterDataRepository {
         waters.setValue(waterDayWithWatersToUpdate);
     }
 
-    public void setNotificationsActive(boolean isNotificationsActive) {
-        this.notificationsActive = isNotificationsActive;
-    }
-
-    public boolean isNotificationsActive() {
-        return notificationsActive;
-    }
-
-    public LocalTime getSelectedNotificationsTime() {
-        return selectedNotificationsTime;
-    }
-
-    public void setSelectedNotificationsTime(LocalTime selectedNotificationsTime) {
-        this.selectedNotificationsTime = selectedNotificationsTime;
-    }
-
-    public LocalTime getConstraintNotificationTimeStart() {
-        return constraintNotificationTimeStart;
-    }
-
-    public void setConstraintNotificationTimeStart(LocalTime constraintNotificationTimeStart) {
-        this.constraintNotificationTimeStart = constraintNotificationTimeStart;
-    }
-
-    public LocalTime getConstraintNotificationTimeEnd() {
-        return constraintNotificationTimeEnd;
-    }
-
-    public void setConstraintNotificationTimeEnd(LocalTime constraintNotificationTimeEnd) {
-        this.constraintNotificationTimeEnd = constraintNotificationTimeEnd;
-    }
-
     public WaterDatabase getWaterDatabase() {
         return waterDatabase;
     }
+
 }

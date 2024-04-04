@@ -1,4 +1,4 @@
-package com.kamjer.woda.viewmodel;
+package com.kamjer.woda.repository;
 
 import android.content.Context;
 

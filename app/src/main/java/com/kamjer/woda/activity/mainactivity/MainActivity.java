@@ -33,6 +33,7 @@ import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.model.WaterDay;
 import com.kamjer.woda.model.WaterDayWithWaters;
+import com.kamjer.woda.utils.AppInitializer;
 import com.kamjer.woda.utils.WaterAppErrorHandler;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 //      checking if it is a restart (rotation of a screen) or a app is starting
         if (savedInstanceState == null) {
 //          initializing app
-            waterViewModel.initialize(getApplicationContext());
+            AppInitializer.initialize(getApplicationContext());
 //          loading data for today
             waterViewModel.loadWaterDayWithWatersByDate(LocalDate.now());
         }
@@ -114,10 +115,7 @@ public class MainActivity extends AppCompatActivity {
         RxJavaPlugins.setErrorHandler(new WaterAppErrorHandler(this));
 
 //      creating observer for liveData in a ViewModel
-                waterViewModel.getWater().observe(this, this::setObserverOnWaters);
-
-        if (savedInstanceState == null) {
-        }
+        waterViewModel.getWater().observe(this, this::setObserverOnWaters);
     }
 
     @Override
