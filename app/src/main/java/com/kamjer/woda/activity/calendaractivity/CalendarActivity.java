@@ -81,35 +81,28 @@ public class CalendarActivity extends AppCompatActivity {
         if (holder instanceof WaterCalendarViewHolder) {
             WaterCalendarViewHolder waterHolder = (WaterCalendarViewHolder) holder;
 
-            findWaterByDate(waters, holder.getDate()).map(waterFound -> {
+            int color = findWaterByDate(waters, holder.getDate()).map(waterFound -> {
 //                  painting elements for a found water
 //                  normalizing water drank
                 float normalizedWater = Math.min(1.0f, (float) waterFound.getWaterDaySum() / (float) waterFound.getWaterDay().getWaterToDrink());
-//                  we want it to be half see through (a = 255/2)
-                int a = 255;
 //                  calculating green value
                 int g = (int) (255 * normalizedWater);
 //                  calculating red value
                 int r = (int) (255 - g);
 
-                Drawable circle = ResourcesCompat.getDrawable(CalendarActivity.this.getResources(), R.drawable.circle, null);
-                if (circle != null) {
-                    circle.setColorFilter(Color.argb(a, r, g, 0), PorterDuff.Mode.SRC_OUT);
-                    waterHolder.getCircle().setBackground(circle);
-                }
-                return waterFound;
+                return Color.rgb(r, g, 0);
             }).orElseGet(() -> {
-//                  we want it to be half see through
-                int a = 255;
 //                  painting day in red (no value found, no water in a database, no water drank)
                 int r = 255;
-                Drawable circle = ResourcesCompat.getDrawable(CalendarActivity.this.getResources(), R.drawable.circle, null);
-                if (circle != null) {
-                    circle.setColorFilter(Color.argb(a, r, 0, 0), PorterDuff.Mode.SRC_OUT);
-                    waterHolder.getCircle().setBackground(circle);
-                }
-                return null;
+
+                return Color.rgb(r, 0, 0);
             });
+
+            Drawable circle = ResourcesCompat.getDrawable(CalendarActivity.this.getResources(), R.drawable.circle, null);
+            if (circle != null) {
+                circle.setColorFilter(color, PorterDuff.Mode.SRC_OUT);
+                waterHolder.getCircle().setBackground(circle);
+            }
         }
     }
 
@@ -126,7 +119,7 @@ public class CalendarActivity extends AppCompatActivity {
     /**
      * Finds Water with specific date in a list, finds first one in a list(it should have only one anyway)
      * @param waters list of waters
-     * @param date to fond
+     * @param date to find
      * @return Optional of a found water
      */
     private Optional<WaterDayWithWaters> findWaterByDate(List<WaterDayWithWaters> waters, LocalDate date) {
