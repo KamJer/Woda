@@ -35,6 +35,10 @@ public class UserViewModel extends ViewModel {
         SharedPreferencesRepository.getInstance().setWaterAmountToDrink(applicationContext, waterAmountToDrink);
     }
 
+    public void setWaterAMountToDrinkObserver(LifecycleOwner owner, Observer<Integer> observer) {
+        SharedPreferencesRepository.getInstance().getWaterAmountToDrinkLiveData().observe(owner, observer);
+    }
+
     /**
      * Custom sql transaction that inserts passed waters to the database,
      * sums all waters in a database and after all of that deletes passed type

@@ -122,6 +122,10 @@ public class UserActivity extends AppCompatActivity {
 
         userViewModel.setTypesObserver(this, longTypeHashMap ->
                 adapter.setTypeList(new ArrayList<>(userViewModel.getTypes().values())));
+
+        userViewModel.setWaterAMountToDrinkObserver(this, integer -> {
+            textViewWaterAmount.setText(String.valueOf(userViewModel.getWaterAmountToDrink()));
+        });
     }
 
     @Override
@@ -137,7 +141,6 @@ public class UserActivity extends AppCompatActivity {
         addWaterTypeButton.setOnClickListener(v -> addNewTypeAction());
 
         textViewWaterAmount = findViewById(R.id.editTextNumber);
-        textViewWaterAmount.setText(String.valueOf(userViewModel.getWaterAmountToDrink()));
         adapter = createNewTypeAdapter(new ArrayList<>(userViewModel.getTypes().values()));
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         typeListRecycler = findViewById(R.id.recyclerViewTypeList);

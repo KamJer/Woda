@@ -3,11 +3,12 @@ package com.kamjer.woda.model;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WaterDayWithWaters {
+public class WaterDayWithWaters implements Serializable {
     @Embedded
     private WaterDay waterDay;
 

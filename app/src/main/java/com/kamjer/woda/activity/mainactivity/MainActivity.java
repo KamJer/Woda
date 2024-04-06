@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -39,14 +40,14 @@ import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 
 public class MainActivity extends AppCompatActivity {
     private WaterViewModel waterViewModel;
 
-    private ActivityResultLauncher<Intent> addStartYourDialogLauncher;
-    private ActivityResultLauncher<Intent> removeStartYourDialogLauncher;
+    private ActivityResultLauncher<Intent> addRemoveWaterDrankDialogLauncher;
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
     private TextView textViewDate;
@@ -72,32 +73,16 @@ public class MainActivity extends AppCompatActivity {
         gestureDetector = new GestureDetectorCompat(this, new ChangeWatersGestureListener(this, waterViewModel));
 
 //      handling response from WaterDialog
-        addStartYourDialogLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+        addRemoveWaterDrankDialogLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         if (data != null) {
-                            int resultData = data.getIntExtra("waterAmount", WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO);
-                            long typeId = data.getLongExtra("type", 0);
-                            if (typeId != 0) {
-                                Type type = waterViewModel.getTypes().get(typeId);
+                            int resultData = data.getIntExtra(AddWaterDialog.WATER_AMOUNT_NAME, WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO);
+                            Type type = Optional.ofNullable((Type) data.getSerializableExtra(AddWaterDialog.TYPE_NAME))
+                                    .orElse(new Type("", Color.BLACK));
+                            if (type.getId() != 0) {
                                 updateWaterFromDialogs(resultData, type);
-                            }
-                        }
-                    }
-                });
-
-//      handling response from WaterDialog (deleting water)
-        removeStartYourDialogLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        if (data != null) {
-                            int resultData = data.getIntExtra("waterAmount", WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO);
-                            long typeId = data.getLongExtra("type", 0);
-                            if (typeId != 0) {
-                                Type type = waterViewModel.getTypes().get(typeId);
-                                updateWaterFromDialogs(-resultData, type);
                             }
                         }
                     }
@@ -186,8 +171,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private  void onClickAddWaterDrankAction(View v) {
         Intent addWaterToDrinkIntent = new Intent(this, AddWaterDialog.class);
-        addWaterToDrinkIntent.putExtra("buttonText", getResources().getString(R.string.add_water_button_text));
-        addStartYourDialogLauncher.launch(addWaterToDrinkIntent);
+        addWaterToDrinkIntent.putExtra(AddWaterDialog.ACTIVE_WATER_DAY_WITH_WATERS_NAME, waterViewModel.getWaterValue());
+        addWaterToDrinkIntent.putExtra(AddWaterDialog.WATER_TYPES_NAME, waterViewModel.getTypesValue());
+        addRemoveWaterDrankDialogLauncher.launch(addWaterToDrinkIntent);
     }
     /**
      * Action for removing water button
@@ -195,9 +181,10 @@ public class MainActivity extends AppCompatActivity {
      */
     private  void onClickRemoveWaterDrankAction(View v) {
         Intent removeWaterToDrinkIntent = new Intent(this, AddWaterDialog.class);
-        removeWaterToDrinkIntent.putExtra("buttonText", getResources().getString(R.string.remove_water_button_text));
-        removeWaterToDrinkIntent.putExtra("isRemove", true);
-        removeStartYourDialogLauncher.launch(removeWaterToDrinkIntent);
+        removeWaterToDrinkIntent.putExtra(AddWaterDialog.IS_REMOVE_NAME, true);
+        removeWaterToDrinkIntent.putExtra(AddWaterDialog.ACTIVE_WATER_DAY_WITH_WATERS_NAME, waterViewModel.getWaterValue());
+        removeWaterToDrinkIntent.putExtra(AddWaterDialog.WATER_TYPES_NAME, waterViewModel.getTypesValue());
+        addRemoveWaterDrankDialogLauncher.launch(removeWaterToDrinkIntent);
     }
 
     private void updateWaterFromDialogs(int result, Type type) {

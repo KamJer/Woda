@@ -4,10 +4,11 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Entity(tableName = "water_day")
-public class WaterDay {
+public class WaterDay implements Serializable {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private LocalDate date;

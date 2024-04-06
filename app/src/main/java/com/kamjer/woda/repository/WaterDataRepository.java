@@ -126,13 +126,6 @@ public class WaterDataRepository {
         HashMap<Long, Type> waterTypes = getWaterTypes();
         waterTypes.remove(id);
         this.waterTypes.setValue(waterTypes);
-//      checking if there are any waters with passed type and deleting them from a list and setting to a day
-        List<Water> watersFiltered = getWaterDayValue()
-                .getWaters()
-                .stream()
-                .filter(water -> water.getTypeId() != id)
-                .collect(Collectors.toList());
-        setWatersInADayValue(watersFiltered);
     }
 
     /**
@@ -205,8 +198,8 @@ public class WaterDataRepository {
      * @param waters list of waters to check
      * @return list of maps
      */
-    public List<Type> getUsedTypes(List<Water> waters) {
-        return waters.stream().map(water -> getWaterTypes().get(water.getTypeId())).collect(Collectors.toList());
+    public static List<Type> getUsedTypes(Map<Long, Type> waterTypes, List<Water> waters) {
+        return waters.stream().map(water -> waterTypes.get(water.getTypeId())).collect(Collectors.toList());
     }
 
     /**

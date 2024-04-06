@@ -20,6 +20,7 @@ public class SharedPreferencesRepository {
     private static final String SELECTED_NOTIFICATIONS_TIME_NAME = "selectedNotificationsTime";
     private static final String CONSTRAINT_NOTIFICATIONS_TIME_START_NAME = "constraintNotificationsTimeStart";
     private static final String CONSTRAINT_NOTIFICATIONS_TIME_END_NAME = "constraintNotificationsTimeEnd";
+    private static final String HOUR_NOTIFICATION_PERIOD_NAME = "hourNotificationPeriodName";
 
     public static final LocalTime TIME_CONSTRAINT_START_DEFAULT = LocalTime.of(8, 0);
     public static final LocalTime TIME_CONSTRAINT_END_DEFAULT = LocalTime.of(22, 0);
@@ -29,6 +30,8 @@ public class SharedPreferencesRepository {
     private final MutableLiveData<LocalTime> selectedNotificationsTimeLiveData = new MutableLiveData<>();
     private final MutableLiveData<LocalTime> constraintNotificationTimeStartLiveData = new MutableLiveData<>();
     private final MutableLiveData<LocalTime> constraintNotificationTimeEndLiveData = new MutableLiveData<>();
+
+    private final MutableLiveData<Integer> hourNotificationPeriodLiveData = new MutableLiveData<>();
 
     private static SharedPreferencesRepository sharedPreferencesRepository;
 
@@ -57,7 +60,7 @@ public class SharedPreferencesRepository {
     }
 
     private void setWaterAmountToDrink(int waterAmountToDrink) {
-        waterAmountToDrinkMutableLiveData.setValue(waterAmountToDrink);
+        waterAmountToDrinkMutableLiveData.postValue(waterAmountToDrink);
     }
 
     public int getWaterAmountToDrink() {
@@ -83,7 +86,7 @@ public class SharedPreferencesRepository {
     }
 
     private void setNotificationsActive(boolean isNotificationsActive) {
-        this.notificationsActiveLiveData.setValue(isNotificationsActive);
+        this.notificationsActiveLiveData.postValue(isNotificationsActive);
     }
 
     public boolean isNotificationsActive() {
@@ -113,7 +116,7 @@ public class SharedPreferencesRepository {
     }
 
     private void setSelectedNotificationsTime(LocalTime selectedNotificationsTime) {
-        this.selectedNotificationsTimeLiveData.setValue(selectedNotificationsTime);
+        this.selectedNotificationsTimeLiveData.postValue(selectedNotificationsTime);
     }
 
     /**
@@ -139,7 +142,7 @@ public class SharedPreferencesRepository {
     }
 
     private void setConstraintNotificationTimeStart(LocalTime constraintNotificationTimeStart) {
-        this.constraintNotificationTimeStartLiveData.setValue(constraintNotificationTimeStart);
+        this.constraintNotificationTimeStartLiveData.postValue(constraintNotificationTimeStart);
     }
 
     /**
@@ -165,10 +168,23 @@ public class SharedPreferencesRepository {
     }
 
     private void setConstraintNotificationTimeEnd(LocalTime constraintNotificationTimeEnd) {
-        this.constraintNotificationTimeEndLiveData.setValue(constraintNotificationTimeEnd);
+        this.constraintNotificationTimeEndLiveData.postValue(constraintNotificationTimeEnd);
     }
 
-    public MutableLiveData<Integer> getWaterAmountToDrinkMutableLiveData() {
+    public void loadHourNotificationPeriod(Context applicationContext) {
+        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        int hourNotificationPeriod = sharedPref.getInt(HOUR_NOTIFICATION_PERIOD_NAME, 1);
+    }
+
+    public Integer getHourNotificationPeriod() {
+        return hourNotificationPeriodLiveData.getValue();
+    }
+
+    public void setHourNotificationPeriod(Integer hourNotificationPeriod) {
+        hourNotificationPeriodLiveData.postValue(hourNotificationPeriod);
+    }
+
+    public MutableLiveData<Integer> getWaterAmountToDrinkLiveData() {
         return waterAmountToDrinkMutableLiveData;
     }
 
@@ -186,5 +202,9 @@ public class SharedPreferencesRepository {
 
     public MutableLiveData<LocalTime> getConstraintNotificationTimeEndLiveData() {
         return constraintNotificationTimeEndLiveData;
+    }
+
+    public MutableLiveData<Integer> getHourNotificationPeriodLiveData() {
+        return hourNotificationPeriodLiveData;
     }
 }

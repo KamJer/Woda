@@ -24,6 +24,9 @@ public class AlarmViewModel extends ViewModel {
     public void setConstraintNotificationsTimeEndObserver(LifecycleOwner owner, Observer<LocalTime> observer){
         SharedPreferencesRepository.getInstance().getConstraintNotificationTimeEndLiveData().observe(owner, observer);
     }
+    public void setHourNotificationPeriodObserver(LifecycleOwner owner, Observer<Integer> observer) {
+        SharedPreferencesRepository.getInstance().getHourNotificationPeriodLiveData().observe(owner, observer);
+    }
 
     public LocalTime getSelectedNotificationsTime() {
         return SharedPreferencesRepository.getInstance().getSelectedNotificationsTime();
@@ -41,6 +44,10 @@ public class AlarmViewModel extends ViewModel {
         return SharedPreferencesRepository.getInstance().isNotificationsActive();
     }
 
+    public Integer getHourNotificationPeriod() {
+        return SharedPreferencesRepository.getInstance().getHourNotificationPeriod();
+    }
+
     public void setSelectedNotificationsTime(Context applicationContext, LocalTime selectedTime) {
         SharedPreferencesRepository.getInstance().setSelectedNotificationsTime(applicationContext, selectedTime);
     }
@@ -55,5 +62,9 @@ public class AlarmViewModel extends ViewModel {
 
     public void setNotificationsActive(Context applicationContext, boolean isChecked) {
         SharedPreferencesRepository.getInstance().setNotificationsActive(applicationContext, isChecked);
+    }
+
+    public void setHourNotificationPeriod(Integer hourNotificationPeriod) {
+        SharedPreferencesRepository.getInstance().setHourNotificationPeriod(hourNotificationPeriod);
     }
 }

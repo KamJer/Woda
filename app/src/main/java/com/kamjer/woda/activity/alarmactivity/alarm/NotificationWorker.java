@@ -10,7 +10,6 @@ import com.kamjer.woda.R;
 import com.kamjer.woda.utils.NotificationHelper;
 
 import java.time.LocalTime;
-import java.util.Calendar;
 
 public class NotificationWorker extends Worker {
 

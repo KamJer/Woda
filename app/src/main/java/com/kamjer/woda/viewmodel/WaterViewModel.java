@@ -9,6 +9,7 @@ import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.model.WaterDay;
 import com.kamjer.woda.model.WaterDayWithWaters;
+import com.kamjer.woda.repository.ResourcesRepository;
 import com.kamjer.woda.repository.SharedPreferencesRepository;
 import com.kamjer.woda.repository.WaterDataRepository;
 
@@ -150,11 +151,11 @@ public class WaterViewModel extends ViewModel {
         disposable.clear();
     }
 
-    public HashMap<Long, Type> getTypes() {
-        return WaterDataRepository.getInstance().getWaterTypes();
-    }
-
     public void setWaterDayWithWatersObserver(LifecycleOwner owner, Observer<WaterDayWithWaters> observer) {
         WaterDataRepository.getInstance().getWaters().observe(owner, observer);
+    }
+
+    public HashMap<Long, Type> getTypesValue() {
+        return WaterDataRepository.getInstance().getWaterTypes();
     }
 }

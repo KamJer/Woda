@@ -19,6 +19,7 @@ public class AppInitializer {
         loadSelectedNotificationTime(applicationContext);
         loadConstraintNotificationTimeStart(applicationContext);
         loadConstraintNotificationTimeEnd(applicationContext);
+        loadHourNotificationPeriod(applicationContext);
     }
 
     private static void loadConstraintNotificationTimeEnd(Context applicationContext) {
@@ -56,5 +57,9 @@ public class AppInitializer {
 
     private static void loadWaterAmount(Context applicationContext) {
         SharedPreferencesRepository.getInstance().loadWaterAmount(applicationContext);
+    }
+
+    private static void loadHourNotificationPeriod(Context applicationContext) {
+        SharedPreferencesRepository.getInstance().loadHourNotificationPeriod(applicationContext);
     }
 }
