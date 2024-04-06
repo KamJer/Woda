@@ -16,6 +16,7 @@ import com.kamjer.woda.model.WaterDayWithWaters;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.disposables.DisposableContainer;
 import io.reactivex.rxjava3.disposables.SerialDisposable;
@@ -40,7 +42,7 @@ public class WaterDataRepository {
 
     private final MutableLiveData<HashMap<Long, Type>> waterTypes = new MutableLiveData<>();
 
-    SerialDisposable serialDisposable = new SerialDisposable();
+    CompositeDisposable serialDisposable = new CompositeDisposable();
 
     public void createWaterDatabase(Context context) {
 //        if database does not exists already create a new one
@@ -50,20 +52,25 @@ public class WaterDataRepository {
             this.waterDAO = waterDatabase.waterDAO();
         }
 
-        serialDisposable.set(getWaterDAO().getAllTypes()
+        serialDisposable.add(getWaterDAO().getAllTypes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(types -> {
-                    setWaterTypes((HashMap<Long, Type>) types.stream().collect(Collectors.toMap(
-                            Type::getId,
-                            type -> type)));
-//                  fetching default values
-//                  check if all default types are in a database and if some are not insert them
+//                  add fetched types to the liveData
+                    types.forEach(this::putType);
+//                  check if fetched data contains default types, if it does not add it to the database and put in liveDatas
                     WaterDataRepository.containsDefaultTypes(ResourcesRepository
-                                    .getInstance()
-                                    .getDefaultDrinksTypes(),
-                                    getWaterTypes())
-                            .forEach(type -> getWaterDAO().insertType(type));
+                                            .getInstance()
+                                            .getDefaultDrinksTypes(),
+                                    getWaterTypes().values())
+                            .forEach(type -> serialDisposable.add(getWaterDAO()
+                                    .insertType(type)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(aLong -> {
+                                        type.setId(aLong);
+                                        putType(type);
+                                    })));
                 }));
     }
 
@@ -89,7 +96,7 @@ public class WaterDataRepository {
         WaterDay waterDay = waterDayWithWaters.getWaterDay();
 //      getting waters from WaterDayWithWaters or creating it
         List<Water> waters = waterDayWithWaters.getWaters();
-        water.setWaterDayId(waterDay.getId());
+        water.setWaterDayId(waterDay.getDate());
         if (!waters.contains(water)) {
             waters.add(water);
         }
@@ -176,21 +183,25 @@ public class WaterDataRepository {
     /**
      * Checks if map of types contains all of types in an array
      * if types are not contained in a map they are added to a list and returned
-     * @param typeArray - types to check
-     * @param typeMap - map of types to compare to
+     * @param defaultTypes - types to check
+     * @param typesToCheck - map of types to compare to
      * @return list of Types not contained in a map, if all types from an array are contained in a map list length is 0
      */
-    public static List<Type> containsDefaultTypes(Type[] typeArray, Map<Long, Type> typeMap) {
+    public static List<Type> containsDefaultTypes(List<Type> defaultTypes, Collection<Type> typesToCheck) {
         List<Type> test = new ArrayList<>();
 //      loop through default drink types and check if it is in a database if it is not, add not found type to the list
-        for (Type type : typeArray) {
-            if (!typeMap.containsValue(type)) {
+        for (Type type : defaultTypes) {
+            if (!typesToCheck.contains(type)) {
                 test.add(type);
             }
         }
 //      if types in a database does not contain default ones return those types that are not in a database,
 //      if database contains all of a default types list will have length of 0
         return test;
+    }
+
+    public static boolean test(List<Type> defaultTypes, Type typeToCheck) {
+        return defaultTypes.contains(typeToCheck);
     }
 
     /**
@@ -224,4 +235,7 @@ public class WaterDataRepository {
         return waterDatabase;
     }
 
+    public void clearDisposable() {
+        serialDisposable.clear();
+    }
 }

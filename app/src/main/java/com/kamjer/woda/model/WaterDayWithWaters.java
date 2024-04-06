@@ -13,7 +13,7 @@ public class WaterDayWithWaters implements Serializable {
     private WaterDay waterDay;
 
     @Relation(
-            parentColumn = "id",
+            parentColumn = "date",
             entityColumn = "waterDayId"
     )
     private List<Water> waters;

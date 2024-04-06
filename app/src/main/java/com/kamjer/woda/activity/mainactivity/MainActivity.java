@@ -205,13 +205,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
 //          checking if waterDay is already in a database and if it is don't insert it
             if (!waterViewModel.getWaterValue().getWaterDay().isInserted()) {
-                waterViewModel.insertWaterDay(waterViewModel.getWaterValue().getWaterDay(), aLong -> {
+                waterViewModel.insertWaterDay(waterViewModel.getWaterValue().getWaterDay(), () -> {
 //                  sets new id for a waterDay
                     WaterDay waterDayToInsert = waterViewModel.getWaterValue().getWaterDay();
-                    waterDayToInsert.setId(aLong);
                     waterDayToInsert.setInserted(true);
 //                  setting water day for a water
-                    waterUpdated.setWaterDayId(waterDayToInsert.getId());
 //                  triggers insertion of a water if insertion of a day was successful
                     waterViewModel.insertWater(waterUpdated);
                 });
@@ -240,15 +238,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         waterViewModel.clearDisposable();
-        waterViewModel.getWater().removeObservers(this);
+        AppInitializer.clearAppResources();
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        waterViewModel.clearDisposable();
         waterViewModel.getWater().observe(this, this::setObserverOnWaters);
-        waterViewModel.loadWaterDayWithWatersByDate(waterViewModel.getActiveDate());
+//        waterViewModel.loadWaterDayWithWatersByDate(waterViewModel.getActiveDate());
     }
 
     @Override

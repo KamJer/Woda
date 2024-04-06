@@ -59,7 +59,7 @@ public abstract class WaterDAO {
 
     @Transaction
     @Query("SELECT * FROM type")
-    public abstract Flowable<List<Type>> getAllTypes();
+    public abstract Single<List<Type>> getAllTypes();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract Maybe<Long> insertType(Type type);
@@ -74,7 +74,7 @@ public abstract class WaterDAO {
 
 //    insert
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public abstract Maybe<Long> insertWaterDay(WaterDay waterDay);
+    public abstract Completable insertWaterDay(WaterDay waterDay);
 
 //    WaterDayWithWater
     @Query("SELECT * FROM water_day WHERE date = :date")

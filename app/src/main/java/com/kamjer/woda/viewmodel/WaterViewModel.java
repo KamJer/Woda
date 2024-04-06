@@ -69,16 +69,7 @@ public class WaterViewModel extends ViewModel {
                 ));
     }
 
-    public void insertWaterDay(WaterDay waterDay) {
-        insertWaterDay(waterDay, aLong -> {
-//            setting id to waterDay
-            waterDay.setId(aLong);
-//            setting waterDay to inserted
-            waterDay.setInserted(true);
-        });
-    }
-
-    public void insertWaterDay(WaterDay waterDay, Consumer<Long> onSuccess) {
+    public void insertWaterDay(WaterDay waterDay, Action onSuccess) {
         disposable.add(WaterDataRepository.getInstance().getWaterDAO().insertWaterDay(waterDay)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -89,8 +80,6 @@ public class WaterViewModel extends ViewModel {
 
     }
 
-
-
     public void insertWater(Water water) {
         insertWater(water, aLong -> {
             water.setId(aLong);
@@ -98,8 +87,6 @@ public class WaterViewModel extends ViewModel {
         });
     }
 
-
-    
     public void insertWater(Water water, Consumer<Long> onSuccess) {
         disposable.add(WaterDataRepository.getInstance().getWaterDAO().insertWater(water).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).
@@ -128,7 +115,6 @@ public class WaterViewModel extends ViewModel {
     public WaterDayWithWaters getWaterValue() {
         return WaterDataRepository.getInstance().getWaterDayValue();
     }
-
 
     public void deleteWater(Water water) {
         deleteWater(water, () -> removeWaterInDay(water));

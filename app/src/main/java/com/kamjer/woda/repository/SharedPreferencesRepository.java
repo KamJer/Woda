@@ -60,7 +60,7 @@ public class SharedPreferencesRepository {
     }
 
     private void setWaterAmountToDrink(int waterAmountToDrink) {
-        waterAmountToDrinkMutableLiveData.postValue(waterAmountToDrink);
+        waterAmountToDrinkMutableLiveData.setValue(waterAmountToDrink);
     }
 
     public int getWaterAmountToDrink() {
@@ -86,7 +86,7 @@ public class SharedPreferencesRepository {
     }
 
     private void setNotificationsActive(boolean isNotificationsActive) {
-        this.notificationsActiveLiveData.postValue(isNotificationsActive);
+        this.notificationsActiveLiveData.setValue(isNotificationsActive);
     }
 
     public boolean isNotificationsActive() {
@@ -116,7 +116,7 @@ public class SharedPreferencesRepository {
     }
 
     private void setSelectedNotificationsTime(LocalTime selectedNotificationsTime) {
-        this.selectedNotificationsTimeLiveData.postValue(selectedNotificationsTime);
+        this.selectedNotificationsTimeLiveData.setValue(selectedNotificationsTime);
     }
 
     /**
@@ -142,7 +142,7 @@ public class SharedPreferencesRepository {
     }
 
     private void setConstraintNotificationTimeStart(LocalTime constraintNotificationTimeStart) {
-        this.constraintNotificationTimeStartLiveData.postValue(constraintNotificationTimeStart);
+        this.constraintNotificationTimeStartLiveData.setValue(constraintNotificationTimeStart);
     }
 
     /**
@@ -168,12 +168,13 @@ public class SharedPreferencesRepository {
     }
 
     private void setConstraintNotificationTimeEnd(LocalTime constraintNotificationTimeEnd) {
-        this.constraintNotificationTimeEndLiveData.postValue(constraintNotificationTimeEnd);
+        this.constraintNotificationTimeEndLiveData.setValue(constraintNotificationTimeEnd);
     }
 
     public void loadHourNotificationPeriod(Context applicationContext) {
         SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         int hourNotificationPeriod = sharedPref.getInt(HOUR_NOTIFICATION_PERIOD_NAME, 1);
+        setHourNotificationPeriod(hourNotificationPeriod);
     }
 
     public Integer getHourNotificationPeriod() {
@@ -181,7 +182,7 @@ public class SharedPreferencesRepository {
     }
 
     public void setHourNotificationPeriod(Integer hourNotificationPeriod) {
-        hourNotificationPeriodLiveData.postValue(hourNotificationPeriod);
+        hourNotificationPeriodLiveData.setValue(hourNotificationPeriod);
     }
 
     public MutableLiveData<Integer> getWaterAmountToDrinkLiveData() {

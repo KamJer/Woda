@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8ef6c2736baeab93b90076c0f48a193c",
+    "identityHash": "c912a59cd5f5fda2c9a7e395343e3b63",
     "entities": [
       {
         "tableName": "water",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `waterDrank` INTEGER, `typeId` INTEGER NOT NULL, `waterDayId` INTEGER NOT NULL, FOREIGN KEY(`typeId`) REFERENCES `type`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`waterDayId`) REFERENCES `water_day`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `waterDrank` INTEGER, `typeId` INTEGER NOT NULL, `waterDayId` TEXT, FOREIGN KEY(`typeId`) REFERENCES `type`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`waterDayId`) REFERENCES `water_day`(`date`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -29,8 +29,8 @@
           {
             "fieldPath": "waterDayId",
             "columnName": "waterDayId",
-            "affinity": "INTEGER",
-            "notNull": true
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -60,26 +60,20 @@
               "waterDayId"
             ],
             "referencedColumns": [
-              "id"
+              "date"
             ]
           }
         ]
       },
       {
         "tableName": "water_day",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` TEXT, `waterToDrink` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`date` TEXT NOT NULL, `waterToDrink` INTEGER, PRIMARY KEY(`date`))",
         "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "date",
             "columnName": "date",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "waterToDrink",
@@ -89,9 +83,9 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": true,
+          "autoGenerate": false,
           "columnNames": [
-            "id"
+            "date"
           ]
         },
         "indices": [],
@@ -133,7 +127,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8ef6c2736baeab93b90076c0f48a193c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c912a59cd5f5fda2c9a7e395343e3b63')"
     ]
   }
 }

@@ -22,7 +22,7 @@
                     onDelete = ForeignKey.CASCADE)
             ,@ForeignKey(
                     entity = WaterDay.class,
-                    parentColumns = "id",
+                    parentColumns = "date",
                     childColumns = "waterDayId",
                     onDelete = ForeignKey.CASCADE
             )})
@@ -32,7 +32,7 @@
         private Integer waterDrank;
         private long typeId;
 
-        private long waterDayId;
+        private LocalDate waterDayId;
 
         public Water() {
         }
@@ -40,7 +40,7 @@
         public Water(int waterDrank, Type type, WaterDay waterDay) {
             this.waterDrank = waterDrank;
             this.typeId = type.getId();
-            this.waterDayId = waterDay.getId();
+            this.waterDayId = waterDay.getDate();
         }
 
         public void setId(long id) {
@@ -67,11 +67,11 @@
             this.typeId = typeId;
         }
 
-        public long getWaterDayId() {
+        public LocalDate getWaterDayId() {
             return waterDayId;
         }
 
-        public void setWaterDayId(long waterDayId) {
+        public void setWaterDayId(LocalDate waterDayId) {
             this.waterDayId = waterDayId;
         }
 

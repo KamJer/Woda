@@ -123,7 +123,7 @@ public class UserActivity extends AppCompatActivity {
         userViewModel.setTypesObserver(this, longTypeHashMap ->
                 adapter.setTypeList(new ArrayList<>(userViewModel.getTypes().values())));
 
-        userViewModel.setWaterAMountToDrinkObserver(this, integer -> {
+        userViewModel.setWaterAmountToDrinkObserver(this, integer -> {
             textViewWaterAmount.setText(String.valueOf(userViewModel.getWaterAmountToDrink()));
         });
     }

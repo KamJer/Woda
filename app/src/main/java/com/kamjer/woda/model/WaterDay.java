@@ -1,5 +1,6 @@
 package com.kamjer.woda.model;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -9,8 +10,8 @@ import java.time.LocalDate;
 
 @Entity(tableName = "water_day")
 public class WaterDay implements Serializable {
-    @PrimaryKey(autoGenerate = true)
-    private long id;
+    @PrimaryKey
+    @NonNull
     private LocalDate date;
 
     private Integer waterToDrink;
@@ -20,19 +21,21 @@ public class WaterDay implements Serializable {
 
     public WaterDay() {
         this.inserted = false;
+        date = LocalDate.now();
     }
 
-    public WaterDay(LocalDate date, int waterAmountToDrink, boolean inserted) {
+    public WaterDay(@NonNull LocalDate date, int waterAmountToDrink, boolean inserted) {
         this.date = date;
         this.waterToDrink = waterAmountToDrink;
         this.inserted = inserted;
     }
 
+    @NonNull
     public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(@NonNull LocalDate date) {
         this.date = date;
     }
 
@@ -42,14 +45,6 @@ public class WaterDay implements Serializable {
 
     public void setWaterToDrink(Integer waterToDrink) {
         this.waterToDrink = waterToDrink;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public boolean isInserted() {

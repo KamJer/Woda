@@ -35,7 +35,7 @@ public class UserViewModel extends ViewModel {
         SharedPreferencesRepository.getInstance().setWaterAmountToDrink(applicationContext, waterAmountToDrink);
     }
 
-    public void setWaterAMountToDrinkObserver(LifecycleOwner owner, Observer<Integer> observer) {
+    public void setWaterAmountToDrinkObserver(LifecycleOwner owner, Observer<Integer> observer) {
         SharedPreferencesRepository.getInstance().getWaterAmountToDrinkLiveData().observe(owner, observer);
     }
 

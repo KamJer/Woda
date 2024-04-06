@@ -62,4 +62,11 @@ public class AppInitializer {
     private static void loadHourNotificationPeriod(Context applicationContext) {
         SharedPreferencesRepository.getInstance().loadHourNotificationPeriod(applicationContext);
     }
+
+    /**
+     * Clears resources from repositories making sure that there are no memory leaks
+     */
+    public static void clearAppResources() {
+        WaterDataRepository.getInstance().clearDisposable();
+    }
 }
