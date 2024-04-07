@@ -9,7 +9,7 @@ public class SqlRepository {
 
     private static SqlRepository sqlRepository;
 
-    private String sqlDropTable;
+    private String sqlDropTempTable;
     private String sqlCreateTempTable;
     private String sqlDeleteFromWater;
     private String sqlInsertIntoWaterFromTemp;
@@ -24,7 +24,7 @@ public class SqlRepository {
     }
 
     public void loadSqlQuery(Context applicationContext) {
-        sqlDropTable = applicationContext.getString(R.string.sql_drop_table);
+        sqlDropTempTable = applicationContext.getString(R.string.sql_drop_table);
         sqlCreateTempTable = applicationContext.getString(R.string.sql_create_temp_table);
         sqlDeleteFromWater = applicationContext.getString(R.string.sql_delete_from_water);
         sqlInsertIntoWaterFromTemp = applicationContext.getString(R.string.sql_insert_into_water_from_temp);
@@ -32,8 +32,8 @@ public class SqlRepository {
         sqlInsertIntoWaterValues = applicationContext.getString(R.string.sql_insert_into_water_values);
     }
 
-    public String getSqlDropTable() {
-        return sqlDropTable;
+    public String getSqlDropTempTable() {
+        return sqlDropTempTable;
     }
 
     public String getSqlCreateTempTable() {

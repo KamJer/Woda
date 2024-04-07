@@ -1,5 +1,6 @@
 package com.kamjer.woda.database.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -66,11 +67,10 @@ public abstract class WaterDAO {
 //  WaterDayWithWater
 //  fetching
     @Query("SELECT * FROM water_day WHERE date = :date")
-    public abstract Maybe<WaterDayWithWaters> getWaterDayWitWatersByDate(String date);
+    public abstract LiveData<WaterDayWithWaters> getWaterDayWithWatersByDate(String date);
 
     @Transaction
     @Query("SELECT * FROM water_day")
-    public abstract Flowable<List<WaterDayWithWaters>> getAllWaterDayWitWatersByDate();
-
+    public abstract LiveData<List<WaterDayWithWaters>> getAllWaterDayWithWaters();
 
 }

@@ -47,7 +47,7 @@ public class AddWaterDialog extends AppCompatActivity {
         isRemove = getIntent().getBooleanExtra(IS_REMOVE_NAME, false);
         WaterDayWithWaters activeWaterDayWithWaters = Optional
                 .ofNullable((WaterDayWithWaters) getIntent().getSerializableExtra(ACTIVE_WATER_DAY_WITH_WATERS_NAME))
-                .orElse(new WaterDayWithWaters(LocalDate.now(), SharedPreferencesRepository.DEFAULT_WATER_TO_DRINK));
+                .orElse(new WaterDayWithWaters(LocalDate.now(), SharedPreferencesRepository.DEFAULT_WATER_AMOUNT_TO_DRINK));
         HashMap<Long, Type> waterTypes = Optional
                 .ofNullable((HashMap<Long, Type>) getIntent().getSerializableExtra(WATER_TYPES_NAME))
                 .orElse(new HashMap<>());

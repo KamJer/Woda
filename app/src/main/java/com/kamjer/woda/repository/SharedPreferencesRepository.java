@@ -6,14 +6,13 @@ import android.content.SharedPreferences;
 import androidx.lifecycle.MutableLiveData;
 
 import com.kamjer.woda.R;
-import com.kamjer.woda.activity.alarmactivity.AlarmActivity;
 
 import java.time.LocalTime;
 import java.util.Optional;
 
 public class SharedPreferencesRepository {
 
-    public static final int DEFAULT_WATER_TO_DRINK = 1500;
+    public static final int DEFAULT_WATER_AMOUNT_TO_DRINK = 1500;
 
     private static final String WATER_AMOUNT_TO_DRINK_NAME = "waterAmountToDrink";
     private static final String NOTIFICATIONS_ACTIVE_NAME = "isNotificationsActive";
@@ -48,7 +47,7 @@ public class SharedPreferencesRepository {
      */
     public void loadWaterAmount(Context applicationContext) {
         SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-        setWaterAmountToDrink(sharedPref.getInt(WATER_AMOUNT_TO_DRINK_NAME, DEFAULT_WATER_TO_DRINK));
+        setWaterAmountToDrink(sharedPref.getInt(WATER_AMOUNT_TO_DRINK_NAME, DEFAULT_WATER_AMOUNT_TO_DRINK));
     }
 
     public void setWaterAmountToDrink(Context applicationContext, int waterAmountToDrink) {
@@ -64,7 +63,7 @@ public class SharedPreferencesRepository {
     }
 
     public int getWaterAmountToDrink() {
-        return Optional.ofNullable(waterAmountToDrinkMutableLiveData.getValue()).orElse(DEFAULT_WATER_TO_DRINK);
+        return Optional.ofNullable(waterAmountToDrinkMutableLiveData.getValue()).orElse(DEFAULT_WATER_AMOUNT_TO_DRINK);
     }
 
     /**

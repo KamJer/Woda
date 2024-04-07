@@ -33,6 +33,7 @@ public class UserViewModel extends ViewModel {
     }
     public void setWaterAmountToDrink(Context applicationContext, int waterAmountToDrink) {
         SharedPreferencesRepository.getInstance().setWaterAmountToDrink(applicationContext, waterAmountToDrink);
+        WaterDataRepository.getInstance().setWaterAmountToDrink(waterAmountToDrink);
     }
 
     public void setWaterAmountToDrinkObserver(LifecycleOwner owner, Observer<Integer> observer) {
@@ -49,11 +50,11 @@ public class UserViewModel extends ViewModel {
         List<String> sql = new ArrayList<>();
 //        preparing sql statements
         waters.forEach(water -> sql.add(SqlRepository.getInstance().getSqlInsertIntoWaterValues(water)));
-        sql.add(SqlRepository.getInstance().getSqlDropTable());
+        sql.add(SqlRepository.getInstance().getSqlDropTempTable());
         sql.add(SqlRepository.getInstance().getSqlCreateTempTable());
         sql.add(SqlRepository.getInstance().getSqlDeleteFromWater());
         sql.add(SqlRepository.getInstance().getSqlInsertIntoWaterFromTemp());
-        sql.add(SqlRepository.getInstance().getSqlDropTable());
+        sql.add(SqlRepository.getInstance().getSqlDropTempTable());
         sql.add(SqlRepository.getInstance().getSqlDeleteTypeWhereId(type.getId()));
         disposable.add(Completable.fromAction(() -> WaterDataRepository.getInstance().getWaterDatabase().customQuery(sql))
                 .subscribeOn(Schedulers.io())
@@ -69,11 +70,7 @@ public class UserViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
-                            waters.forEach(water -> {
-                                if (WaterDataRepository.getInstance().getWaterDayValue().getWaters().contains(water)) {
-                                    WaterDataRepository.getInstance().removeWaterValue(water);
-                                }
-                            });
+
                         },
                         RxJavaPlugins::onError));
     }

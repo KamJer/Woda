@@ -4,11 +4,11 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
+import com.kamjer.woda.activity.calendaractivity.CalendarActivity;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.model.WaterDay;
 import com.kamjer.woda.model.WaterDayWithWaters;
-import com.kamjer.woda.repository.SharedPreferencesRepository;
 import com.kamjer.woda.repository.WaterDataRepository;
 
 import java.time.LocalDate;
@@ -31,39 +31,7 @@ public class WaterViewModel extends ViewModel {
 
 //    DATABASE OPERATIONS
     public void loadWaterDayWithWatersByDate(LocalDate date) {
-        loadWaterDayWithWatersByDate(
-                date,
-                waterDayWithWaters -> {
-                    WaterDataRepository.getInstance().setWatersValue(waterDayWithWaters);
-//                    water day is loaded from database by definition is already inserted
-                    waterDayWithWaters.getWaterDay().setInserted(true);
-                },
-                () -> {
-                    WaterDayWithWaters waterDayWithWaters = new WaterDayWithWaters(date, SharedPreferencesRepository.getInstance().getWaterAmountToDrink());
-                    setWaterValue(waterDayWithWaters);
-                });
-    }
-
-    public void loadWaterDayWithWatersByDate(LocalDate date, Consumer<WaterDayWithWaters> onSuccess, Action onComplete) {
-        disposable.add(WaterDataRepository.getInstance().getWaterDAO().getWaterDayWitWatersByDate(date.toString())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        onSuccess,
-                        RxJavaPlugins::onError,
-                        onComplete
-                ));
-    }
-
-    public void loadAllWaterDayWithWaters(Consumer<List<WaterDayWithWaters>> onSuccess) {
-        disposable.add((WaterDataRepository.getInstance().getWaterDAO()
-                .getAllWaterDayWitWatersByDate())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        onSuccess,
-                        RxJavaPlugins::onError
-                ));
+        WaterDataRepository.getInstance().getWaterDayWithWatersByDate(date);
     }
 
     public void insertWaterDay(WaterDay waterDay, Action onSuccess) {
@@ -102,15 +70,11 @@ public class WaterViewModel extends ViewModel {
     }
 
     public void removeWaterInDay(Water water) {
-        WaterDataRepository.getInstance().removeWaterValue(water);
+        WaterDataRepository.getInstance().removeWater(water);
     }
 
-    public void setWaterValue(WaterDayWithWaters waters) {
-        WaterDataRepository.getInstance().getWaterDayWithWatersLivaData().setValue(waters);
-    }
-
-    public WaterDayWithWaters getWaterValue() {
-        return WaterDataRepository.getInstance().getWaterDayValue();
+    public WaterDayWithWaters getWaterDayWithWatersValue() {
+        return WaterDataRepository.getInstance().getWaterDayWithWatersValue();
     }
 
     public void deleteWater(Water water) {
@@ -127,16 +91,18 @@ public class WaterViewModel extends ViewModel {
     }
 
     public LocalDate getActiveDate() {
-        return getWaterValue().getWaterDay().getDate();
+        return getWaterDayWithWatersValue().getWaterDay().getDate();
     }
 
     public void clearDisposable() {
         disposable.clear();
     }
 
-
-
     public HashMap<Long, Type> getTypesValue() {
         return WaterDataRepository.getInstance().getWaterTypes();
+    }
+
+    public void setAllWaterDayWithWatersObserver(CalendarActivity owner, Observer<List<WaterDayWithWaters>> observer) {
+        WaterDataRepository.getInstance().getAllWaterDayWithWatersLiveData().observe(owner, observer);
     }
 }

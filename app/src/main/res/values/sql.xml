@@ -1,19 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="sql_insert_and_sum_water_drank">
-        CREATE TEMP TABLE IF NOT EXISTS TempTable AS
-        SELECT id, waterDayId, typeId, SUM(waterDrank) AS waterDrank
-        FROM water
-        GROUP BY waterDayId, typeId;
-
-        DELETE FROM water;
-
-        INSERT INTO water (id, waterDayId, typeId, waterDrank)
-        SELECT id, waterDayId, typeId, waterDrank
-        FROM TempTable;
-
-        DROP TABLE IF EXISTS TempTable;
-        </string>
     <string name="sql_drop_table">DROP TABLE IF EXISTS TempTable;</string>
     <string name="sql_create_temp_table">CREATE TEMP TABLE IF NOT EXISTS TempTable AS
         SELECT id, waterDayId, typeId, SUM(waterDrank) AS waterDrank

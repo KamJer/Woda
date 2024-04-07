@@ -3,6 +3,8 @@ package com.kamjer.woda.repository;
 import android.content.Context;
 
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.room.Room;
@@ -35,11 +37,14 @@ public class WaterDataRepository {
 
     private WaterDatabase waterDatabase;
     private WaterDAO waterDAO;
-    private final MutableLiveData<WaterDayWithWaters> waters = new MutableLiveData<>();
+
+    private final MediatorLiveData<WaterDayWithWaters> waters = new MediatorLiveData<>();
+
+    private LiveData<List<WaterDayWithWaters>> allWaterDayWithWatersLiveData;
 
     private final MutableLiveData<HashMap<Long, Type>> waterTypes = new MutableLiveData<>();
 
-    CompositeDisposable serialDisposable = new CompositeDisposable();
+    private final CompositeDisposable serialDisposable = new CompositeDisposable();
 
     public void createWaterDatabase(Context context) {
 //        if database does not exists already create a new one
@@ -62,6 +67,8 @@ public class WaterDataRepository {
                                     getWaterTypes().values())
                             .forEach(this::insertType);
                 }));
+
+        allWaterDayWithWatersLiveData = (getWaterDAO().getAllWaterDayWithWaters());
     }
 
     public static WaterDataRepository getInstance() {
@@ -71,7 +78,18 @@ public class WaterDataRepository {
         return instance;
     }
 
-    public void setWatersValue(WaterDayWithWaters waters) {
+    public void getWaterDayWithWatersByDate(LocalDate date) {
+        LiveData<WaterDayWithWaters> waterDayWithWatersLiveData = getWaterDAO().getWaterDayWithWatersByDate(date.toString());
+        this.waters.addSource(waterDayWithWatersLiveData, waterDayWithWaters -> {
+            waters.setValue(Optional.ofNullable(waterDayWithWaters).map(waterDayWithWaters1 -> {
+                waterDayWithWaters1.getWaterDay().setInserted(true);
+                return waterDayWithWaters1;
+            }).orElse(new WaterDayWithWaters(date, SharedPreferencesRepository.getInstance().getWaterAmountToDrink())));
+            waters.removeSource(waterDayWithWatersLiveData);
+        });
+    }
+
+    public void setWaterDayWithWatersValue(WaterDayWithWaters waters) {
         this.waters.setValue(waters);
     }
 
@@ -93,27 +111,25 @@ public class WaterDataRepository {
         this.waters.setValue(waterDayWithWaters);
     }
 
-    public void removeWaterValue(Water water) {
-        WaterDayWithWaters waterDayWithWaters = Optional.ofNullable(this.waters.getValue())
-                .orElseGet(() -> new WaterDayWithWaters(LocalDate.now(), SharedPreferencesRepository.DEFAULT_WATER_TO_DRINK));
+    public void removeWater(Water water) {
+        WaterDayWithWaters waterDayWithWaters = getWaterDayWithWatersValue();
         waterDayWithWaters.getWaters().remove(water);
-        this.waters.setValue(waterDayWithWaters);
+        this.setWaterDayWithWatersValue(waterDayWithWaters);
     }
 
     public void setWatersInADayValue(List<Water> waters) {
-        WaterDayWithWaters waterDayValue = getWaterDayValue();
+        WaterDayWithWaters waterDayValue = getWaterDayWithWatersValue();
         waterDayValue.setWaters(waters);
-        setWatersValue(waterDayValue);
+        setWaterDayWithWatersValue(waterDayValue);
     }
 
     public WaterDAO getWaterDAO() {
         return waterDAO;
     }
 
-
-    public WaterDayWithWaters getWaterDayValue() {
+    public WaterDayWithWaters getWaterDayWithWatersValue() {
         return Optional.ofNullable(waters.getValue())
-                .orElse(new WaterDayWithWaters(LocalDate.now(), SharedPreferencesRepository.DEFAULT_WATER_TO_DRINK));
+                .orElse(new WaterDayWithWaters(LocalDate.now(), SharedPreferencesRepository.DEFAULT_WATER_AMOUNT_TO_DRINK));
     }
 
     public void insertType(Type type) {
@@ -180,8 +196,6 @@ public class WaterDataRepository {
         this.waterTypes.setValue(waterTypes);
     }
 
-
-
     /**
      * Checks if map of types contains all of types in an array
      * if types are not contained in a map they are added to a list and returned
@@ -220,7 +234,7 @@ public class WaterDataRepository {
      * @return value of water to drink
      */
     public int getWaterAmountToDrink() {
-        return getWaterDayValue().getWaterDay().getWaterToDrink();
+        return getWaterDayWithWatersValue().getWaterDay().getWaterToDrink();
     }
 
     /**
@@ -228,9 +242,13 @@ public class WaterDataRepository {
      * @param waterAmountToDrink - new goal
      */
     public void setWaterAmountToDrink(int waterAmountToDrink) {
-        WaterDayWithWaters waterDayWithWatersToUpdate = getWaterDayValue();
+        WaterDayWithWaters waterDayWithWatersToUpdate = getWaterDayWithWatersValue();
         waterDayWithWatersToUpdate.getWaterDay().setWaterToDrink(waterAmountToDrink);
-        waters.setValue(waterDayWithWatersToUpdate);
+        setWaterDayWithWatersValue(waterDayWithWatersToUpdate);
+    }
+
+    public LiveData<List<WaterDayWithWaters>> getAllWaterDayWithWatersLiveData() {
+        return allWaterDayWithWatersLiveData;
     }
 
     public WaterDatabase getWaterDatabase() {

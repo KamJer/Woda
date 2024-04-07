@@ -134,17 +134,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setObserverOnWaters(WaterDayWithWaters waterDayWithWaters) {
-//      handling glass image
-        waterImage.setAmount(waterDayWithWaters);
-        waterImage.invalidate();
+        if (waterDayWithWaters != null) {
+            //      handling glass image
+            waterImage.setAmount(waterDayWithWaters);
+            waterImage.invalidate();
 //      handling progress bar
-        progressBarWaterDrank.setMax(waterDayWithWaters.getWaterDay().getWaterToDrink());
-        int sum = waterDayWithWaters.getWaterDaySum();
-        progressBarWaterDrank.setProgress(sum);
-        String waterStatus = sum + " / " + waterDayWithWaters.getWaterDay().getWaterToDrink();
-        textViewWaterToDrink.setText(waterStatus);
+            progressBarWaterDrank.setMax(waterDayWithWaters.getWaterDay().getWaterToDrink());
+            int sum = waterDayWithWaters.getWaterDaySum();
+            progressBarWaterDrank.setProgress(sum);
+            String waterStatus = sum + " / " + waterDayWithWaters.getWaterDay().getWaterToDrink();
+            textViewWaterToDrink.setText(waterStatus);
 //      handling date on top of a screen
-        textViewDate.setText(waterViewModel.getActiveDate().toString());
+            textViewDate.setText(waterViewModel.getActiveDate().toString());
+        }
     }
 
     /**
@@ -171,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private  void onClickAddWaterDrankAction(View v) {
         Intent addWaterToDrinkIntent = new Intent(this, AddWaterDialog.class);
-        addWaterToDrinkIntent.putExtra(AddWaterDialog.ACTIVE_WATER_DAY_WITH_WATERS_NAME, waterViewModel.getWaterValue());
+        addWaterToDrinkIntent.putExtra(AddWaterDialog.ACTIVE_WATER_DAY_WITH_WATERS_NAME, waterViewModel.getWaterDayWithWatersValue());
         addWaterToDrinkIntent.putExtra(AddWaterDialog.WATER_TYPES_NAME, waterViewModel.getTypesValue());
         addRemoveWaterDrankDialogLauncher.launch(addWaterToDrinkIntent);
     }
@@ -182,13 +184,13 @@ public class MainActivity extends AppCompatActivity {
     private  void onClickRemoveWaterDrankAction(View v) {
         Intent removeWaterToDrinkIntent = new Intent(this, AddWaterDialog.class);
         removeWaterToDrinkIntent.putExtra(AddWaterDialog.IS_REMOVE_NAME, true);
-        removeWaterToDrinkIntent.putExtra(AddWaterDialog.ACTIVE_WATER_DAY_WITH_WATERS_NAME, waterViewModel.getWaterValue());
+        removeWaterToDrinkIntent.putExtra(AddWaterDialog.ACTIVE_WATER_DAY_WITH_WATERS_NAME, waterViewModel.getWaterDayWithWatersValue());
         removeWaterToDrinkIntent.putExtra(AddWaterDialog.WATER_TYPES_NAME, waterViewModel.getTypesValue());
         addRemoveWaterDrankDialogLauncher.launch(removeWaterToDrinkIntent);
     }
 
     private void updateWaterFromDialogs(int result, Type type) {
-        List<Water> watersUpdated = waterViewModel.getWaterValue().getWaters();
+        List<Water> watersUpdated = waterViewModel.getWaterDayWithWatersValue().getWaters();
         Water waterUpdated = watersUpdated
                 .stream()
                 .filter(water ->
@@ -198,16 +200,16 @@ public class MainActivity extends AppCompatActivity {
                     water.setWaterDrank(water.getWaterDrank() + result);
                     return water;
                 })
-                .orElseGet(() -> new Water(result, type, waterViewModel.getWaterValue().getWaterDay())
+                .orElseGet(() -> new Water(result, type, waterViewModel.getWaterDayWithWatersValue().getWaterDay())
                 );
         if (waterUpdated.getWaterDrank() <= 0) {
             waterViewModel.deleteWater(waterUpdated);
         } else {
 //          checking if waterDay is already in a database and if it is don't insert it
-            if (!waterViewModel.getWaterValue().getWaterDay().isInserted()) {
-                waterViewModel.insertWaterDay(waterViewModel.getWaterValue().getWaterDay(), () -> {
+            if (!waterViewModel.getWaterDayWithWatersValue().getWaterDay().isInserted()) {
+                waterViewModel.insertWaterDay(waterViewModel.getWaterDayWithWatersValue().getWaterDay(), () -> {
 //                  sets new id for a waterDay
-                    WaterDay waterDayToInsert = waterViewModel.getWaterValue().getWaterDay();
+                    WaterDay waterDayToInsert = waterViewModel.getWaterDayWithWatersValue().getWaterDay();
                     waterDayToInsert.setInserted(true);
 //                  setting water day for a water
 //                  triggers insertion of a water if insertion of a day was successful

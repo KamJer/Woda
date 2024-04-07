@@ -27,7 +27,7 @@ public class CalendarActivity extends AppCompatActivity {
 
     private WaterViewModel waterViewModel;
     private CalendarView calendarView;
-    private List<WaterDayWithWaters> waters;
+    private List<WaterDayWithWaters> waterDayWithWaters;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,6 +38,11 @@ public class CalendarActivity extends AppCompatActivity {
 
         waterViewModel.setWaterDayWithWatersObserver(this,
                 waterDayWithWaters -> calendarView.setSelectedDate(waterDayWithWaters.getWaterDay().getDate()));
+
+        waterViewModel.setAllWaterDayWithWatersObserver(this, waterDayWithWaters -> {
+            this.waterDayWithWaters = waterDayWithWaters;
+            calendarView.showMonthView();
+        });
     }
 
     @Override
@@ -52,23 +57,7 @@ public class CalendarActivity extends AppCompatActivity {
 
 //      setting calendar listeners
         calendarView.setSelectedDateChangedListener(this::dateChangedAction);
-        calendarView.setCustomHolderBehavior(holder -> colorDays(waters, holder));
-
-        SelectedDataChangedListener selectedDateChangedListener = (view, localDate) -> fetchData();
-
-        calendarView.setNextMonthChangeListener(selectedDateChangedListener);
-        calendarView.setPreviousMonthChangeListener(selectedDateChangedListener);
-
-//      fetching data from database
-        fetchData();
-    }
-
-    private void fetchData() {
-        waterViewModel.loadAllWaterDayWithWaters(waters -> {
-            CalendarActivity.this.waters = waters;
-//          after complete setup show days of month
-            calendarView.showMonthView();
-        });
+        calendarView.setCustomHolderBehavior(holder -> colorDays(waterDayWithWaters, holder));
     }
 
     /**

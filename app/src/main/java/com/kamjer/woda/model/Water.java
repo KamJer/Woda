@@ -74,7 +74,7 @@
         @NonNull
         @Override
         public String toString() {
-            return getId() + ", " + getWaterDrank() + ", " + getTypeId() + ", " + getWaterDayId();
+            return getId() + ", " + getWaterDrank() + ", " + getTypeId() + ", " + "'" + getWaterDayId() + "'";
         }
 
         @Override
@@ -84,10 +84,7 @@
 
         @Override
         public boolean equals(@Nullable Object obj) {
-            if (obj instanceof Water) {
-                return false;
-            }
-            if (obj == null) {
+            if (!(obj instanceof Water)) {
                 return false;
             }
             return obj.hashCode() == this.hashCode();
