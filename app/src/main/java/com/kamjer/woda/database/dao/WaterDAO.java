@@ -6,6 +6,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
+import androidx.room.Update;
 
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
@@ -29,24 +30,9 @@ public abstract class WaterDAO {
     @Query("SELECT * FROM water WHERE typeId = :typeId")
     public abstract Flowable<List<Water>> getWaterByType(long typeId);
 
-    @Query("SELECT * FROM water WHERE id = :waterId")
-    public abstract Single<Water> getWaterById(long waterId);
-
 //  inserts
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract Maybe<Long> insertWater(Water water);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public abstract Maybe<List<Long>> insertWaters(List<Water> waters);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public abstract void insertWatersAndDeleteType(List<Water> waters, Type type);
-
-    @Transaction
-    public void sumWaters(List<Water> waters, Type type) {
-        insertWater(waters.get(0));
-        deleteType(type);
-    }
 
 //  deletes
     @Delete
@@ -55,28 +41,30 @@ public abstract class WaterDAO {
     @Delete
     public abstract Completable deleteWaters(List<Water> waters);
 
-//    Type table methods
-
+//  Type table methods
+//  fetching
     @Transaction
     @Query("SELECT * FROM type")
     public abstract Single<List<Type>> getAllTypes();
 
+//  inserts
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract Maybe<Long> insertType(Type type);
 
+    @Update
+    public abstract Completable updateType(Type type);
+
+//  deletes
     @Delete
     public abstract Completable deleteType(Type type);
 
-//    WaterDay
-//    fetching
-    @Query("SELECT * FROM water_day WHERE date = :date")
-    public abstract Single<WaterDay> getWaterDayByDate(String date);
-
-//    insert
+//  WaterDay table methods
+//  insert
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract Completable insertWaterDay(WaterDay waterDay);
 
-//    WaterDayWithWater
+//  WaterDayWithWater
+//  fetching
     @Query("SELECT * FROM water_day WHERE date = :date")
     public abstract Maybe<WaterDayWithWaters> getWaterDayWitWatersByDate(String date);
 

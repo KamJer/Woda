@@ -33,7 +33,8 @@ public class CalendarActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //      getting viewModel
-        waterViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(WaterViewModel.class);
+        waterViewModel = new ViewModelProvider(this,
+                new ViewModelProvider.NewInstanceFactory()).get(WaterViewModel.class);
 
         waterViewModel.setWaterDayWithWatersObserver(this,
                 waterDayWithWaters -> calendarView.setSelectedDate(waterDayWithWaters.getWaterDay().getDate()));

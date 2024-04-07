@@ -56,24 +56,21 @@ public class UserActivity extends AppCompatActivity {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         if (data != null) {
+//                            getting data from dialog
                             DeleteTypeConflictDialog.Selected selected = Optional
                                     .ofNullable((DeleteTypeConflictDialog.Selected) data.getSerializableExtra(DeleteTypeConflictDialog.ACTION_SELECTED_NAME))
                                     .orElse(DeleteTypeConflictDialog.Selected.NOTHING);
                             Type typeToDelete = (Type) Optional.ofNullable(data.getSerializableExtra(DeleteTypeConflictDialog.TYPE_TO_DELETE_NAME)).orElse(new Type());
                             List<Water> waterList =  Optional.ofNullable((ArrayList<Water>) data.getSerializableExtra(DeleteTypeConflictDialog.WATER_LIST_NAME))
                                     .orElse(new ArrayList<>());
+//                            handling selection
                             switch (selected) {
                                 case CHANGE:
                                     Type typeSelected = Optional.ofNullable((Type) data.getSerializableExtra(DeleteTypeConflictDialog.TYPE_SELECTED_NAME)).orElse(new Type());
-                                    long typeIdSelected = typeSelected.getId();
-                                    waterList.forEach(water -> water.setTypeId(typeIdSelected));
-                                    userViewModel.insertWatersSumWatersDeleteType(waterList, typeToDelete);
+                                    changeTypesDialogAction(typeSelected, waterList, typeToDelete);
                                     break;
                                 case DELETE:
-                                    userViewModel.removeWaters(waterList);
-                                    userViewModel.removeType(typeToDelete);
-                                    break;
-                                case NOTHING:
+                                    deleteTypesDialogAction(waterList, typeToDelete);
                                     break;
                             }
                         }
@@ -104,7 +101,7 @@ public class UserActivity extends AppCompatActivity {
                         if (data != null) {
                             Type typeToUpdate = Optional.ofNullable((Type) data.getSerializableExtra("type"))
                                     .orElse(new Type());
-                            userViewModel.insertType(typeToUpdate);
+                            userViewModel.updateType(typeToUpdate);
                         }
                     }
                 });
@@ -117,7 +114,7 @@ public class UserActivity extends AppCompatActivity {
 
         typeNameChangedAction = (type, newName) -> {
             type.setType(newName.toString());
-            userViewModel.insertType(type);
+            userViewModel.updateType(type);
         };
 
         userViewModel.setTypesObserver(this, longTypeHashMap ->
@@ -148,6 +145,17 @@ public class UserActivity extends AppCompatActivity {
         typeListRecycler.setAdapter(adapter);
     }
 
+    private void changeTypesDialogAction(Type typeSelected, List<Water> waterList, Type typeToDelete) {
+        long typeIdSelected = typeSelected.getId();
+        waterList.forEach(water -> water.setTypeId(typeIdSelected));
+        userViewModel.insertWatersSumWatersDeleteType(waterList, typeToDelete);
+    }
+
+    private void deleteTypesDialogAction(List<Water> waterList, Type typeToDelete) {
+        userViewModel.removeWaters(waterList);
+        userViewModel.removeType(typeToDelete);
+    }
+
     private void floatingActionButtonSetWaterAmountAction(View view) {
         int waterAmountToDrink = Integer.parseInt(textViewWaterAmount.getText().toString());
         userViewModel.setWaterAmountToDrink(getApplicationContext(), waterAmountToDrink);
@@ -170,7 +178,6 @@ public class UserActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        userViewModel.removeTypeLiveDataObserver(this);
 //        clears focus on all elements in a recyclerView, necessary to fire focus listener on ViewHolder
         typeListRecycler.notifyFocusCleared();
         userViewModel.clearDisposable();

@@ -1,7 +1,6 @@
 package com.kamjer.woda.viewmodel;
 
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
@@ -9,7 +8,6 @@ import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.model.WaterDay;
 import com.kamjer.woda.model.WaterDayWithWaters;
-import com.kamjer.woda.repository.ResourcesRepository;
 import com.kamjer.woda.repository.SharedPreferencesRepository;
 import com.kamjer.woda.repository.WaterDataRepository;
 
@@ -57,7 +55,6 @@ public class WaterViewModel extends ViewModel {
                 ));
     }
 
-
     public void loadAllWaterDayWithWaters(Consumer<List<WaterDayWithWaters>> onSuccess) {
         disposable.add((WaterDataRepository.getInstance().getWaterDAO()
                 .getAllWaterDayWitWatersByDate())
@@ -96,8 +93,8 @@ public class WaterViewModel extends ViewModel {
                 ));
     }
 
-    public MutableLiveData<WaterDayWithWaters> getWater() {
-        return WaterDataRepository.getInstance().getWaters();
+    public void setWaterDayWithWatersObserver(LifecycleOwner owner, Observer<WaterDayWithWaters> observer) {
+        WaterDataRepository.getInstance().getWaterDayWithWatersLivaData().observe(owner, observer);
     }
 
     public void addWaterInDay(Water water) {
@@ -109,7 +106,7 @@ public class WaterViewModel extends ViewModel {
     }
 
     public void setWaterValue(WaterDayWithWaters waters) {
-        WaterDataRepository.getInstance().getWaters().setValue(waters);
+        WaterDataRepository.getInstance().getWaterDayWithWatersLivaData().setValue(waters);
     }
 
     public WaterDayWithWaters getWaterValue() {
@@ -137,9 +134,7 @@ public class WaterViewModel extends ViewModel {
         disposable.clear();
     }
 
-    public void setWaterDayWithWatersObserver(LifecycleOwner owner, Observer<WaterDayWithWaters> observer) {
-        WaterDataRepository.getInstance().getWaters().observe(owner, observer);
-    }
+
 
     public HashMap<Long, Type> getTypesValue() {
         return WaterDataRepository.getInstance().getWaterTypes();

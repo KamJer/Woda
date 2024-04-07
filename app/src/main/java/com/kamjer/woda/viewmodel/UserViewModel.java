@@ -15,6 +15,7 @@ import com.kamjer.woda.repository.WaterDataRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
@@ -68,11 +69,29 @@ public class UserViewModel extends ViewModel {
         disposable.add(WaterDataRepository.getInstance().getWaterDAO().deleteWaters(waters)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
+                .subscribe(() -> {
+                            waters.forEach(water -> {
+                                if (WaterDataRepository.getInstance().getWaterDayValue().getWaters().contains(water)) {
+                                    WaterDataRepository.getInstance().removeWaterValue(water);
+                                }
+                            });
+                        },
+                        RxJavaPlugins::onError));
     }
 
     private void putType(Type type) {
         WaterDataRepository.getInstance().putType(type);
+    }
+
+    public void updateType(Type type) {
+        disposable.add(WaterDataRepository.getInstance().getWaterDAO()
+                .updateType(type)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    putType(type);
+                },
+                        RxJavaPlugins::onError));
     }
 
     public void insertType(Type type) {
@@ -113,10 +132,6 @@ public class UserViewModel extends ViewModel {
 
     public void setTypesObserver(LifecycleOwner owner, Observer<HashMap<Long, Type>> observer) {
         WaterDataRepository.getInstance().setTypesLiveDataObserver(owner, observer);
-    }
-
-    public void removeTypeLiveDataObserver(LifecycleOwner owner) {
-        WaterDataRepository.getInstance().removeTypeLiveDataObserver(owner);
     }
 
     public void loadWatersByType(Type type, Consumer<List<Water>> onSuccess) {

@@ -29,8 +29,6 @@ public class AlarmActivity extends AppCompatActivity {
     private Button buttonConstraintTimeStart;
     private Button buttonConstraintTimeEnd;
 
-    private Spinner spinnerHourSelectNotification;
-
     private AlarmViewModel alarmViewModel;
 
 
@@ -59,7 +57,7 @@ public class AlarmActivity extends AppCompatActivity {
         if (!alarmViewModel.isNotificationsActive()) {
             alarmViewModel.setSelectedNotificationsTime(getApplicationContext(), LocalTime.now());
         }
-        spinnerHourSelectNotification = findViewById(R.id.spinnerHourSelectNotification);
+        Spinner spinnerHourSelectNotification = findViewById(R.id.spinnerHourSelectNotification);
 
         Integer[] hours = new Integer[24];
         for (int i = 0; i < hours.length; i++) {
@@ -90,15 +88,15 @@ public class AlarmActivity extends AppCompatActivity {
 
         buttonConstraintTimeStart = findViewById(R.id.buttonConstraintTimeStart);
         buttonConstraintTimeStart.setOnClickListener(v ->
-                showTimePickerDialog(buttonConstraintTimeStartAction(buttonConstraintTimeStart)));
+                showTimePickerDialog(buttonConstraintTimeStartAction()));
 
         buttonConstraintTimeEnd = findViewById(R.id.buttonConstraintTimeEnd);
         buttonConstraintTimeEnd.setOnClickListener(v ->
-                showTimePickerDialog(buttonConstraintTimeEndAction(buttonConstraintTimeEnd)
+                showTimePickerDialog(buttonConstraintTimeEndAction()
         ));
     }
 
-    private TimePickerDialog.OnTimeSetListener buttonConstraintTimeStartAction(Button buttonConstraintTimeStart) {
+    private TimePickerDialog.OnTimeSetListener buttonConstraintTimeStartAction() {
         return (view, hourOfDay, minute) -> {
             LocalTime timeConstraintStart = LocalTime.of(hourOfDay, minute);
             alarmViewModel.setConstraintNotificationTimeStart(getApplicationContext(), timeConstraintStart);
@@ -106,7 +104,7 @@ public class AlarmActivity extends AppCompatActivity {
         };
     }
 
-    private TimePickerDialog.OnTimeSetListener buttonConstraintTimeEndAction(Button buttonConstraintTimeEnd) {
+    private TimePickerDialog.OnTimeSetListener buttonConstraintTimeEndAction() {
         return (view, hourOfDay, minute) -> {
             LocalTime timeConstraintEnd = LocalTime.of(hourOfDay, minute);
             alarmViewModel.setConstraintNotificationTimeEnd(getApplicationContext(), timeConstraintEnd);

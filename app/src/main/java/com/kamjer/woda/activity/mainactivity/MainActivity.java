@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         RxJavaPlugins.setErrorHandler(new WaterAppErrorHandler(this));
 
 //      creating observer for liveData in a ViewModel
-        waterViewModel.getWater().observe(this, this::setObserverOnWaters);
+        waterViewModel.setWaterDayWithWatersObserver(this, this::setObserverOnWaters);
     }
 
     @Override
@@ -244,7 +244,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        waterViewModel.getWater().observe(this, this::setObserverOnWaters);
+        waterViewModel.setWaterDayWithWatersObserver(this, this::setObserverOnWaters);
+//        reloading data to make sure it is up ot date
 //        waterViewModel.loadWaterDayWithWatersByDate(waterViewModel.getActiveDate());
     }
 

@@ -22,7 +22,6 @@ public class WaterImage extends androidx.appcompat.widget.AppCompatImageView {
     private static final int IMAGE_SIZE_X = 200;
     private static final int IMAGE_SIZE_Y = 200;
     private Drawable glassDrawable;
-    private Matrix matrix1;
 
     public WaterImage(Context context) {
         super(context);
@@ -55,7 +54,7 @@ public class WaterImage extends androidx.appcompat.widget.AppCompatImageView {
         float scaleX = (float) glassDrawable.getIntrinsicWidth() / IMAGE_SIZE_X;
         float scaleY = (float) glassDrawable.getIntrinsicHeight() / IMAGE_SIZE_Y;
 
-        matrix1 = new Matrix();
+        Matrix matrix1 = new Matrix();
         matrix1.postScale(scaleX, scaleY);
 
         int maxValue = Math.max(waterDayWithWaters.getWaterDay().getWaterToDrink(), waterDayWithWaters.getWaterDaySum());

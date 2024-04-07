@@ -3,6 +3,7 @@ package com.kamjer.woda.repository;
 import android.content.Context;
 
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.room.Room;
@@ -25,9 +26,6 @@ import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.disposables.DisposableContainer;
-import io.reactivex.rxjava3.disposables.SerialDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class WaterDataRepository {
@@ -63,14 +61,7 @@ public class WaterDataRepository {
                                             .getInstance()
                                             .getDefaultDrinksTypes(),
                                     getWaterTypes().values())
-                            .forEach(type -> serialDisposable.add(getWaterDAO()
-                                    .insertType(type)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(aLong -> {
-                                        type.setId(aLong);
-                                        putType(type);
-                                    })));
+                            .forEach(this::insertType);
                 }));
     }
 
@@ -85,7 +76,7 @@ public class WaterDataRepository {
         this.waters.setValue(waters);
     }
 
-    public MutableLiveData<WaterDayWithWaters> getWaters() {
+    public MutableLiveData<WaterDayWithWaters> getWaterDayWithWatersLivaData() {
         return waters;
     }
 
@@ -120,9 +111,29 @@ public class WaterDataRepository {
         return waterDAO;
     }
 
+
     public WaterDayWithWaters getWaterDayValue() {
         return Optional.ofNullable(waters.getValue())
                 .orElse(new WaterDayWithWaters(LocalDate.now(), SharedPreferencesRepository.DEFAULT_WATER_TO_DRINK));
+    }
+
+    public void insertType(Type type) {
+        serialDisposable.add(getWaterDAO()
+                .insertType(type)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> {
+                    type.setId(aLong);
+                    putType(type);
+                }));
+    }
+
+    public void updateType(Type type) {
+        serialDisposable.add(getWaterDAO()
+                .updateType(type)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe());
     }
 
     /**
@@ -136,7 +147,7 @@ public class WaterDataRepository {
     }
 
     /**
-     * Puts type in live data
+     * Puts type in live data, does not insert nor update it into database
      * @param type to put in a live data
      */
     public void putType(Type type) {
@@ -152,14 +163,6 @@ public class WaterDataRepository {
      */
     public void setTypesLiveDataObserver(LifecycleOwner owner, Observer<HashMap<Long, Type>> observer) {
         waterTypes.observe(owner, observer);
-    }
-
-    /**
-     * Removes observers from a type liveData
-     * @param owner owner of a observer to set
-     */
-    public void removeTypeLiveDataObserver(LifecycleOwner owner) {
-        waterTypes.removeObservers(owner);
     }
 
     /**

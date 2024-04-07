@@ -1,6 +1,7 @@
     package com.kamjer.woda.model;
 
     import androidx.annotation.NonNull;
+    import androidx.annotation.Nullable;
     import androidx.room.ColumnInfo;
     import androidx.room.Entity;
     import androidx.room.ForeignKey;
@@ -79,5 +80,18 @@
         @Override
         public String toString() {
             return getId() + ", " + getWaterDrank() + ", " + getTypeId() + ", " + getWaterDayId();
+        }
+
+        @Override
+        public int hashCode() {
+            return (int) id;
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            return obj.hashCode() == this.hashCode();
         }
     }
