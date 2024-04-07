@@ -2,14 +2,9 @@
 
     import androidx.annotation.NonNull;
     import androidx.annotation.Nullable;
-    import androidx.room.ColumnInfo;
     import androidx.room.Entity;
     import androidx.room.ForeignKey;
-    import androidx.room.Insert;
-    import androidx.room.OnConflictStrategy;
     import androidx.room.PrimaryKey;
-
-    import org.jetbrains.annotations.NotNull;
 
     import java.io.Serializable;
     import java.time.LocalDate;
@@ -89,6 +84,9 @@
 
         @Override
         public boolean equals(@Nullable Object obj) {
+            if (obj instanceof Water) {
+                return false;
+            }
             if (obj == null) {
                 return false;
             }
