@@ -7,7 +7,11 @@ import com.kamjer.woda.repository.SharedPreferencesRepository;
 import com.kamjer.woda.repository.SqlRepository;
 import com.kamjer.woda.repository.WaterDataRepository;
 
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+
 public class AppInitializer {
+
+    private static final CompositeDisposable disposable = new CompositeDisposable();
 
     public static void initialize(Context applicationContext) {
         initializeSql(applicationContext);
@@ -53,6 +57,7 @@ public class AppInitializer {
     private static void createDatabase(Context applicationContext) {
         WaterDataRepository.getInstance().createWaterDatabase(applicationContext);
         ResourcesRepository.getInstance().loadDefaultTypes(applicationContext);
+        disposable.add(WaterDataRepository.getInstance().getAllTypes());
     }
 
     private static void loadWaterAmount(Context applicationContext) {
@@ -67,6 +72,6 @@ public class AppInitializer {
      * Clears resources from repositories making sure that there are no memory leaks
      */
     public static void clearAppResources() {
-        WaterDataRepository.getInstance().clearDisposable();
+        disposable.clear();
     }
 }

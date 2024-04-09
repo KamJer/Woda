@@ -26,7 +26,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Action;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class WaterDataRepository {
@@ -44,7 +47,7 @@ public class WaterDataRepository {
 
     private final MutableLiveData<HashMap<Long, Type>> waterTypes = new MutableLiveData<>();
 
-    private final CompositeDisposable serialDisposable = new CompositeDisposable();
+//    private final CompositeDisposable serialDisposable = new CompositeDisposable();
 
     public void createWaterDatabase(Context context) {
 //        if database does not exists already create a new one
@@ -53,8 +56,11 @@ public class WaterDataRepository {
                     .build();
             this.waterDAO = waterDatabase.waterDAO();
         }
+        allWaterDayWithWatersLiveData = (getWaterDAO().getAllWaterDayWithWaters());
+    }
 
-        serialDisposable.add(getWaterDAO().getAllTypes()
+    public Disposable getAllTypes() {
+        return getWaterDAO().getAllTypes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(types -> {
@@ -65,10 +71,15 @@ public class WaterDataRepository {
                                             .getInstance()
                                             .getDefaultDrinksTypes(),
                                     getWaterTypes().values())
-                            .forEach(this::insertType);
-                }));
+                            .forEach(type -> insertType(type, aLong -> {
+                                type.setId(aLong);
+                                putType(type);
+                            }));
+                });
+    }
 
-        allWaterDayWithWatersLiveData = (getWaterDAO().getAllWaterDayWithWaters());
+    public WaterDAO getWaterDAO() {
+        return waterDAO;
     }
 
     public static WaterDataRepository getInstance() {
@@ -78,7 +89,7 @@ public class WaterDataRepository {
         return instance;
     }
 
-    public void getWaterDayWithWatersByDate(LocalDate date) {
+    public void loadWaterDayWithWatersByDate(LocalDate date) {
         LiveData<WaterDayWithWaters> waterDayWithWatersLiveData = getWaterDAO().getWaterDayWithWatersByDate(date.toString());
         this.waters.addSource(waterDayWithWatersLiveData, waterDayWithWaters -> {
             waters.setValue(Optional.ofNullable(waterDayWithWaters).map(waterDayWithWaters1 -> {
@@ -89,17 +100,40 @@ public class WaterDataRepository {
         });
     }
 
+    public Disposable insertWater(Water water, Consumer<Long> action) {
+        return getWaterDAO()
+                .insertWater(water)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(action, RxJavaPlugins::onError);
+    }
+
+    public Disposable insertWaterDay(WaterDay waterDay, Action onSuccess) {
+        return getWaterDAO().insertWaterDay(waterDay)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        onSuccess,
+                        RxJavaPlugins::onError
+                );
+    }
+
+    public Disposable deleteWater(Water water, Action action) {
+        return getWaterDAO()
+                .deleteWater(water)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(action, RxJavaPlugins::onError);
+    }
+
     public void setWaterDayWithWatersValue(WaterDayWithWaters waters) {
         this.waters.setValue(waters);
     }
 
-    public MutableLiveData<WaterDayWithWaters> getWaterDayWithWatersLivaData() {
-        return waters;
-    }
 
-    public void addWaterValue(Water water) {
+    public void addWaterInDay(Water water) {
 //      getting waterDayWithWaters or creating it
-        WaterDayWithWaters waterDayWithWaters = Optional.ofNullable(this.waters.getValue()).orElseGet(() -> new WaterDayWithWaters(LocalDate.now(), 1500));
+        WaterDayWithWaters waterDayWithWaters = getWaterDayWithWatersValue();
 //      getting waterDay from WaterDayWithWaters or creating it
         WaterDay waterDay = waterDayWithWaters.getWaterDay();
 //      getting waters from WaterDayWithWaters or creating it
@@ -108,23 +142,17 @@ public class WaterDataRepository {
         if (!waters.contains(water)) {
             waters.add(water);
         }
-        this.waters.setValue(waterDayWithWaters);
+        setWaterDayWithWatersValue(waterDayWithWaters);
     }
 
-    public void removeWater(Water water) {
+    public void removeWaterInDay(Water water) {
         WaterDayWithWaters waterDayWithWaters = getWaterDayWithWatersValue();
         waterDayWithWaters.getWaters().remove(water);
         this.setWaterDayWithWatersValue(waterDayWithWaters);
     }
 
-    public void setWatersInADayValue(List<Water> waters) {
-        WaterDayWithWaters waterDayValue = getWaterDayWithWatersValue();
-        waterDayValue.setWaters(waters);
-        setWaterDayWithWatersValue(waterDayValue);
-    }
-
-    public WaterDAO getWaterDAO() {
-        return waterDAO;
+    public MutableLiveData<WaterDayWithWaters> getWaterDayWithWatersLivaData() {
+        return waters;
     }
 
     public WaterDayWithWaters getWaterDayWithWatersValue() {
@@ -132,30 +160,35 @@ public class WaterDataRepository {
                 .orElse(new WaterDayWithWaters(LocalDate.now(), SharedPreferencesRepository.DEFAULT_WATER_AMOUNT_TO_DRINK));
     }
 
-    public void insertType(Type type) {
-        serialDisposable.add(getWaterDAO()
+    public Disposable insertType(Type type, Consumer<Long> onSuccess) {
+        return getWaterDAO()
                 .insertType(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> {
-                    type.setId(aLong);
-                    putType(type);
-                }));
+                .subscribe(onSuccess, RxJavaPlugins::onError);
     }
 
-    public void updateType(Type type) {
-        serialDisposable.add(getWaterDAO()
+    public Disposable updateType(Type type, Action onSuccess) {
+        return getWaterDAO()
                 .updateType(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
+                .subscribe(onSuccess, RxJavaPlugins::onError);
+    }
+
+    public Disposable removeType(Type type, Action action) {
+        return getWaterDAO()
+                .deleteType(type)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(action, RxJavaPlugins::onError);
     }
 
     /**
      * Removes a type, filters all of waters in a active day and removes them from that day
      * @param id of a type to remove
      */
-    public void removeWaterType(long id) {
+    public void removeType(long id) {
         HashMap<Long, Type> waterTypes = getWaterTypes();
         waterTypes.remove(id);
         this.waterTypes.setValue(waterTypes);
@@ -189,14 +222,6 @@ public class WaterDataRepository {
     }
 
     /**
-     * Sets passed map to liveData
-     * @param waterTypes map of types to set
-     */
-    public void setWaterTypes(HashMap<Long, Type> waterTypes) {
-        this.waterTypes.setValue(waterTypes);
-    }
-
-    /**
      * Checks if map of types contains all of types in an array
      * if types are not contained in a map they are added to a list and returned
      * @param defaultTypes - types to check
@@ -214,10 +239,6 @@ public class WaterDataRepository {
 //      if types in a database does not contain default ones return those types that are not in a database,
 //      if database contains all of a default types list will have length of 0
         return test;
-    }
-
-    public static boolean test(List<Type> defaultTypes, Type typeToCheck) {
-        return defaultTypes.contains(typeToCheck);
     }
 
     /**
@@ -238,13 +259,14 @@ public class WaterDataRepository {
     }
 
     /**
-     * Sets in an active WaterDay new water amount to drink
+     * Sets in an active WaterDay new water amount to drink and updates WaterDay
      * @param waterAmountToDrink - new goal
      */
-    public void setWaterAmountToDrink(int waterAmountToDrink) {
+    public Disposable setWaterAmountToDrink(int waterAmountToDrink) {
         WaterDayWithWaters waterDayWithWatersToUpdate = getWaterDayWithWatersValue();
         waterDayWithWatersToUpdate.getWaterDay().setWaterToDrink(waterAmountToDrink);
         setWaterDayWithWatersValue(waterDayWithWatersToUpdate);
+        return getWaterDAO().updateWaterDay(waterDayWithWatersToUpdate.getWaterDay()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
     }
 
     public LiveData<List<WaterDayWithWaters>> getAllWaterDayWithWatersLiveData() {
@@ -253,9 +275,5 @@ public class WaterDataRepository {
 
     public WaterDatabase getWaterDatabase() {
         return waterDatabase;
-    }
-
-    public void clearDisposable() {
-        serialDisposable.clear();
     }
 }

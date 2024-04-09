@@ -33,7 +33,7 @@ public class UserViewModel extends ViewModel {
     }
     public void setWaterAmountToDrink(Context applicationContext, int waterAmountToDrink) {
         SharedPreferencesRepository.getInstance().setWaterAmountToDrink(applicationContext, waterAmountToDrink);
-        WaterDataRepository.getInstance().setWaterAmountToDrink(waterAmountToDrink);
+        disposable.add(WaterDataRepository.getInstance().setWaterAmountToDrink(waterAmountToDrink));
     }
 
     public void setWaterAmountToDrinkObserver(LifecycleOwner owner, Observer<Integer> observer) {
@@ -60,7 +60,7 @@ public class UserViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        () -> WaterDataRepository.getInstance().removeWaterType(type.getId()),
+                        () -> WaterDataRepository.getInstance().removeType(type.getId()),
                         RxJavaPlugins::onError
                 ));
     }
@@ -70,7 +70,11 @@ public class UserViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
-
+                            waters.forEach(water -> {
+                                if (WaterDataRepository.getInstance().getWaterDayWithWatersValue().getWaters().contains(water)) {
+                                    WaterDataRepository.getInstance().removeWaterInDay(water);
+                                }
+                            });
                         },
                         RxJavaPlugins::onError));
     }
@@ -80,42 +84,18 @@ public class UserViewModel extends ViewModel {
     }
 
     public void updateType(Type type) {
-        disposable.add(WaterDataRepository.getInstance().getWaterDAO()
-                .updateType(type)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                    putType(type);
-                },
-                        RxJavaPlugins::onError));
+        disposable.add(WaterDataRepository.getInstance().updateType(type, () -> putType(type)));
     }
 
     public void insertType(Type type) {
-        insertType(type, aLong -> {
+        disposable.add(WaterDataRepository.getInstance().insertType(type, aLong -> {
             type.setId(aLong);
             putType(type);
-        });
-    }
-
-    public void insertType(Type type, Consumer<Long> onSuccess) {
-        disposable.add(WaterDataRepository.getInstance().getWaterDAO().insertType(type)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        onSuccess,
-                        RxJavaPlugins::onError
-                ));
+        }));
     }
 
     public void removeType(Type type) {
-        removeType(type, () -> WaterDataRepository.getInstance().removeWaterType(type.getId()));
-    }
-
-    public void removeType(Type type, Action action) {
-        disposable.add(WaterDataRepository.getInstance().getWaterDAO().deleteType(type)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(action));
+        disposable.add(WaterDataRepository.getInstance().removeType(type, () -> WaterDataRepository.getInstance().removeType(type.getId())));
     }
 
     /**

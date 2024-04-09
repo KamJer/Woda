@@ -64,6 +64,9 @@ public abstract class WaterDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract Completable insertWaterDay(WaterDay waterDay);
 
+    @Update
+    public abstract Completable updateWaterDay(WaterDay waterDay);
+
 //  WaterDayWithWater
 //  fetching
     @Query("SELECT * FROM water_day WHERE date = :date")
