@@ -15,31 +15,11 @@ public class AppInitializer {
 
     public static void initialize(Context applicationContext) {
         initializeSql(applicationContext);
+        loadResources(applicationContext);
 //      creating database;
         createDatabase(applicationContext);
 //      loading preferences
-        loadWaterAmount(applicationContext);
-        loadActiveNotification(applicationContext);
-        loadSelectedNotificationTime(applicationContext);
-        loadConstraintNotificationTimeStart(applicationContext);
-        loadConstraintNotificationTimeEnd(applicationContext);
-        loadHourNotificationPeriod(applicationContext);
-    }
-
-    private static void loadConstraintNotificationTimeEnd(Context applicationContext) {
-        SharedPreferencesRepository.getInstance().loadConstraintNotificationTimeEnd(applicationContext);
-    }
-
-    private static void loadConstraintNotificationTimeStart(Context applicationContext) {
-        SharedPreferencesRepository.getInstance().loadConstraintNotificationTimeStart(applicationContext);
-    }
-
-    private static void loadSelectedNotificationTime(Context applicationContext) {
-        SharedPreferencesRepository.getInstance().loadSelectedNotificationTime(applicationContext);
-    }
-
-    private static void loadActiveNotification(Context applicationContext) {
-        SharedPreferencesRepository.getInstance().loadActiveNotification(applicationContext);
+        loadSharedPreferences(applicationContext);
     }
 
     /**
@@ -56,16 +36,21 @@ public class AppInitializer {
      */
     private static void createDatabase(Context applicationContext) {
         WaterDataRepository.getInstance().createWaterDatabase(applicationContext);
-        ResourcesRepository.getInstance().loadDefaultTypes(applicationContext);
-        disposable.add(WaterDataRepository.getInstance().getAllTypes());
+        WaterDataRepository.getInstance().getAllTypes();
     }
 
-    private static void loadWaterAmount(Context applicationContext) {
+    private static void loadSharedPreferences(Context applicationContext) {
+        SharedPreferencesRepository.getInstance().loadConstraintNotificationTimeEnd(applicationContext);
+        SharedPreferencesRepository.getInstance().loadConstraintNotificationTimeStart(applicationContext);
+        SharedPreferencesRepository.getInstance().loadSelectedNotificationTime(applicationContext);
+        SharedPreferencesRepository.getInstance().loadActiveNotification(applicationContext);
         SharedPreferencesRepository.getInstance().loadWaterAmount(applicationContext);
+        SharedPreferencesRepository.getInstance().loadHourNotificationPeriod(applicationContext);
     }
 
-    private static void loadHourNotificationPeriod(Context applicationContext) {
-        SharedPreferencesRepository.getInstance().loadHourNotificationPeriod(applicationContext);
+    private static void loadResources(Context applicationContext) {
+        ResourcesRepository.getInstance().loadDefaultTypeDeleteMessage(applicationContext);
+        ResourcesRepository.getInstance().loadDefaultTypes(applicationContext);
     }
 
     /**

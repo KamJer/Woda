@@ -60,7 +60,8 @@ public class UserViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        () -> WaterDataRepository.getInstance().removeType(type.getId()),
+//                        () -> WaterDataRepository.getInstance().removeType(type.getId()),
+                        () -> {},
                         RxJavaPlugins::onError
                 ));
     }
@@ -79,23 +80,16 @@ public class UserViewModel extends ViewModel {
                         RxJavaPlugins::onError));
     }
 
-    private void putType(Type type) {
-        WaterDataRepository.getInstance().putType(type);
-    }
-
     public void updateType(Type type) {
-        disposable.add(WaterDataRepository.getInstance().updateType(type, () -> putType(type)));
+        disposable.add(WaterDataRepository.getInstance().updateType(type));
     }
 
     public void insertType(Type type) {
-        disposable.add(WaterDataRepository.getInstance().insertType(type, aLong -> {
-            type.setId(aLong);
-            putType(type);
-        }));
+        disposable.add(WaterDataRepository.getInstance().insertType(type, type::setId));
     }
 
     public void removeType(Type type) {
-        disposable.add(WaterDataRepository.getInstance().removeType(type, () -> WaterDataRepository.getInstance().removeType(type.getId())));
+        disposable.add(WaterDataRepository.getInstance().removeType(type));
     }
 
     /**

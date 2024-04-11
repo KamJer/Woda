@@ -23,7 +23,7 @@ public class WaterAppErrorHandler implements Consumer<Throwable> {
         if (e != null) {
             String errorMessage = Optional.ofNullable(e.getMessage()).orElse("Error detected, source not known");
             Log.e(this.getClass().getName(), errorMessage);
-            Toast.makeText(context, context.getResources().getString(R.string.error_message), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show();
         }
     }
 }

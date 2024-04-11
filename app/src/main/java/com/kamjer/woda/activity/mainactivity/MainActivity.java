@@ -39,6 +39,7 @@ import com.kamjer.woda.utils.WaterAppErrorHandler;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
     private WaterImage waterImage;
     
     private GestureDetectorCompat gestureDetector;
+
+    private HashMap<Long, Type> typeHashMap;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -99,8 +102,7 @@ public class MainActivity extends AppCompatActivity {
 //      creating behavior for error in a RxJava
         RxJavaPlugins.setErrorHandler(new WaterAppErrorHandler(this));
 
-//      creating observer for liveData in a ViewModel
-        waterViewModel.setWaterDayWithWatersObserver(this, this::setObserverOnWaters);
+        setObservers();
     }
 
     @Override
@@ -174,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
     private  void onClickAddWaterDrankAction(View v) {
         Intent addWaterToDrinkIntent = new Intent(this, AddWaterDialog.class);
         addWaterToDrinkIntent.putExtra(AddWaterDialog.ACTIVE_WATER_DAY_WITH_WATERS_NAME, waterViewModel.getWaterDayWithWatersValue());
-        addWaterToDrinkIntent.putExtra(AddWaterDialog.WATER_TYPES_NAME, waterViewModel.getTypesValue());
+        addWaterToDrinkIntent.putExtra(AddWaterDialog.WATER_TYPES_NAME, typeHashMap);
         addRemoveWaterDrankDialogLauncher.launch(addWaterToDrinkIntent);
     }
     /**
@@ -185,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
         Intent removeWaterToDrinkIntent = new Intent(this, AddWaterDialog.class);
         removeWaterToDrinkIntent.putExtra(AddWaterDialog.IS_REMOVE_NAME, true);
         removeWaterToDrinkIntent.putExtra(AddWaterDialog.ACTIVE_WATER_DAY_WITH_WATERS_NAME, waterViewModel.getWaterDayWithWatersValue());
-        removeWaterToDrinkIntent.putExtra(AddWaterDialog.WATER_TYPES_NAME, waterViewModel.getTypesValue());
+        removeWaterToDrinkIntent.putExtra(AddWaterDialog.WATER_TYPES_NAME, typeHashMap);
         addRemoveWaterDrankDialogLauncher.launch(removeWaterToDrinkIntent);
     }
 
@@ -236,6 +238,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setObservers() {
+        //      creating observer for liveData in a ViewModel
+        waterViewModel.setWaterDayWithWatersObserver(this, this::setObserverOnWaters);
+        waterViewModel.setAllTypesObserver(this, longTypeHashMap -> {
+            typeHashMap = longTypeHashMap;
+        });
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -246,9 +256,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        waterViewModel.setWaterDayWithWatersObserver(this, this::setObserverOnWaters);
-//        reloading data to make sure it is up ot date
-//        waterViewModel.loadWaterDayWithWatersByDate(waterViewModel.getActiveDate());
+        setObservers();
     }
 
     @Override

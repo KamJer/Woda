@@ -85,7 +85,6 @@ public class NotificationHelper {
                 .setInputData(data)
                 .build();
 
-
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORKER_NAME,
                 ExistingPeriodicWorkPolicy.KEEP,
@@ -100,8 +99,9 @@ public class NotificationHelper {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.glass)
                 .setContentTitle(title)
-                .setContentText(message)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(message))
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {

@@ -21,8 +21,8 @@ public class SharedPreferencesRepository {
     private static final String CONSTRAINT_NOTIFICATIONS_TIME_END_NAME = "constraintNotificationsTimeEnd";
     private static final String HOUR_NOTIFICATION_PERIOD_NAME = "hourNotificationPeriodName";
 
-    public static final LocalTime TIME_CONSTRAINT_START_DEFAULT = LocalTime.of(8, 0);
-    public static final LocalTime TIME_CONSTRAINT_END_DEFAULT = LocalTime.of(22, 0);
+    public static final LocalTime TIME_CONSTRAINT_START_DEFAULT = LocalTime.of(22, 0);
+    public static final LocalTime TIME_CONSTRAINT_END_DEFAULT = LocalTime.of(8, 0);
 
     private final MutableLiveData<Integer> waterAmountToDrinkMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> notificationsActiveLiveData = new MutableLiveData<>();

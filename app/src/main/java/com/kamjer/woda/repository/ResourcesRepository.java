@@ -13,6 +13,8 @@ public class ResourcesRepository {
 
     private static ResourcesRepository resourcesRepository;
 
+    private String deleteTypeDefaultMessageException;
+
     private List<Type> defaultDrinksTypes;
 
     public static ResourcesRepository getInstance() {
@@ -31,11 +33,19 @@ public class ResourcesRepository {
         }
     }
 
+    public void loadDefaultTypeDeleteMessage(Context context) {
+        deleteTypeDefaultMessageException = context.getResources().getString(R.string.delete_type_default_message_exception);
+    }
+
     /**
      * Returns default types of water
      * @return default types loaded on start of an app, if there are no default types loaded, returns empty array of types
      */
     public List<Type> getDefaultDrinksTypes() {
         return Optional.ofNullable(defaultDrinksTypes).orElse(new ArrayList<>());
+    }
+
+    public String getDeleteTypeDefaultMessageException() {
+        return deleteTypeDefaultMessageException;
     }
 }

@@ -46,11 +46,14 @@ public abstract class WaterDAO {
 //  fetching
     @Transaction
     @Query("SELECT * FROM type")
-    public abstract Single<List<Type>> getAllTypes();
+    public abstract LiveData<List<Type>> getAllTypes();
 
 //  inserts
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract Maybe<Long> insertType(Type type);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public abstract Maybe<List<Long>> insertTypes(List<Type> types);
 
     @Update
     public abstract Completable updateType(Type type);

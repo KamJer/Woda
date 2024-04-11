@@ -30,7 +30,10 @@ public class NotificationWorker extends Worker {
 
             String drinkWaterNotificationTitle = getApplicationContext().getString(R.string.drink_water_notification_title);
             String drinkWaterNotificationMessage = getApplicationContext().getString(R.string.drink_water_notification_message);
-            NotificationHelper.showNotification(getApplicationContext(), drinkWaterNotificationTitle, drinkWaterNotificationMessage);
+            NotificationHelper
+                    .showNotification(getApplicationContext(),
+                            drinkWaterNotificationTitle,
+                            drinkWaterNotificationMessage);
         }
         return Result.success();
     }

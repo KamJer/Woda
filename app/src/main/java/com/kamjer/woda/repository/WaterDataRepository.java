@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.room.Room;
 
+import com.kamjer.woda.database.WaterDataValidation;
 import com.kamjer.woda.database.dao.WaterDAO;
 import com.kamjer.woda.database.WaterDatabase;
 import com.kamjer.woda.model.Type;
@@ -45,9 +46,7 @@ public class WaterDataRepository {
 
     private LiveData<List<WaterDayWithWaters>> allWaterDayWithWatersLiveData;
 
-    private final MutableLiveData<HashMap<Long, Type>> waterTypes = new MutableLiveData<>();
-
-//    private final CompositeDisposable serialDisposable = new CompositeDisposable();
+    private final MediatorLiveData<HashMap<Long, Type>> waterTypes = new MediatorLiveData<>();
 
     public void createWaterDatabase(Context context) {
 //        if database does not exists already create a new one
@@ -59,23 +58,20 @@ public class WaterDataRepository {
         allWaterDayWithWatersLiveData = (getWaterDAO().getAllWaterDayWithWaters());
     }
 
-    public Disposable getAllTypes() {
-        return getWaterDAO().getAllTypes()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(types -> {
-//                  add fetched types to the liveData
-                    types.forEach(this::putType);
-//                  check if fetched data contains default types, if it does not add it to the database and put in liveDatas
-                    WaterDataRepository.containsDefaultTypes(ResourcesRepository
-                                            .getInstance()
-                                            .getDefaultDrinksTypes(),
-                                    getWaterTypes().values())
-                            .forEach(type -> insertType(type, aLong -> {
-                                type.setId(aLong);
-                                putType(type);
-                            }));
-                });
+    public void getAllTypes() {
+        waterTypes.addSource(getWaterDAO().getAllTypes(), types -> {
+            waterTypes.setValue((HashMap<Long, Type>) types.stream().collect(Collectors.toMap(
+                    type -> ((Type) type).getId(),
+                    o -> o)));
+
+            getWaterDAO().insertTypes(WaterDataRepository.containsDefaultTypes(ResourcesRepository
+                            .getInstance()
+                            .getDefaultDrinksTypes(),
+                    getWaterTypes().values()))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe();
+        });
     }
 
     public WaterDAO getWaterDAO() {
@@ -96,6 +92,7 @@ public class WaterDataRepository {
                 waterDayWithWaters1.getWaterDay().setInserted(true);
                 return waterDayWithWaters1;
             }).orElse(new WaterDayWithWaters(date, SharedPreferencesRepository.getInstance().getWaterAmountToDrink())));
+//            we need to remove it so there is no issue with to many sources being loaded to the livedata
             waters.removeSource(waterDayWithWatersLiveData);
         });
     }
@@ -168,40 +165,24 @@ public class WaterDataRepository {
                 .subscribe(onSuccess, RxJavaPlugins::onError);
     }
 
-    public Disposable updateType(Type type, Action onSuccess) {
+    public Disposable updateType(Type type) {
         return getWaterDAO()
                 .updateType(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(onSuccess, RxJavaPlugins::onError);
+                .subscribe(() -> {}, RxJavaPlugins::onError);
     }
 
-    public Disposable removeType(Type type, Action action) {
+    public Disposable removeType(Type type) throws IllegalArgumentException{
+        if (WaterDataValidation.validateTypeToRemove(type)) {
+            throw new IllegalArgumentException(ResourcesRepository.getInstance().getDeleteTypeDefaultMessageException());
+        }
         return getWaterDAO()
                 .deleteType(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(action, RxJavaPlugins::onError);
-    }
+                .subscribe(() -> {}, RxJavaPlugins::onError);
 
-    /**
-     * Removes a type, filters all of waters in a active day and removes them from that day
-     * @param id of a type to remove
-     */
-    public void removeType(long id) {
-        HashMap<Long, Type> waterTypes = getWaterTypes();
-        waterTypes.remove(id);
-        this.waterTypes.setValue(waterTypes);
-    }
-
-    /**
-     * Puts type in live data, does not insert nor update it into database
-     * @param type to put in a live data
-     */
-    public void putType(Type type) {
-        HashMap<Long, Type> waterTypes = getWaterTypes();
-        waterTypes.put(type.getId(), type);
-        this.waterTypes.setValue(waterTypes);
     }
 
     /**

@@ -36,7 +36,6 @@ public class AlarmActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         alarmViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(AlarmViewModel.class);
-
         setObservers();
     }
 
@@ -155,20 +154,16 @@ public class AlarmActivity extends AppCompatActivity {
     }
 
     private void setObservers() {
-        alarmViewModel.isNotificationsActiveObserver(this, isChecked -> {
-            switchCompatNotifications.setChecked(isChecked);
-        });
+        alarmViewModel.isNotificationsActiveObserver(this, isChecked ->
+                switchCompatNotifications.setChecked(isChecked));
 
-        alarmViewModel.setSelectedNotificationsTimeObserver(this, time -> {
-            buttonSelectHourStart.setText(time.format(TIME_FORMATTER));
-        });
+        alarmViewModel.setSelectedNotificationsTimeObserver(this, time ->
+                buttonSelectHourStart.setText(time.format(TIME_FORMATTER)));
 
-        alarmViewModel.setConstraintNotificationsTimeStartObserver(this, time -> {
-            buttonConstraintTimeStart.setText(time.format(TIME_FORMATTER));
-        });
+        alarmViewModel.setConstraintNotificationsTimeStartObserver(this, time ->
+                buttonConstraintTimeStart.setText(time.format(TIME_FORMATTER)));
 
-        alarmViewModel.setConstraintNotificationsTimeEndObserver(this, time -> {
-            buttonConstraintTimeEnd.setText(time.format(TIME_FORMATTER));
-        });
+        alarmViewModel.setConstraintNotificationsTimeEndObserver(this, time ->
+                buttonConstraintTimeEnd.setText(time.format(TIME_FORMATTER)));
     }
 }

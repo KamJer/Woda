@@ -73,7 +73,11 @@ public class WaterViewModel extends ViewModel {
         return WaterDataRepository.getInstance().getWaterTypes();
     }
 
-    public void setAllWaterDayWithWatersObserver(CalendarActivity owner, Observer<List<WaterDayWithWaters>> observer) {
+    public void setAllWaterDayWithWatersObserver(LifecycleOwner owner, Observer<List<WaterDayWithWaters>> observer) {
         WaterDataRepository.getInstance().getAllWaterDayWithWatersLiveData().observe(owner, observer);
+    }
+
+    public void setAllTypesObserver(LifecycleOwner owner, Observer<HashMap<Long, Type>> observer) {
+        WaterDataRepository.getInstance().setTypesLiveDataObserver(owner, observer);
     }
 }
