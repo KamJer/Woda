@@ -36,7 +36,6 @@ public class AppInitializer {
      */
     private static void createDatabase(Context applicationContext) {
         WaterDataRepository.getInstance().createWaterDatabase(applicationContext);
-        WaterDataRepository.getInstance().getAllTypes();
     }
 
     private static void loadSharedPreferences(Context applicationContext) {

@@ -1,0 +1,392 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > WaterDataRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: WaterDataRepository (com.kamjer.woda.repository)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WaterDataRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/104)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.repository;
+&nbsp;
+&nbsp;import android.content.Context;
+&nbsp;
+&nbsp;import androidx.lifecycle.LifecycleOwner;
+&nbsp;import androidx.lifecycle.LiveData;
+&nbsp;import androidx.lifecycle.MediatorLiveData;
+&nbsp;import androidx.lifecycle.MutableLiveData;
+&nbsp;import androidx.lifecycle.Observer;
+&nbsp;import androidx.room.Room;
+&nbsp;
+&nbsp;import com.kamjer.woda.database.WaterDataValidation;
+&nbsp;import com.kamjer.woda.database.dao.WaterDAO;
+&nbsp;import com.kamjer.woda.database.WaterDatabase;
+&nbsp;import com.kamjer.woda.model.Type;
+&nbsp;import com.kamjer.woda.model.Water;
+&nbsp;import com.kamjer.woda.model.WaterDay;
+&nbsp;import com.kamjer.woda.model.WaterDayWithWaters;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+&nbsp;import io.reactivex.rxjava3.disposables.Disposable;
+&nbsp;import io.reactivex.rxjava3.functions.Action;
+&nbsp;import io.reactivex.rxjava3.functions.Consumer;
+&nbsp;import io.reactivex.rxjava3.plugins.RxJavaPlugins;
+&nbsp;import io.reactivex.rxjava3.schedulers.Schedulers;
+&nbsp;
+<b class="nc">&nbsp;public class WaterDataRepository {</b>
+&nbsp;
+&nbsp;    private static WaterDataRepository instance;
+&nbsp;
+&nbsp;    public static final String DATABASE_NAME = &quot;water&quot;;
+&nbsp;
+&nbsp;    private WaterDatabase waterDatabase;
+&nbsp;    private WaterDAO waterDAO;
+&nbsp;
+<b class="nc">&nbsp;    private final MediatorLiveData&lt;WaterDayWithWaters&gt; waterDayWithWatersMediatorLiveData = new MediatorLiveData&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private LiveData&lt;List&lt;WaterDayWithWaters&gt;&gt; allWaterDayWithWatersLiveData;
+&nbsp;
+<b class="nc">&nbsp;    private final MediatorLiveData&lt;HashMap&lt;Long, Type&gt;&gt; waterTypes = new MediatorLiveData&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public void createWaterDatabase(Context context) {
+&nbsp;//        if database does not exists create a new one
+<b class="nc">&nbsp;        if (waterDatabase == null) {</b>
+<b class="nc">&nbsp;            this.waterDatabase = Room.databaseBuilder(context, WaterDatabase.class, WaterDataRepository.DATABASE_NAME)</b>
+<b class="nc">&nbsp;                    .build();</b>
+<b class="nc">&nbsp;            this.waterDAO = waterDatabase.waterDAO();</b>
+&nbsp;
+<b class="nc">&nbsp;            allWaterDayWithWatersLiveData = (getWaterDAO().getAllWaterDayWithWaters());</b>
+<b class="nc">&nbsp;            getAllTypes();</b>
+<b class="nc">&nbsp;            loadWaterDayWithWatersByDate(LocalDate.now());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void getAllTypes() {
+<b class="nc">&nbsp;        waterTypes.addSource(getWaterDAO().getAllTypes(), types -&gt; {</b>
+<b class="nc">&nbsp;            waterTypes.setValue((HashMap&lt;Long, Type&gt;) types.stream().collect(Collectors.toMap(</b>
+&nbsp;                    Type::getId,
+<b class="nc">&nbsp;                    o -&gt; o)));</b>
+&nbsp;
+<b class="nc">&nbsp;            getWaterDAO().insertTypes(WaterDataRepository.containsDefaultTypes(ResourcesRepository</b>
+<b class="nc">&nbsp;                            .getInstance()</b>
+<b class="nc">&nbsp;                            .getDefaultDrinksTypes(),</b>
+<b class="nc">&nbsp;                    getWaterTypes().values()))</b>
+<b class="nc">&nbsp;                    .subscribeOn(Schedulers.io())</b>
+<b class="nc">&nbsp;                    .observeOn(Schedulers.newThread())</b>
+<b class="nc">&nbsp;                    .subscribe();</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public WaterDAO getWaterDAO() {
+<b class="nc">&nbsp;        return waterDAO;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static WaterDataRepository getInstance() {
+<b class="nc">&nbsp;        WaterDataRepository result = instance;</b>
+<b class="nc">&nbsp;        if (result != null) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        synchronized (WaterDataRepository.class) {</b>
+<b class="nc">&nbsp;            if (instance == null) {</b>
+<b class="nc">&nbsp;                instance = new WaterDataRepository();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return instance;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void loadWaterDayWithWatersByDate(LocalDate date) {
+<b class="nc">&nbsp;        LiveData&lt;WaterDayWithWaters&gt; waterDayWithWatersLiveData = getWaterDAO().getWaterDayWithWatersByDate(date.toString());</b>
+<b class="nc">&nbsp;        this.waterDayWithWatersMediatorLiveData.addSource(waterDayWithWatersLiveData, waterDayWithWaters -&gt; {</b>
+<b class="nc">&nbsp;            waterDayWithWatersMediatorLiveData.setValue(Optional.ofNullable(waterDayWithWaters).map(waterDayWithWaters1 -&gt; {</b>
+<b class="nc">&nbsp;                waterDayWithWaters1.getWaterDay().setInserted(true);</b>
+<b class="nc">&nbsp;                return waterDayWithWaters1;</b>
+<b class="nc">&nbsp;            }).orElse(new WaterDayWithWaters(date, SharedPreferencesRepository.getInstance().getWaterAmountToDrink())));</b>
+&nbsp;//            we need to remove it so there is no issue with to many sources being loaded to the livedata
+<b class="nc">&nbsp;            waterDayWithWatersMediatorLiveData.removeSource(waterDayWithWatersLiveData);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public Disposable insertWater(Water water, Consumer&lt;Long&gt; action) {
+<b class="nc">&nbsp;        return getWaterDAO()</b>
+<b class="nc">&nbsp;                .insertWater(water)</b>
+<b class="nc">&nbsp;                .subscribeOn(Schedulers.io())</b>
+<b class="nc">&nbsp;                .observeOn(AndroidSchedulers.mainThread())</b>
+<b class="nc">&nbsp;                .subscribe(action, RxJavaPlugins::onError);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Disposable insertWaterDay(WaterDay waterDay, Action onSuccess) {
+<b class="nc">&nbsp;        return getWaterDAO().insertWaterDay(waterDay)</b>
+<b class="nc">&nbsp;                .subscribeOn(Schedulers.io())</b>
+<b class="nc">&nbsp;                .observeOn(AndroidSchedulers.mainThread())</b>
+<b class="nc">&nbsp;                .subscribe(</b>
+&nbsp;                        onSuccess,
+&nbsp;                        RxJavaPlugins::onError
+&nbsp;                );
+&nbsp;    }
+&nbsp;
+&nbsp;    public Disposable deleteWater(Water water, Action action) {
+<b class="nc">&nbsp;        return getWaterDAO()</b>
+<b class="nc">&nbsp;                .deleteWater(water)</b>
+<b class="nc">&nbsp;                .subscribeOn(Schedulers.io())</b>
+<b class="nc">&nbsp;                .observeOn(AndroidSchedulers.mainThread())</b>
+<b class="nc">&nbsp;                .subscribe(action, RxJavaPlugins::onError);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Disposable deleteWaters(List&lt;Water&gt; waters, Action action) {
+<b class="nc">&nbsp;        return getWaterDAO().deleteWaters(waters)</b>
+<b class="nc">&nbsp;                .subscribeOn(Schedulers.io())</b>
+<b class="nc">&nbsp;                .observeOn(AndroidSchedulers.mainThread())</b>
+<b class="nc">&nbsp;                .subscribe(action, RxJavaPlugins::onError);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setWaterDayWithWatersValue(WaterDayWithWaters waters) {
+<b class="nc">&nbsp;        this.waterDayWithWatersMediatorLiveData.setValue(waters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public void addWaterInDay(Water water) {
+&nbsp;//      getting waterDayWithWaters or creating it
+<b class="nc">&nbsp;        WaterDayWithWaters waterDayWithWaters = getWaterDayWithWatersValue();</b>
+&nbsp;//      getting waterDay from WaterDayWithWaters or creating it
+<b class="nc">&nbsp;        WaterDay waterDay = waterDayWithWaters.getWaterDay();</b>
+&nbsp;//      getting waters from WaterDayWithWaters or creating it
+<b class="nc">&nbsp;        List&lt;Water&gt; waters = waterDayWithWaters.getWaters();</b>
+<b class="nc">&nbsp;        water.setWaterDayId(waterDay.getDate());</b>
+<b class="nc">&nbsp;        if (!waters.contains(water)) {</b>
+<b class="nc">&nbsp;            waters.add(water);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        setWaterDayWithWatersValue(waterDayWithWaters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeWaterInDay(Water water) {
+<b class="nc">&nbsp;        WaterDayWithWaters waterDayWithWaters = getWaterDayWithWatersValue();</b>
+<b class="nc">&nbsp;        waterDayWithWaters.getWaters().remove(water);</b>
+<b class="nc">&nbsp;        this.setWaterDayWithWatersValue(waterDayWithWaters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MutableLiveData&lt;WaterDayWithWaters&gt; getWaterDayWithWatersLivaData() {
+<b class="nc">&nbsp;        return waterDayWithWatersMediatorLiveData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public WaterDayWithWaters getWaterDayWithWatersValue() {
+<b class="nc">&nbsp;        return Optional.ofNullable(waterDayWithWatersMediatorLiveData.getValue())</b>
+<b class="nc">&nbsp;                .orElse(new WaterDayWithWaters(LocalDate.now(), SharedPreferencesRepository.DEFAULT_WATER_AMOUNT_TO_DRINK));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Disposable insertType(Type type, Consumer&lt;Long&gt; onSuccess) {
+<b class="nc">&nbsp;        return getWaterDAO()</b>
+<b class="nc">&nbsp;                .insertType(type)</b>
+<b class="nc">&nbsp;                .subscribeOn(Schedulers.io())</b>
+<b class="nc">&nbsp;                .observeOn(AndroidSchedulers.mainThread())</b>
+<b class="nc">&nbsp;                .subscribe(onSuccess, RxJavaPlugins::onError);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Disposable updateType(Type type) {
+<b class="nc">&nbsp;        return getWaterDAO()</b>
+<b class="nc">&nbsp;                .updateType(type)</b>
+<b class="nc">&nbsp;                .subscribeOn(Schedulers.io())</b>
+<b class="nc">&nbsp;                .observeOn(AndroidSchedulers.mainThread())</b>
+<b class="nc">&nbsp;                .subscribe(() -&gt; {}, RxJavaPlugins::onError);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Disposable removeType(Type type) throws IllegalArgumentException{
+<b class="nc">&nbsp;        if (WaterDataValidation.validateTypeToRemove(type)) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(ResourcesRepository.getInstance().getDeleteTypeDefaultMessageException());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return getWaterDAO()</b>
+<b class="nc">&nbsp;                .deleteType(type)</b>
+<b class="nc">&nbsp;                .subscribeOn(Schedulers.io())</b>
+<b class="nc">&nbsp;                .observeOn(AndroidSchedulers.mainThread())</b>
+<b class="nc">&nbsp;                .subscribe(() -&gt; {}, RxJavaPlugins::onError);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets observer on a type liveData
+&nbsp;     * @param owner owner of a observer to set
+&nbsp;     * @param observer observer to set
+&nbsp;     */
+&nbsp;    public void setTypesLiveDataObserver(LifecycleOwner owner, Observer&lt;HashMap&lt;Long, Type&gt;&gt; observer) {
+<b class="nc">&nbsp;        waterTypes.observe(owner, observer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns new HashMap of Types, changing it does not effect original Map
+&nbsp;     * @return new map of Types
+&nbsp;     */
+&nbsp;    public HashMap&lt;Long, Type&gt; getWaterTypes() {
+<b class="nc">&nbsp;        return new HashMap&lt;&gt;(Optional.ofNullable(waterTypes.getValue()).orElseGet(HashMap::new));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if map of types contains all of types in an array
+&nbsp;     * if types are not contained in a map they are added to a list and returned
+&nbsp;     * @param defaultTypes - types to check
+&nbsp;     * @param typesToCheck - map of types to compare to
+&nbsp;     * @return list of Types not contained in a map, if all types from an array are contained in a map list length is 0
+&nbsp;     */
+&nbsp;    public static List&lt;Type&gt; containsDefaultTypes(List&lt;Type&gt; defaultTypes, Collection&lt;Type&gt; typesToCheck) {
+<b class="nc">&nbsp;        List&lt;Type&gt; test = new ArrayList&lt;&gt;();</b>
+&nbsp;//      loop through default drink types and check if it is in a database if it is not, add not found type to the list
+<b class="nc">&nbsp;        for (Type type : defaultTypes) {</b>
+<b class="nc">&nbsp;            if (!typesToCheck.contains(type)) {</b>
+<b class="nc">&nbsp;                test.add(type);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;//      if types in a database does not contain default ones return those types that are not in a database,
+&nbsp;//      if database contains all of a default types list will have length of 0
+<b class="nc">&nbsp;        return test;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds all of used types in a passed list of waters
+&nbsp;     * @param waters list of waters to check
+&nbsp;     * @return list of maps
+&nbsp;     */
+&nbsp;    public static List&lt;Type&gt; getUsedTypes(Map&lt;Long, Type&gt; waterTypes, List&lt;Water&gt; waters) {
+<b class="nc">&nbsp;        return waters.stream().map(water -&gt; waterTypes.get(water.getTypeId())).collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the amount of water to drink to achieve set goal, returns value from active waterDay
+&nbsp;     * @return value of water to drink
+&nbsp;     */
+&nbsp;    public int getWaterAmountToDrink() {
+<b class="nc">&nbsp;        return getWaterDayWithWatersValue().getWaterDay().getWaterToDrink();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets in an active WaterDay new water amount to drink and updates WaterDay
+&nbsp;     * @param waterAmountToDrink - new goal
+&nbsp;     */
+&nbsp;    public Disposable setWaterAmountToDrink(int waterAmountToDrink) {
+<b class="nc">&nbsp;        WaterDayWithWaters waterDayWithWatersToUpdate = getWaterDayWithWatersValue();</b>
+<b class="nc">&nbsp;        waterDayWithWatersToUpdate.getWaterDay().setWaterToDrink(waterAmountToDrink);</b>
+<b class="nc">&nbsp;        setWaterDayWithWatersValue(waterDayWithWatersToUpdate);</b>
+<b class="nc">&nbsp;        return getWaterDAO().updateWaterDay(waterDayWithWatersToUpdate.getWaterDay()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LiveData&lt;List&lt;WaterDayWithWaters&gt;&gt; getAllWaterDayWithWatersLiveData() {
+<b class="nc">&nbsp;        return allWaterDayWithWatersLiveData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAllWaterDayWithWatersObserver(LifecycleOwner owner, Observer&lt;List&lt;WaterDayWithWaters&gt;&gt; observer) {
+<b class="nc">&nbsp;        allWaterDayWithWatersLiveData.observe(owner, observer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;WaterDayWithWaters&gt; getAllWaterDayWithWatersLiveDataValue() {
+<b class="nc">&nbsp;        return Optional.ofNullable(allWaterDayWithWatersLiveData.getValue()).orElse(new ArrayList&lt;&gt;());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void loadAllWaterDayWithWaters() {
+<b class="nc">&nbsp;        allWaterDayWithWatersLiveData = waterDAO.getAllWaterDayWithWaters();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public WaterDatabase getWaterDatabase() {
+<b class="nc">&nbsp;        return waterDatabase;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

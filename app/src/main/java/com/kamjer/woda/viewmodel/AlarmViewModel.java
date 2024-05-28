@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import com.kamjer.woda.repository.SharedPreferencesRepository;
 
@@ -12,59 +13,75 @@ import java.time.LocalTime;
 
 public class AlarmViewModel extends ViewModel {
 
+    SharedPreferencesRepository sharedPreferencesRepository;
+
+    public static final ViewModelInitializer<AlarmViewModel> initializer = new ViewModelInitializer<>(
+            AlarmViewModel.class,
+            creationExtras ->
+                    new AlarmViewModel(SharedPreferencesRepository.getInstance())
+    );
+
+    public AlarmViewModel(SharedPreferencesRepository sharedPreferencesRepository) {
+        this.sharedPreferencesRepository = sharedPreferencesRepository;
+    }
+
     public void setSelectedNotificationsTimeObserver(LifecycleOwner owner, Observer<LocalTime> observer){
-        SharedPreferencesRepository.getInstance().getSelectedNotificationsTimeLiveData().observe(owner, observer);
+        sharedPreferencesRepository.getSelectedNotificationsTimeLiveData().observe(owner, observer);
     }
+
     public void isNotificationsActiveObserver(LifecycleOwner owner, Observer<Boolean> observer){
-        SharedPreferencesRepository.getInstance().getNotificationsActiveLiveData().observe(owner, observer);
+        sharedPreferencesRepository.getNotificationsActiveLiveData().observe(owner, observer);
     }
+
     public void setConstraintNotificationsTimeStartObserver(LifecycleOwner owner, Observer<LocalTime> observer){
-        SharedPreferencesRepository.getInstance().getConstraintNotificationTimeStartLiveData().observe(owner, observer);
+        sharedPreferencesRepository.getConstraintNotificationTimeStartLiveData().observe(owner, observer);
     }
+
     public void setConstraintNotificationsTimeEndObserver(LifecycleOwner owner, Observer<LocalTime> observer){
-        SharedPreferencesRepository.getInstance().getConstraintNotificationTimeEndLiveData().observe(owner, observer);
+        sharedPreferencesRepository.getConstraintNotificationTimeEndLiveData().observe(owner, observer);
     }
+
     public void setHourNotificationPeriodObserver(LifecycleOwner owner, Observer<Integer> observer) {
-        SharedPreferencesRepository.getInstance().getHourNotificationPeriodLiveData().observe(owner, observer);
+        sharedPreferencesRepository.getHourNotificationPeriodLiveData().observe(owner, observer);
     }
 
     public LocalTime getSelectedNotificationsTime() {
-        return SharedPreferencesRepository.getInstance().getSelectedNotificationsTime();
+        return sharedPreferencesRepository.getSelectedNotificationsTime();
     }
 
     public LocalTime getConstraintNotificationTimeStart() {
-        return SharedPreferencesRepository.getInstance().getConstraintNotificationTimeStart();
+        return sharedPreferencesRepository.getConstraintNotificationTimeStart();
     }
 
     public LocalTime getConstraintNotificationTimeEnd() {
-        return SharedPreferencesRepository.getInstance().getConstraintNotificationTimeEnd();
+        return sharedPreferencesRepository.getConstraintNotificationTimeEnd();
     }
 
     public boolean isNotificationsActive() {
-        return SharedPreferencesRepository.getInstance().isNotificationsActive();
+        return sharedPreferencesRepository.isNotificationsActive();
     }
 
     public Integer getHourNotificationPeriod() {
-        return SharedPreferencesRepository.getInstance().getHourNotificationPeriod();
+        return sharedPreferencesRepository.getHourNotificationPeriod();
     }
 
     public void setSelectedNotificationsTime(Context applicationContext, LocalTime selectedTime) {
-        SharedPreferencesRepository.getInstance().setSelectedNotificationsTime(applicationContext, selectedTime);
+        sharedPreferencesRepository.setSelectedNotificationsTime(applicationContext, selectedTime);
     }
 
     public void setConstraintNotificationTimeStart(Context applicationContext, LocalTime timeConstraintStart) {
-        SharedPreferencesRepository.getInstance().setConstraintNotificationTimeStart(applicationContext, timeConstraintStart);
+        sharedPreferencesRepository.setConstraintNotificationTimeStart(applicationContext, timeConstraintStart);
     }
 
     public void setConstraintNotificationTimeEnd(Context applicationContext, LocalTime timeConstraintEnd) {
-        SharedPreferencesRepository.getInstance().setConstraintNotificationTimeEnd(applicationContext, timeConstraintEnd);
+        sharedPreferencesRepository.setConstraintNotificationTimeEnd(applicationContext, timeConstraintEnd);
     }
 
     public void setNotificationsActive(Context applicationContext, boolean isChecked) {
-        SharedPreferencesRepository.getInstance().setNotificationsActive(applicationContext, isChecked);
+        sharedPreferencesRepository.setNotificationsActive(applicationContext, isChecked);
     }
 
-    public void setHourNotificationPeriod(Integer hourNotificationPeriod) {
-        SharedPreferencesRepository.getInstance().setHourNotificationPeriod(hourNotificationPeriod);
+    public void setHourNotificationPeriod(Context applicationContext, int hourNotificationPeriod) {
+        sharedPreferencesRepository.setHourNotificationPeriod(applicationContext, hourNotificationPeriod);
     }
 }

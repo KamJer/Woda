@@ -19,23 +19,35 @@ import com.kamjer.woda.viewmodel.AlarmViewModel;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AlarmActivity extends AppCompatActivity {
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("H : mm");
 
     private SwitchCompat switchCompatNotifications;
+    private Spinner spinnerHourSelectNotification;
     private Button buttonSelectHourStart;
     private Button buttonConstraintTimeStart;
     private Button buttonConstraintTimeEnd;
 
     private AlarmViewModel alarmViewModel;
 
+    private boolean userAction = false;
+    private List<Integer> hours;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        alarmViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(AlarmViewModel.class);
+        alarmViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(AlarmViewModel.initializer)).get(AlarmViewModel.class);
+        hours = new ArrayList<>();
+
+        for (int i = 0; i < 24; i++) {
+            hours.add(i + 1);
+        }
+
         setObservers();
     }
 
@@ -45,32 +57,31 @@ public class AlarmActivity extends AppCompatActivity {
         setContentView(R.layout.alarm_activity_layout);
 
         switchCompatNotifications = findViewById(R.id.switchNotifications);
-
-        switchCompatNotifications.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> {
-                    setNotificationsActions(isChecked);
-                });
+        switchCompatNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (userAction) {
+                setNotificationsActions(isChecked);
+            }
+        });
 
         buttonSelectHourStart = findViewById(R.id.buttonSelectHourStart);
 
         if (!alarmViewModel.isNotificationsActive()) {
             alarmViewModel.setSelectedNotificationsTime(getApplicationContext(), LocalTime.now());
         }
-        Spinner spinnerHourSelectNotification = findViewById(R.id.spinnerHourSelectNotification);
+        spinnerHourSelectNotification = findViewById(R.id.spinnerHourSelectNotification);
 
-        Integer[] hours = new Integer[24];
-        for (int i = 0; i < hours.length; i++) {
-            hours[i] = i + 1;
-        }
+
         ArrayAdapter<Integer> hourSelectAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, hours);
         spinnerHourSelectNotification.setAdapter(hourSelectAdapter);
         spinnerHourSelectNotification.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                alarmViewModel.setHourNotificationPeriod(hours[position]);
                 if (switchCompatNotifications.isChecked()) {
-                    NotificationHelper.cancelAlarms(getApplicationContext());
-                    resetNotifications();
+                    if (!hours.get(position).equals(alarmViewModel.getHourNotificationPeriod())) {
+                        NotificationHelper.cancelAlarms(getApplicationContext());
+                        resetNotifications();
+                        alarmViewModel.setHourNotificationPeriod(getApplicationContext(), hours.get(position));
+                    }
                 }
             }
 
@@ -133,11 +144,11 @@ public class AlarmActivity extends AppCompatActivity {
 
     private void setNotifications() {
         NotificationHelper.setNotificationRepeatableAlarm(
-                getApplicationContext(),
-                alarmViewModel.getSelectedNotificationsTime(),
-                alarmViewModel.getHourNotificationPeriod(),
-                alarmViewModel.getConstraintNotificationTimeStart(),
-                alarmViewModel.getConstraintNotificationTimeEnd());
+                    getApplicationContext(),
+                    alarmViewModel.getSelectedNotificationsTime(),
+                    alarmViewModel.getHourNotificationPeriod(),
+                    alarmViewModel.getConstraintNotificationTimeStart(),
+                    alarmViewModel.getConstraintNotificationTimeEnd());
     }
 
     private void resetNotifications() {
@@ -154,8 +165,7 @@ public class AlarmActivity extends AppCompatActivity {
     }
 
     private void setObservers() {
-        alarmViewModel.isNotificationsActiveObserver(this, isChecked ->
-                switchCompatNotifications.setChecked(isChecked));
+        alarmViewModel.isNotificationsActiveObserver(this, this::setChecked);
 
         alarmViewModel.setSelectedNotificationsTimeObserver(this, time ->
                 buttonSelectHourStart.setText(time.format(TIME_FORMATTER)));
@@ -165,5 +175,14 @@ public class AlarmActivity extends AppCompatActivity {
 
         alarmViewModel.setConstraintNotificationsTimeEndObserver(this, time ->
                 buttonConstraintTimeEnd.setText(time.format(TIME_FORMATTER)));
+
+        alarmViewModel.setHourNotificationPeriodObserver(this, integer ->
+                spinnerHourSelectNotification.setSelection(hours.indexOf(integer)));
+    }
+
+    private void setChecked(boolean isChecked) {
+        userAction = false;
+        switchCompatNotifications.setChecked(isChecked);
+        userAction = true;
     }
 }

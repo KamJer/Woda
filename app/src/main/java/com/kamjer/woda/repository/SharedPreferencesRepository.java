@@ -3,7 +3,9 @@ package com.kamjer.woda.repository;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.kamjer.woda.R;
 
@@ -35,10 +37,16 @@ public class SharedPreferencesRepository {
     private static SharedPreferencesRepository sharedPreferencesRepository;
 
     public static SharedPreferencesRepository getInstance(){
-        if (sharedPreferencesRepository == null) {
-            sharedPreferencesRepository = new SharedPreferencesRepository();
+        SharedPreferencesRepository result = sharedPreferencesRepository;
+        if (result != null) {
+            return result;
         }
-        return sharedPreferencesRepository;
+        synchronized (SharedPreferencesRepository.class) {
+            if (sharedPreferencesRepository == null) {
+                sharedPreferencesRepository = new SharedPreferencesRepository();
+            }
+            return sharedPreferencesRepository;
+        }
     }
 
     /**
@@ -180,12 +188,24 @@ public class SharedPreferencesRepository {
         return hourNotificationPeriodLiveData.getValue();
     }
 
-    public void setHourNotificationPeriod(Integer hourNotificationPeriod) {
+    public void setHourNotificationPeriod(Context context, int hourNotificationPeriod) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(HOUR_NOTIFICATION_PERIOD_NAME, hourNotificationPeriod);
+        editor.apply();
+        setHourNotificationPeriod(hourNotificationPeriod);
+    }
+
+    private void setHourNotificationPeriod(int hourNotificationPeriod) {
         hourNotificationPeriodLiveData.setValue(hourNotificationPeriod);
     }
 
     public MutableLiveData<Integer> getWaterAmountToDrinkLiveData() {
         return waterAmountToDrinkMutableLiveData;
+    }
+
+    public void setWaterAmountToDrinkMutableLiveDataObserver(LifecycleOwner owner, Observer<Integer> observer) {
+        waterAmountToDrinkMutableLiveData.observe(owner, observer);
     }
 
     public MutableLiveData<Boolean> getNotificationsActiveLiveData() {

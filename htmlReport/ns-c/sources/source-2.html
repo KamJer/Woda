@@ -1,0 +1,186 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > WaterImageDrawable</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.activity.mainactivity.waterimage</a>
+</div>
+
+<h1>Coverage Summary for Class: WaterImageDrawable (com.kamjer.woda.activity.mainactivity.waterimage)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WaterImageDrawable</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.activity.mainactivity.waterimage;
+&nbsp;
+&nbsp;import android.graphics.Canvas;
+&nbsp;import android.graphics.ColorFilter;
+&nbsp;import android.graphics.Matrix;
+&nbsp;import android.graphics.Paint;
+&nbsp;import android.graphics.Path;
+&nbsp;import android.graphics.PixelFormat;
+&nbsp;import android.graphics.Rect;
+&nbsp;import android.graphics.RectF;
+&nbsp;import android.graphics.drawable.VectorDrawable;
+&nbsp;
+&nbsp;import androidx.annotation.NonNull;
+&nbsp;import androidx.annotation.Nullable;
+&nbsp;
+&nbsp;import com.kamjer.woda.model.Type;
+&nbsp;import com.kamjer.woda.utils.FloatPoint;
+&nbsp;
+&nbsp;public class WaterImageDrawable extends VectorDrawable {
+&nbsp;
+&nbsp;    private final Path path;
+&nbsp;    private Matrix matrix;
+<b class="nc">&nbsp;    private final Paint paint = new Paint();</b>
+&nbsp;
+&nbsp;    private final Type type;
+&nbsp;    private final FloatPoint textTypeStartPoint;
+&nbsp;    private final FloatPoint textAmountStartPoint;
+&nbsp;    private final String amountText;
+&nbsp;
+&nbsp;    private static final int PADDING_TEXT_TOP = 5;
+&nbsp;    private static final int PADDING_TEXT_LEFT = 10;
+&nbsp;    private static final int PADDING_TEXT_RIGHT = 15;
+&nbsp;
+<b class="nc">&nbsp;    public WaterImageDrawable(Path path, Type type, int amount) {</b>
+<b class="nc">&nbsp;        this.path = path;</b>
+<b class="nc">&nbsp;        this.type = type;</b>
+&nbsp;//      setting paint
+<b class="nc">&nbsp;        paint.setColor(type.getColor());</b>
+<b class="nc">&nbsp;        paint.setStyle(Paint.Style.FILL_AND_STROKE);</b>
+&nbsp;//      computing bounds of a path and texts for text placement
+<b class="nc">&nbsp;        RectF pathBounds = new RectF();</b>
+<b class="nc">&nbsp;        path.computeBounds(pathBounds, false);</b>
+<b class="nc">&nbsp;        Rect amountTextBounds = new Rect();</b>
+<b class="nc">&nbsp;        Rect typeNameTextBounds = new Rect();</b>
+<b class="nc">&nbsp;        amountText = amount + &quot; ml&quot;;</b>
+<b class="nc">&nbsp;        paint.getTextBounds(amountText, 0, amountText.length() - 1, amountTextBounds);</b>
+<b class="nc">&nbsp;        paint.getTextBounds(type.getType(), 0, type.getType().length() - 1, typeNameTextBounds);</b>
+<b class="nc">&nbsp;        textTypeStartPoint = new FloatPoint(pathBounds.right + PADDING_TEXT_LEFT, pathBounds.top + PADDING_TEXT_TOP);</b>
+<b class="nc">&nbsp;        textAmountStartPoint = new FloatPoint(pathBounds.left - PADDING_TEXT_RIGHT - amountTextBounds.width(), pathBounds.top + PADDING_TEXT_TOP);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void draw(@NonNull Canvas canvas) {
+<b class="nc">&nbsp;        canvas.save();</b>
+<b class="nc">&nbsp;        canvas.concat(matrix);</b>
+<b class="nc">&nbsp;        canvas.drawPath(path, paint);</b>
+&nbsp;//        type of a water drank
+<b class="nc">&nbsp;        canvas.drawText(type.getType(), textTypeStartPoint.getX(), textTypeStartPoint.getY(), paint);</b>
+&nbsp;//        amount of a water drank
+<b class="nc">&nbsp;        canvas.drawText(amountText, textAmountStartPoint.getX(), textAmountStartPoint.getY(), paint);</b>
+<b class="nc">&nbsp;        canvas.restore();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setAlpha(int alpha) {
+<b class="nc">&nbsp;        paint.setAlpha(alpha);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setColorFilter(@Nullable ColorFilter colorFilter) {
+<b class="nc">&nbsp;        paint.setColorFilter(colorFilter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getOpacity() {
+<b class="nc">&nbsp;        return PixelFormat.OPAQUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMatrix(Matrix matrix) {
+<b class="nc">&nbsp;        this.matrix = matrix;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

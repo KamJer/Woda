@@ -25,11 +25,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kamjer.woda.R;
 import com.kamjer.woda.activity.alarmactivity.AlarmActivity;
-import com.kamjer.woda.activity.mainactivity.addwaterdialog.AddWaterDialog;
 import com.kamjer.woda.activity.calendaractivity.CalendarActivity;
-import com.kamjer.woda.activity.useractivity.UserActivity;
+import com.kamjer.woda.activity.mainactivity.addwaterdialog.AddWaterDialog;
 import com.kamjer.woda.activity.mainactivity.listeners.ChangeWatersGestureListener;
 import com.kamjer.woda.activity.mainactivity.waterimage.WaterImage;
+import com.kamjer.woda.activity.useractivity.UserActivity;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.model.WaterDay;
@@ -38,7 +38,6 @@ import com.kamjer.woda.utils.AppInitializer;
 import com.kamjer.woda.utils.WaterAppErrorHandler;
 import com.kamjer.woda.viewmodel.WaterViewModel;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -64,13 +63,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //      creating View model and setting data base to it
-        waterViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(WaterViewModel.class);
+        waterViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(WaterViewModel.initializer)).get(WaterViewModel.class);
 //      checking if it is a restart (rotation of a screen) or a app is starting
         if (savedInstanceState == null) {
 //          initializing app
             AppInitializer.initialize(getApplicationContext());
-//          loading data for today
-            waterViewModel.loadWaterDayWithWatersByDate(LocalDate.now());
         }
 
         gestureDetector = new GestureDetectorCompat(this, new ChangeWatersGestureListener(this, waterViewModel));
@@ -241,9 +238,7 @@ public class MainActivity extends AppCompatActivity {
     private void setObservers() {
         //      creating observer for liveData in a ViewModel
         waterViewModel.setWaterDayWithWatersObserver(this, this::setObserverOnWaters);
-        waterViewModel.setAllTypesObserver(this, longTypeHashMap -> {
-            typeHashMap = longTypeHashMap;
-        });
+        waterViewModel.setAllTypesObserver(this, longTypeHashMap -> typeHashMap = longTypeHashMap);
     }
 
     @Override
@@ -251,6 +246,12 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         waterViewModel.clearDisposable();
         AppInitializer.clearAppResources();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setObservers();
     }
 
     @Override

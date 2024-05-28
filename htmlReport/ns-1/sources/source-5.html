@@ -1,0 +1,263 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > DaysOfMonthView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.mycalendarview</a>
+</div>
+
+<h1>Coverage Summary for Class: DaysOfMonthView (com.kamjer.mycalendarview)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DaysOfMonthView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.mycalendarview;
+&nbsp;
+&nbsp;import android.content.Context;
+&nbsp;import android.util.AttributeSet;
+&nbsp;import android.view.GestureDetector;
+&nbsp;import android.view.MotionEvent;
+&nbsp;import android.view.View;
+&nbsp;import android.view.ViewGroup;
+&nbsp;import android.widget.TextView;
+&nbsp;
+&nbsp;import androidx.annotation.NonNull;
+&nbsp;import androidx.annotation.Nullable;
+&nbsp;import androidx.core.view.GestureDetectorCompat;
+&nbsp;import androidx.recyclerview.widget.DividerItemDecoration;
+&nbsp;import androidx.recyclerview.widget.GridLayoutManager;
+&nbsp;import androidx.recyclerview.widget.RecyclerView;
+&nbsp;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;import java.lang.reflect.Type;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.time.Month;
+&nbsp;import java.time.Year;
+&nbsp;import java.time.YearMonth;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.util.ArrayList;
+&nbsp;
+&nbsp;public class DaysOfMonthView extends RecyclerView {
+&nbsp;    private Month shownMonth;
+&nbsp;    private LocalDate selectedDate;
+&nbsp;    private CalendarViewAdapter calendarAdapter;
+&nbsp;    private CustomHolderBehavior customHolderBehavior;
+&nbsp;    private Constructor&lt;? extends CalendarViewHolder&gt; calendarViewHolderConstructor;
+&nbsp;    private SelectedDataChangedListener selectedDataChangedListener;
+&nbsp;    private int layoutId;
+&nbsp;
+&nbsp;    public DaysOfMonthView(@NonNull Context context) {
+<b class="nc">&nbsp;        super(context);</b>
+<b class="nc">&nbsp;        init();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DaysOfMonthView(@NonNull Context context, @Nullable AttributeSet attrs) {
+<b class="nc">&nbsp;        super(context, attrs);</b>
+<b class="nc">&nbsp;        init();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DaysOfMonthView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+<b class="nc">&nbsp;        super(context, attrs, defStyleAttr);</b>
+<b class="nc">&nbsp;        init();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void init() {
+<b class="nc">&nbsp;        selectedDate = LocalDate.now();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMonthView() {
+<b class="nc">&nbsp;        shownMonth = selectedDate.getMonth();</b>
+<b class="nc">&nbsp;        ArrayList&lt;LocalDate&gt; daysInMonth = daysInMonthArray(selectedDate);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (calendarViewHolderConstructor == null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                calendarViewHolderConstructor = CalendarViewHolder.class.getConstructor(View.class);</b>
+<b class="nc">&nbsp;                layoutId = R.layout.calendar_cell;</b>
+<b class="nc">&nbsp;            } catch (NoSuchMethodException e) {</b>
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        calendarAdapter = new CalendarViewAdapter(</b>
+&nbsp;                calendarViewHolderConstructor,
+&nbsp;                layoutId,
+&nbsp;                selectedDataChangedListener,
+&nbsp;                customHolderBehavior,
+&nbsp;                this,
+&nbsp;                daysInMonth,
+<b class="nc">&nbsp;                getContext());</b>
+<b class="nc">&nbsp;        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 7);</b>
+<b class="nc">&nbsp;        setLayoutManager(layoutManager);</b>
+<b class="nc">&nbsp;        setAdapter(calendarAdapter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ArrayList&lt;LocalDate&gt; daysInMonthArray(LocalDate date) {
+<b class="nc">&nbsp;        ArrayList&lt;LocalDate&gt; daysInMonthArray = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        YearMonth yearMonth = YearMonth.from(date);</b>
+&nbsp;
+<b class="nc">&nbsp;        int daysInMonth = yearMonth.lengthOfMonth();</b>
+&nbsp;
+<b class="nc">&nbsp;        LocalDate firstOfMonth = date.withDayOfMonth(1);</b>
+<b class="nc">&nbsp;        LocalDate lastOfMonth = date.withDayOfMonth(yearMonth.lengthOfMonth());</b>
+<b class="nc">&nbsp;        int startDayOfWeek = firstOfMonth.getDayOfWeek().getValue();</b>
+<b class="nc">&nbsp;        int endDayOfWeek = lastOfMonth.getDayOfWeek().getValue();</b>
+<b class="nc">&nbsp;        int endTemp = 7 - endDayOfWeek - 1;</b>
+&nbsp;
+&nbsp;//                                  days in a month
+<b class="nc">&nbsp;        int maxDaysCount = yearMonth.getMonth().length(Year.isLeap(yearMonth.getYear())) +</b>
+&nbsp;//      the number of days in a week before month begin
+&nbsp;                            startDayOfWeek +
+&nbsp;//      the number of days in a week after month ends
+&nbsp;                            endTemp;
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 1; i &lt;= maxDaysCount; i++) {</b>
+<b class="nc">&nbsp;            if (i &lt; startDayOfWeek) {</b>
+<b class="nc">&nbsp;                daysInMonthArray.add(firstOfMonth.minusDays(startDayOfWeek - i));</b>
+<b class="nc">&nbsp;            } else if (i &gt; daysInMonth + startDayOfWeek) {</b>
+<b class="nc">&nbsp;                daysInMonthArray.add(firstOfMonth.plusDays(i - startDayOfWeek));</b>
+&nbsp;            }else {
+<b class="nc">&nbsp;                daysInMonthArray.add(firstOfMonth.plusDays(i - startDayOfWeek));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return daysInMonthArray;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSelectedDateChangedListener(SelectedDataChangedListener selectedDataChangedListener) {
+<b class="nc">&nbsp;        this.selectedDataChangedListener = selectedDataChangedListener;</b>
+<b class="nc">&nbsp;        if (calendarAdapter != null)</b>
+<b class="nc">&nbsp;            this.calendarAdapter.setSelectedDataChangedListener(selectedDataChangedListener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCustomHolderBehavior(CustomHolderBehavior customHolderBehavior) {
+<b class="nc">&nbsp;        this.customHolderBehavior = customHolderBehavior;</b>
+<b class="nc">&nbsp;        if (calendarAdapter != null)</b>
+<b class="nc">&nbsp;            this.calendarAdapter.setCustomHolderBehavior(customHolderBehavior);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void previousMonthAction() {
+<b class="nc">&nbsp;        selectedDate = selectedDate.minusMonths(1);</b>
+<b class="nc">&nbsp;        setMonthView();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void nextMonthAction() {
+<b class="nc">&nbsp;        selectedDate = selectedDate.plusMonths(1);</b>
+<b class="nc">&nbsp;        setMonthView();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LocalDate getSelectedDate() {
+<b class="nc">&nbsp;        return selectedDate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSelectedDate(LocalDate selectedDate) {
+<b class="nc">&nbsp;        this.selectedDate = selectedDate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public CalendarViewAdapter getCalendarAdapter() {
+<b class="nc">&nbsp;        return calendarAdapter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Month getShownMonth() {
+<b class="nc">&nbsp;        return shownMonth;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Constructor&lt;? extends CalendarViewHolder&gt; getCalendarViewHolderConstructor() {
+<b class="nc">&nbsp;        return calendarViewHolderConstructor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCalendarViewHolderConstructor(Constructor&lt;? extends CalendarViewHolder&gt; calendarViewHolderConstructor, int layoutId) {
+&nbsp;//        setting new holder for a calendar
+<b class="nc">&nbsp;        this.calendarViewHolderConstructor = calendarViewHolderConstructor;</b>
+<b class="nc">&nbsp;        this.layoutId = layoutId;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

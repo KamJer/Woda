@@ -2,13 +2,12 @@ package com.kamjer.woda.activity.useractivity.coloreditdialog;
 
 import android.app.Activity;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Filter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -16,11 +15,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.kamjer.woda.R;
 import com.kamjer.woda.model.Type;
-import com.kamjer.woda.viewmodel.WaterViewModel;
 
 import java.util.Optional;
 
@@ -32,6 +29,7 @@ public class ColorPickerDialog extends AppCompatActivity {
     private SeekBar blueSeekBar;
 
     private ImageButton colorIndicator;
+    private ImageView colorIndicatorAccept;
 
     private Type type;
 
@@ -54,6 +52,8 @@ public class ColorPickerDialog extends AppCompatActivity {
         colorIndicator = findViewById(R.id.colorIndicatorImageView);
         colorIndicator.setOnClickListener(this::acceptAction);
 
+        colorIndicatorAccept = findViewById(R.id.acceptImage);
+
         redSeekBar.setOnSeekBarChangeListener(new ColorSeekBarListener(color, ColorSeekBarListener.Chanel.RED));
         greenSeekBar.setOnSeekBarChangeListener(new ColorSeekBarListener(color, ColorSeekBarListener.Chanel.GREEN));
         blueSeekBar.setOnSeekBarChangeListener(new ColorSeekBarListener(color, ColorSeekBarListener.Chanel.BLUE));
@@ -74,10 +74,22 @@ public class ColorPickerDialog extends AppCompatActivity {
 
         type.setColor(rgb);
 
+        int max = Math.max(red, Math.max(green, blue));
+        int inversColor = Color.argb(255, 255 - max, 255 - max, 255 - max);
+
         Drawable buttonShape = ResourcesCompat.getDrawable(getResources(), R.drawable.color_type_button_shape, null);
         if (buttonShape != null) {
             buttonShape.setColorFilter(rgb, PorterDuff.Mode.SRC_OVER);
             colorIndicator.setBackground(buttonShape);
+        } else {
+            Toast.makeText(this, getResources().getText(R.string.error_message_can_not_load), Toast.LENGTH_LONG).show();
+            this.finish();
+        }
+
+        Drawable acceptImage = ResourcesCompat.getDrawable(getResources(), R.drawable.accept, null);
+        if (acceptImage != null) {
+            acceptImage.setTint(inversColor);
+            colorIndicatorAccept.setBackground(acceptImage);
         } else {
             Toast.makeText(this, getResources().getText(R.string.error_message_can_not_load), Toast.LENGTH_LONG).show();
             this.finish();

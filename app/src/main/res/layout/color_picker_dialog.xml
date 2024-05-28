@@ -37,14 +37,31 @@
         android:thumbTint="@color/blue"
         />
 
-    <ImageButton
-        android:id="@+id/colorIndicatorImageView"
+    <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_gravity="center"
-        android:background="@drawable/color_type_button_shape"
-        android:contentDescription="TODO"
-        android:padding="10dp"
-        />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <ImageButton
+            android:id="@+id/colorIndicatorImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/color_type_button_shape"
+            android:contentDescription="button for accepting picked color"
+            android:padding="10dp"
+            />
+
+        <ImageView
+            android:id="@+id/acceptImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/accept"
+            android:layout_centerInParent="true"
+            android:scaleType="centerCrop"
+            android:contentDescription="image to make button for accepting picked color more readeable"
+            />
+    </RelativeLayout>
+
 
 </LinearLayout>

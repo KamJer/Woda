@@ -11,9 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.kamjer.mycalendarview.CalendarViewHolder;
 import com.kamjer.mycalendarview.CalendarView;
-import com.kamjer.mycalendarview.SelectedDataChangedListener;
+import com.kamjer.mycalendarview.CalendarViewHolder;
 import com.kamjer.woda.R;
 import com.kamjer.woda.activity.calendaractivity.viewHolder.WaterCalendarViewHolder;
 import com.kamjer.woda.model.WaterDayWithWaters;
@@ -34,7 +33,7 @@ public class CalendarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 //      getting viewModel
         waterViewModel = new ViewModelProvider(this,
-                new ViewModelProvider.NewInstanceFactory()).get(WaterViewModel.class);
+                ViewModelProvider.Factory.from(WaterViewModel.initializer)).get(WaterViewModel.class);
 
         waterViewModel.setWaterDayWithWatersObserver(this,
                 waterDayWithWaters -> calendarView.setSelectedDate(waterDayWithWaters.getWaterDay().getDate()));

@@ -1,6 +1,5 @@
 package com.kamjer.woda.activity.calendaractivity.viewHolder;
 
-import android.graphics.Color;
 import android.view.View;
 
 import androidx.annotation.NonNull;

@@ -53,7 +53,7 @@ public class TypeViewHolder extends RecyclerView.ViewHolder{
             Toast.makeText(itemView.getContext(), itemView.getContext().getResources().getText(R.string.error_message_can_not_load), Toast.LENGTH_LONG).show();
         }
         buttonColorPicker.setOnClickListener(v -> {
-//          becuse how android manges focus i need to switch focus by hand when opening
+//          because how android manges focus i need to switch focus by hand when opening
             notifyFocusedCleared();
             colorSelectorAction.action(type, position);
         });

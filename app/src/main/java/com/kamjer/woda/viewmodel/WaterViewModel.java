@@ -3,8 +3,8 @@ package com.kamjer.woda.viewmodel;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
-import com.kamjer.woda.activity.calendaractivity.CalendarActivity;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.model.WaterDay;
@@ -23,42 +23,56 @@ public class WaterViewModel extends ViewModel {
 
     public static final int DEFAULT_WATER_DRANK_IN_ONE_GO = 250;
 
-    private final CompositeDisposable disposable = new CompositeDisposable();
+    private final CompositeDisposable disposable;
 
-//    DATABASE OPERATIONS
+    private final WaterDataRepository waterDataRepository;
+
+    public static final ViewModelInitializer<WaterViewModel> initializer = new ViewModelInitializer<>(
+            WaterViewModel.class,
+            creationExtras ->
+                    new WaterViewModel(new CompositeDisposable(),
+                            WaterDataRepository.getInstance())
+    );
+
+    public WaterViewModel(CompositeDisposable compositeDisposable, WaterDataRepository waterDataRepository) {
+        this.disposable = compositeDisposable;
+        this.waterDataRepository = waterDataRepository;
+    }
+
+    //    DATABASE OPERATIONS
     public void loadWaterDayWithWatersByDate(LocalDate date) {
-        WaterDataRepository.getInstance().loadWaterDayWithWatersByDate(date);
+        waterDataRepository.loadWaterDayWithWatersByDate(date);
     }
 
     public void insertWaterDay(WaterDay waterDay, Action onSuccess) {
-        disposable.add(WaterDataRepository.getInstance().insertWaterDay(waterDay, onSuccess));
+        disposable.add(waterDataRepository.insertWaterDay(waterDay, onSuccess));
     }
 
     public void insertWater(Water water) {
-        disposable.add(WaterDataRepository.getInstance().insertWater(water, aLong -> {
+        disposable.add(waterDataRepository.insertWater(water, aLong -> {
             water.setId(aLong);
             addWaterInDay(water);
         }));
     }
 
     public void setWaterDayWithWatersObserver(LifecycleOwner owner, Observer<WaterDayWithWaters> observer) {
-        WaterDataRepository.getInstance().getWaterDayWithWatersLivaData().observe(owner, observer);
+        waterDataRepository.getWaterDayWithWatersLivaData().observe(owner, observer);
     }
 
     public void addWaterInDay(Water water) {
-        WaterDataRepository.getInstance().addWaterInDay(water);
+        waterDataRepository.addWaterInDay(water);
     }
 
     public void removeWaterInDay(Water water) {
-        WaterDataRepository.getInstance().removeWaterInDay(water);
+        waterDataRepository.removeWaterInDay(water);
     }
 
     public WaterDayWithWaters getWaterDayWithWatersValue() {
-        return WaterDataRepository.getInstance().getWaterDayWithWatersValue();
+        return waterDataRepository.getWaterDayWithWatersValue();
     }
 
     public void deleteWater(Water water) {
-        disposable.add(WaterDataRepository.getInstance().deleteWater(water, () -> removeWaterInDay(water)));
+        disposable.add(waterDataRepository.deleteWater(water, () -> removeWaterInDay(water)));
     }
 
     public LocalDate getActiveDate() {
@@ -69,15 +83,11 @@ public class WaterViewModel extends ViewModel {
         disposable.clear();
     }
 
-    public HashMap<Long, Type> getTypesValue() {
-        return WaterDataRepository.getInstance().getWaterTypes();
-    }
-
     public void setAllWaterDayWithWatersObserver(LifecycleOwner owner, Observer<List<WaterDayWithWaters>> observer) {
-        WaterDataRepository.getInstance().getAllWaterDayWithWatersLiveData().observe(owner, observer);
+        waterDataRepository.setAllWaterDayWithWatersObserver(owner, observer);
     }
 
     public void setAllTypesObserver(LifecycleOwner owner, Observer<HashMap<Long, Type>> observer) {
-        WaterDataRepository.getInstance().setTypesLiveDataObserver(owner, observer);
+        waterDataRepository.setTypesLiveDataObserver(owner, observer);
     }
 }

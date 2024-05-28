@@ -1,0 +1,263 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > WaterImage</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.activity.mainactivity.waterimage</a>
+</div>
+
+<h1>Coverage Summary for Class: WaterImage (com.kamjer.woda.activity.mainactivity.waterimage)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WaterImage</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.activity.mainactivity.waterimage;
+&nbsp;
+&nbsp;import android.content.Context;
+&nbsp;import android.graphics.Canvas;
+&nbsp;import android.graphics.Matrix;
+&nbsp;import android.graphics.Path;
+&nbsp;import android.graphics.drawable.Drawable;
+&nbsp;import android.graphics.drawable.LayerDrawable;
+&nbsp;import android.util.AttributeSet;
+&nbsp;
+&nbsp;import androidx.annotation.Nullable;
+&nbsp;import androidx.core.graphics.PathParser;
+&nbsp;
+&nbsp;import com.kamjer.woda.model.Type;
+&nbsp;import com.kamjer.woda.model.WaterDayWithWaters;
+&nbsp;import com.kamjer.woda.utils.FloatPoint;
+&nbsp;import com.kamjer.woda.repository.WaterDataRepository;
+&nbsp;
+&nbsp;public class WaterImage extends androidx.appcompat.widget.AppCompatImageView {
+&nbsp;
+&nbsp;    //    image size in pd
+&nbsp;    private static final int IMAGE_SIZE_X = 200;
+&nbsp;    private static final int IMAGE_SIZE_Y = 200;
+&nbsp;    private Drawable glassDrawable;
+&nbsp;
+&nbsp;    public WaterImage(Context context) {
+<b class="nc">&nbsp;        super(context);</b>
+<b class="nc">&nbsp;        init();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public WaterImage(Context context, @Nullable AttributeSet attrs) {
+<b class="nc">&nbsp;        super(context, attrs);</b>
+<b class="nc">&nbsp;        init();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public WaterImage(Context context, @Nullable AttributeSet attrs, int defStyle) {
+<b class="nc">&nbsp;        super(context, attrs, defStyle);</b>
+<b class="nc">&nbsp;        init();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void init(){
+<b class="nc">&nbsp;        setScaleType(ScaleType.CENTER_INSIDE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAmount(WaterDayWithWaters waterDayWithWaters) {
+<b class="nc">&nbsp;        if (glassDrawable == null) {</b>
+<b class="nc">&nbsp;            glassDrawable = getDrawable();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Drawable[] layers = new Drawable[waterDayWithWaters.getWaters().size() + 1];</b>
+<b class="nc">&nbsp;        layers[0] = glassDrawable;</b>
+&nbsp;
+&nbsp;        // Calculate scaling factors
+<b class="nc">&nbsp;        float scaleX = (float) glassDrawable.getIntrinsicWidth() / IMAGE_SIZE_X;</b>
+<b class="nc">&nbsp;        float scaleY = (float) glassDrawable.getIntrinsicHeight() / IMAGE_SIZE_Y;</b>
+&nbsp;
+<b class="nc">&nbsp;        Matrix matrix1 = new Matrix();</b>
+<b class="nc">&nbsp;        matrix1.postScale(scaleX, scaleY);</b>
+&nbsp;
+<b class="nc">&nbsp;        int maxValue = Math.max(waterDayWithWaters.getWaterDay().getWaterToDrink(), waterDayWithWaters.getWaterDaySum());</b>
+&nbsp;
+<b class="nc">&nbsp;        waterDayWithWaters.getWaters().sort((o1, o2) -&gt; o2.getWaterDrank() - o1.getWaterDrank());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; waterDayWithWaters.getWaters().size(); i++) {</b>
+<b class="nc">&nbsp;            int amount = 0;</b>
+<b class="nc">&nbsp;            for (int j = i; j &lt; waterDayWithWaters.getWaters().size(); j++) {</b>
+<b class="nc">&nbsp;                amount += waterDayWithWaters.getWaters().get(j).getWaterDrank();</b>
+&nbsp;            }
+&nbsp;//          creating string builder for a path
+<b class="nc">&nbsp;            StringBuilder bd = new StringBuilder();</b>
+&nbsp;//          initial point to move mouse to
+<b class="nc">&nbsp;            FloatPoint stLeftPoint = newLeftPointInGlass(maxValue , amount);</b>
+&nbsp;//          appending initial point
+<b class="nc">&nbsp;            bd.append(&quot;M&quot;).</b>
+<b class="nc">&nbsp;                    append(stLeftPoint.getX()).</b>
+<b class="nc">&nbsp;                    append(&quot;,&quot;).</b>
+<b class="nc">&nbsp;                    append(stLeftPoint.getY()).</b>
+<b class="nc">&nbsp;                    append(&quot; &quot;);</b>
+&nbsp;//          creating bottom of a water in a glass and appending it
+<b class="nc">&nbsp;            String path = &quot;L75.48,140.02C75.95,142.47 78.01,148.98 85.17,149.02 85.17,149.02 115.36,149.04 115.36,149.04 122.04,149.02 124,142.55 124.52,140.05&quot;;</b>
+<b class="nc">&nbsp;            bd.append(path);</b>
+&nbsp;
+&nbsp;//          creating last point for water, the one on a right side and appending it
+<b class="nc">&nbsp;            FloatPoint rightPoint = newRightPointInGlass(maxValue, amount);</b>
+<b class="nc">&nbsp;            bd.append(&quot;L&quot;).</b>
+<b class="nc">&nbsp;                    append(rightPoint.getX()).</b>
+<b class="nc">&nbsp;                    append(&quot;,&quot;).</b>
+<b class="nc">&nbsp;                    append(rightPoint.getY()).</b>
+<b class="nc">&nbsp;                    append(&quot; Z&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            Path path1 = (PathParser.createPathFromPathData(bd.toString()));</b>
+&nbsp;//          since for the rest of a code it is necessary for type to exists get default one (Water) if for some reason there is no type for water
+<b class="nc">&nbsp;            Type type = WaterDataRepository.getInstance().</b>
+<b class="nc">&nbsp;                    getWaterTypes().</b>
+<b class="nc">&nbsp;                    get(waterDayWithWaters.getWaters().get(i).getTypeId());</b>
+<b class="nc">&nbsp;            if (type != null) {</b>
+<b class="nc">&nbsp;                WaterImageDrawable waterImageDrawable = new WaterImageDrawable(path1, type, waterDayWithWaters.getWaters().get(i).getWaterDrank());</b>
+&nbsp;
+<b class="nc">&nbsp;                waterImageDrawable.setMatrix(matrix1);</b>
+<b class="nc">&nbsp;                layers[i + 1] = waterImageDrawable;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;        }
+<b class="nc">&nbsp;        setImageDrawable(new LayerDrawable(layers));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private FloatPoint newLeftPointInGlass(int glassSize, float amount) {
+&nbsp;//      angular coefficient
+<b class="nc">&nbsp;        float aLeft =   6.589041096f;</b>
+<b class="nc">&nbsp;        float bLeft = -355.1369863f;</b>
+&nbsp;
+&nbsp;//      calculating y position on a left side of a glass
+<b class="nc">&nbsp;        float y = clcYInGlass(glassSize, amount);</b>
+&nbsp;//      calculating x position based on a already defined side of a glass
+<b class="nc">&nbsp;        float x = (y - bLeft) / aLeft;</b>
+&nbsp;//      returning new point
+<b class="nc">&nbsp;        return new FloatPoint(x, y);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    private FloatPoint newRightPointInGlass(int glassSize, float amount) {
+&nbsp;//      angular coefficient
+<b class="nc">&nbsp;        float aRight = -6.119047619f;</b>
+<b class="nc">&nbsp;        float bRight = 898.9380952f;</b>
+&nbsp;
+&nbsp;//      calculating y position on a right side of a glass
+<b class="nc">&nbsp;        float y = clcYInGlass(glassSize, amount);</b>
+&nbsp;//      calculating x position based on a already defined side of a glass
+<b class="nc">&nbsp;        float x = (y - bRight) / aRight;</b>
+&nbsp;//      returning new point
+<b class="nc">&nbsp;        return new FloatPoint(x, y);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private float clcYInGlass(int glassSize, float amount) {
+&nbsp;//      for how match water point in glass symbolizes
+<b class="nc">&nbsp;        int bottomGlassXImage = 149;</b>
+<b class="nc">&nbsp;        int bottomGlassYWater = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        int topGlassXImage = 50;</b>
+&nbsp;//      angular coefficient
+<b class="nc">&nbsp;        FloatPoint aAndB = calculateCoefficients(topGlassXImage, glassSize, bottomGlassXImage, bottomGlassYWater);</b>
+<b class="nc">&nbsp;        float a =  aAndB.getX();</b>
+<b class="nc">&nbsp;        float b = aAndB.getY();</b>
+&nbsp;
+&nbsp;//      y value for a glass (from y = ax + b transformed to x = (y - b) / a)
+<b class="nc">&nbsp;        return (amount - b) / a;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private FloatPoint calculateCoefficients(int xA, int yA, int xB, int yB) {
+<b class="nc">&nbsp;        return new FloatPoint(</b>
+&nbsp;                (float) (yA - yB) / (xA - xB),
+&nbsp;                yA - ((float) (yA - yB) / (xA - xB)) * xA);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onDraw(Canvas canvas) {
+<b class="nc">&nbsp;        super.onDraw(canvas);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

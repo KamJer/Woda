@@ -1,0 +1,218 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > DeleteTypeConflictDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.activity.useractivity.deletetypeconflictdialog</a>
+</div>
+
+<h1>Coverage Summary for Class: DeleteTypeConflictDialog (com.kamjer.woda.activity.useractivity.deletetypeconflictdialog)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DeleteTypeConflictDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DeleteTypeConflictDialog$Selected</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.activity.useractivity.deletetypeconflictdialog;
+&nbsp;
+&nbsp;import android.app.Activity;
+&nbsp;import android.app.Notification;
+&nbsp;import android.graphics.Path;
+&nbsp;import android.os.Bundle;
+&nbsp;import android.widget.ArrayAdapter;
+&nbsp;import android.widget.Button;
+&nbsp;import android.widget.Spinner;
+&nbsp;
+&nbsp;import androidx.annotation.Nullable;
+&nbsp;import androidx.appcompat.app.AppCompatActivity;
+&nbsp;
+&nbsp;import com.kamjer.woda.R;
+&nbsp;import com.kamjer.woda.model.Type;
+&nbsp;import com.kamjer.woda.model.Water;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+<b class="nc">&nbsp;public class DeleteTypeConflictDialog extends AppCompatActivity {</b>
+&nbsp;
+&nbsp;    public static final String WATER_LIST_NAME = &quot;waters&quot;;
+&nbsp;    public static final String TYPE_TO_DELETE_NAME = &quot;typeToDelete&quot;;
+&nbsp;    public static final String TYPE_SELECTED_NAME = &quot;typeSelected&quot;;
+&nbsp;    public static final String ACTION_SELECTED_NAME = &quot;selected&quot;;
+&nbsp;    public static final String TYPE_LIST_NAME = &quot;typylist&quot;;
+&nbsp;
+&nbsp;
+&nbsp;    private ArrayList&lt;Type&gt; typeList;
+&nbsp;    private ArrayList&lt;Water&gt; waterList;
+&nbsp;    private Type typeToDelete;
+&nbsp;
+&nbsp;    private Button deleteButton;
+&nbsp;    private Button chageButton;
+&nbsp;    private Button nothingButton;
+&nbsp;
+&nbsp;    private Spinner spinner;
+&nbsp;
+<b class="nc">&nbsp;    public enum Selected {</b>
+<b class="nc">&nbsp;        DELETE,</b>
+<b class="nc">&nbsp;        CHANGE,</b>
+<b class="nc">&nbsp;        NOTHING</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onCreate(@Nullable Bundle savedInstanceState) {
+<b class="nc">&nbsp;        super.onCreate(savedInstanceState);</b>
+&nbsp;
+<b class="nc">&nbsp;        typeList = Optional.ofNullable((ArrayList&lt;Type&gt;) getIntent().getSerializableExtra(TYPE_LIST_NAME))</b>
+<b class="nc">&nbsp;                .orElse(new ArrayList&lt;&gt;());</b>
+<b class="nc">&nbsp;        waterList =  Optional.ofNullable((ArrayList&lt;Water&gt;) getIntent().getSerializableExtra(WATER_LIST_NAME))</b>
+<b class="nc">&nbsp;                .orElse(new ArrayList&lt;&gt;());</b>
+<b class="nc">&nbsp;        typeToDelete =  Optional.ofNullable((Type) getIntent().getSerializableExtra(TYPE_TO_DELETE_NAME)).orElse(new Type());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onStart() {
+<b class="nc">&nbsp;        super.onStart();</b>
+<b class="nc">&nbsp;        setContentView(R.layout.delete_type_conflict_dialog);</b>
+<b class="nc">&nbsp;        deleteButton = findViewById(R.id.deleteButton);</b>
+<b class="nc">&nbsp;        deleteButton.setText(getResources().getText(R.string.text_delete_button_delete_type_conflict_dialog));</b>
+&nbsp;
+<b class="nc">&nbsp;        chageButton = findViewById(R.id.changeButton);</b>
+<b class="nc">&nbsp;        chageButton.setText(getResources().getText(R.string.text_change_button_delete_type_conflict_dialog));</b>
+&nbsp;
+<b class="nc">&nbsp;        nothingButton = findViewById(R.id.nothingButton);</b>
+<b class="nc">&nbsp;        nothingButton.setText(getResources().getText(R.string.text_nothing_button_delete_type_conflict_dialog));</b>
+&nbsp;
+<b class="nc">&nbsp;        ArrayAdapter&lt;Type&gt; adapter = new ArrayAdapter&lt;&gt;(this, android.R.layout.simple_spinner_item, typeList);</b>
+<b class="nc">&nbsp;        spinner = findViewById(R.id.typeSpinner);</b>
+<b class="nc">&nbsp;        spinner.setAdapter(adapter);</b>
+&nbsp;
+<b class="nc">&nbsp;        deleteButton.setOnClickListener(v -&gt; setActionSelectedAction(Selected.DELETE));</b>
+<b class="nc">&nbsp;        chageButton.setOnClickListener(v -&gt; setActionSelectedAction(Selected.CHANGE));</b>
+<b class="nc">&nbsp;        nothingButton.setOnClickListener(v -&gt; setActionSelectedAction(Selected.NOTHING));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setActionSelectedAction(Selected selected) {
+<b class="nc">&nbsp;        getIntent().putExtra(ACTION_SELECTED_NAME, selected);</b>
+<b class="nc">&nbsp;        if (Objects.requireNonNull(selected) == Selected.CHANGE) {</b>
+<b class="nc">&nbsp;            getIntent().putExtra(TYPE_SELECTED_NAME, (Type) spinner.getSelectedItem());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        setResult(Activity.RESULT_OK, getIntent());</b>
+<b class="nc">&nbsp;        this.finish();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

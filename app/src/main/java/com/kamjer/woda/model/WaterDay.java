@@ -1,6 +1,7 @@
 package com.kamjer.woda.model;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -53,5 +54,15 @@ public class WaterDay implements Serializable {
 
     public void setInserted(boolean inserted) {
         this.inserted = inserted;
+    }
+
+    @Override
+    public int hashCode() {
+        return date.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        return obj instanceof WaterDay && obj.hashCode() == hashCode();
     }
 }

@@ -2,7 +2,16 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="DatabaseInstrumentedTest">
+        <State />
+      </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="removeWater_isFailed()">
+        <State />
+      </entry>
+      <entry key="removeWater_isSuccessful()">
         <State />
       </entry>
     </value>

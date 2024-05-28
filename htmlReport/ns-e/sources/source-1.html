@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > ColorPickerDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.activity.useractivity.coloreditdialog</a>
+</div>
+
+<h1>Coverage Summary for Class: ColorPickerDialog (com.kamjer.woda.activity.useractivity.coloreditdialog)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ColorPickerDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.activity.useractivity.coloreditdialog;
+&nbsp;
+&nbsp;import android.app.Activity;
+&nbsp;import android.graphics.BlendMode;
+&nbsp;import android.graphics.Color;
+&nbsp;import android.graphics.ColorFilter;
+&nbsp;import android.graphics.PorterDuff;
+&nbsp;import android.graphics.drawable.Drawable;
+&nbsp;import android.os.Bundle;
+&nbsp;import android.view.View;
+&nbsp;import android.widget.Filter;
+&nbsp;import android.widget.ImageButton;
+&nbsp;import android.widget.ImageView;
+&nbsp;import android.widget.SeekBar;
+&nbsp;import android.widget.Toast;
+&nbsp;
+&nbsp;import androidx.annotation.Nullable;
+&nbsp;import androidx.appcompat.app.AppCompatActivity;
+&nbsp;import androidx.core.content.res.ResourcesCompat;
+&nbsp;import androidx.lifecycle.MutableLiveData;
+&nbsp;import androidx.lifecycle.ViewModelProvider;
+&nbsp;
+&nbsp;import com.kamjer.woda.R;
+&nbsp;import com.kamjer.woda.model.Type;
+&nbsp;import com.kamjer.woda.repository.ResourcesRepository;
+&nbsp;import com.kamjer.woda.viewmodel.WaterViewModel;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+<b class="nc">&nbsp;public class ColorPickerDialog extends AppCompatActivity {</b>
+<b class="nc">&nbsp;    private final MutableLiveData&lt;Integer&gt; color = new MutableLiveData&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private SeekBar redSeekBar;
+&nbsp;    private SeekBar greenSeekBar;
+&nbsp;    private SeekBar blueSeekBar;
+&nbsp;
+&nbsp;    private ImageButton colorIndicator;
+&nbsp;    private ImageView colorIndicatorAccept;
+&nbsp;
+&nbsp;    private Type type;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onCreate(@Nullable Bundle savedInstanceState) {
+<b class="nc">&nbsp;        super.onCreate(savedInstanceState);</b>
+&nbsp;
+<b class="nc">&nbsp;        type = (Type) Optional.ofNullable(getIntent().getSerializableExtra(&quot;type&quot;)).orElse(new Type());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onStart() {
+<b class="nc">&nbsp;        super.onStart();</b>
+<b class="nc">&nbsp;        setContentView(R.layout.color_picker_dialog);</b>
+&nbsp;
+<b class="nc">&nbsp;        redSeekBar = findViewById(R.id.redSeekBar);</b>
+<b class="nc">&nbsp;        greenSeekBar = findViewById(R.id.greenSeekBar);</b>
+<b class="nc">&nbsp;        blueSeekBar = findViewById(R.id.blueSeekBar);</b>
+&nbsp;
+<b class="nc">&nbsp;        colorIndicator = findViewById(R.id.colorIndicatorImageView);</b>
+<b class="nc">&nbsp;        colorIndicator.setOnClickListener(this::acceptAction);</b>
+&nbsp;
+<b class="nc">&nbsp;        colorIndicatorAccept = findViewById(R.id.acceptImage);</b>
+&nbsp;
+<b class="nc">&nbsp;        redSeekBar.setOnSeekBarChangeListener(new ColorSeekBarListener(color, ColorSeekBarListener.Chanel.RED));</b>
+<b class="nc">&nbsp;        greenSeekBar.setOnSeekBarChangeListener(new ColorSeekBarListener(color, ColorSeekBarListener.Chanel.GREEN));</b>
+<b class="nc">&nbsp;        blueSeekBar.setOnSeekBarChangeListener(new ColorSeekBarListener(color, ColorSeekBarListener.Chanel.BLUE));</b>
+&nbsp;
+<b class="nc">&nbsp;        color.observe(this, this::colorObserver);</b>
+<b class="nc">&nbsp;        color.setValue(type.getColor());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void colorObserver(int rgb) {
+&nbsp;//        loading all colors
+<b class="nc">&nbsp;        int red = Color.red(rgb);</b>
+<b class="nc">&nbsp;        int green = Color.green(rgb);</b>
+<b class="nc">&nbsp;        int blue = Color.blue(rgb);</b>
+&nbsp;
+<b class="nc">&nbsp;        redSeekBar.setProgress(red);</b>
+<b class="nc">&nbsp;        greenSeekBar.setProgress(green);</b>
+<b class="nc">&nbsp;        blueSeekBar.setProgress(blue);</b>
+&nbsp;
+<b class="nc">&nbsp;        type.setColor(rgb);</b>
+&nbsp;
+<b class="nc">&nbsp;        int max = Math.max(red, Math.max(green, blue));</b>
+<b class="nc">&nbsp;        int inversColor = Color.argb(255, 255 - max, 255 - max, 255 - max);</b>
+&nbsp;
+<b class="nc">&nbsp;        Drawable buttonShape = ResourcesCompat.getDrawable(getResources(), R.drawable.color_type_button_shape, null);</b>
+<b class="nc">&nbsp;        if (buttonShape != null) {</b>
+<b class="nc">&nbsp;            buttonShape.setColorFilter(rgb, PorterDuff.Mode.SRC_OVER);</b>
+<b class="nc">&nbsp;            colorIndicator.setBackground(buttonShape);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            Toast.makeText(this, getResources().getText(R.string.error_message_can_not_load), Toast.LENGTH_LONG).show();</b>
+<b class="nc">&nbsp;            this.finish();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Drawable acceptImage = ResourcesCompat.getDrawable(getResources(), R.drawable.accept, null);</b>
+<b class="nc">&nbsp;        if (acceptImage != null) {</b>
+<b class="nc">&nbsp;            acceptImage.setTint(inversColor);</b>
+<b class="nc">&nbsp;            colorIndicatorAccept.setBackground(acceptImage);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            Toast.makeText(this, getResources().getText(R.string.error_message_can_not_load), Toast.LENGTH_LONG).show();</b>
+<b class="nc">&nbsp;            this.finish();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void acceptAction(View v) {
+<b class="nc">&nbsp;        getIntent().putExtra(&quot;type&quot;, type);</b>
+<b class="nc">&nbsp;        setResult(Activity.RESULT_OK, getIntent());</b>
+<b class="nc">&nbsp;        this.finish();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

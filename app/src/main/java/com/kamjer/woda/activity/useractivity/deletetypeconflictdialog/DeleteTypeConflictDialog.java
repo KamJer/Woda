@@ -1,8 +1,6 @@
 package com.kamjer.woda.activity.useractivity.deletetypeconflictdialog;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.graphics.Path;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;

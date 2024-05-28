@@ -1,0 +1,319 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > AlarmActivity</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.activity.alarmactivity</a>
+</div>
+
+<h1>Coverage Summary for Class: AlarmActivity (com.kamjer.woda.activity.alarmactivity)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AlarmActivity</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/71)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AlarmActivity$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/78)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.activity.alarmactivity;
+&nbsp;
+&nbsp;import android.app.TimePickerDialog;
+&nbsp;import android.os.Bundle;
+&nbsp;import android.view.View;
+&nbsp;import android.widget.AdapterView;
+&nbsp;import android.widget.ArrayAdapter;
+&nbsp;import android.widget.Button;
+&nbsp;import android.widget.Spinner;
+&nbsp;
+&nbsp;import androidx.annotation.Nullable;
+&nbsp;import androidx.appcompat.app.AppCompatActivity;
+&nbsp;import androidx.appcompat.widget.SwitchCompat;
+&nbsp;import androidx.lifecycle.ViewModelProvider;
+&nbsp;
+&nbsp;import com.kamjer.woda.R;
+&nbsp;import com.kamjer.woda.repository.SharedPreferencesRepository;
+&nbsp;import com.kamjer.woda.utils.NotificationHelper;
+&nbsp;import com.kamjer.woda.viewmodel.AlarmViewModel;
+&nbsp;
+&nbsp;import java.time.LocalTime;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+<b class="nc">&nbsp;public class AlarmActivity extends AppCompatActivity {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern(&quot;H : mm&quot;);</b>
+&nbsp;
+&nbsp;    private SwitchCompat switchCompatNotifications;
+&nbsp;    private Spinner spinnerHourSelectNotification;
+&nbsp;    private Button buttonSelectHourStart;
+&nbsp;    private Button buttonConstraintTimeStart;
+&nbsp;    private Button buttonConstraintTimeEnd;
+&nbsp;
+&nbsp;    private AlarmViewModel alarmViewModel;
+&nbsp;
+<b class="nc">&nbsp;    private boolean userAction = false;</b>
+&nbsp;    private List&lt;Integer&gt; hours;
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onCreate(@Nullable Bundle savedInstanceState) {
+<b class="nc">&nbsp;        super.onCreate(savedInstanceState);</b>
+<b class="nc">&nbsp;        alarmViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(AlarmViewModel.initializer)).get(AlarmViewModel.class);</b>
+<b class="nc">&nbsp;        hours = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; 24; i++) {</b>
+<b class="nc">&nbsp;            hours.add(i + 1);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        setObservers();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onStart() {
+<b class="nc">&nbsp;        super.onStart();</b>
+<b class="nc">&nbsp;        setContentView(R.layout.alarm_activity_layout);</b>
+&nbsp;
+<b class="nc">&nbsp;        switchCompatNotifications = findViewById(R.id.switchNotifications);</b>
+<b class="nc">&nbsp;        switchCompatNotifications.setOnCheckedChangeListener((buttonView, isChecked) -&gt; {</b>
+<b class="nc">&nbsp;            if (userAction) {</b>
+<b class="nc">&nbsp;                setNotificationsActions(isChecked);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        buttonSelectHourStart = findViewById(R.id.buttonSelectHourStart);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!alarmViewModel.isNotificationsActive()) {</b>
+<b class="nc">&nbsp;            alarmViewModel.setSelectedNotificationsTime(getApplicationContext(), LocalTime.now());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        spinnerHourSelectNotification = findViewById(R.id.spinnerHourSelectNotification);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        ArrayAdapter&lt;Integer&gt; hourSelectAdapter = new ArrayAdapter&lt;&gt;(this, android.R.layout.simple_spinner_dropdown_item, hours);</b>
+<b class="nc">&nbsp;        spinnerHourSelectNotification.setAdapter(hourSelectAdapter);</b>
+<b class="nc">&nbsp;        spinnerHourSelectNotification.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {</b>
+&nbsp;            @Override
+&nbsp;            public void onItemSelected(AdapterView&lt;?&gt; parent, View view, int position, long id) {
+<b class="nc">&nbsp;                if (switchCompatNotifications.isChecked()) {</b>
+<b class="nc">&nbsp;                    if (!hours.get(position).equals(alarmViewModel.getHourNotificationPeriod())) {</b>
+<b class="nc">&nbsp;                        NotificationHelper.cancelAlarms(getApplicationContext());</b>
+<b class="nc">&nbsp;                        resetNotifications();</b>
+<b class="nc">&nbsp;                        alarmViewModel.setHourNotificationPeriod(getApplicationContext(), hours.get(position));</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void onNothingSelected(AdapterView&lt;?&gt; parent) {
+&nbsp;//                do nothing when nothing is selected
+<b class="nc">&nbsp;            }</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        buttonSelectHourStart.setOnClickListener(v -&gt; showTimePickerDialog((view, hour, minute) -&gt; {</b>
+<b class="nc">&nbsp;            alarmViewModel.setSelectedNotificationsTime(getApplicationContext(), LocalTime.of(hour, minute));</b>
+<b class="nc">&nbsp;            resetNotifications();</b>
+&nbsp;        }));
+&nbsp;
+<b class="nc">&nbsp;        buttonConstraintTimeStart = findViewById(R.id.buttonConstraintTimeStart);</b>
+<b class="nc">&nbsp;        buttonConstraintTimeStart.setOnClickListener(v -&gt;</b>
+<b class="nc">&nbsp;                showTimePickerDialog(buttonConstraintTimeStartAction()));</b>
+&nbsp;
+<b class="nc">&nbsp;        buttonConstraintTimeEnd = findViewById(R.id.buttonConstraintTimeEnd);</b>
+<b class="nc">&nbsp;        buttonConstraintTimeEnd.setOnClickListener(v -&gt;</b>
+<b class="nc">&nbsp;                showTimePickerDialog(buttonConstraintTimeEndAction()</b>
+&nbsp;        ));
+&nbsp;    }
+&nbsp;
+&nbsp;    private TimePickerDialog.OnTimeSetListener buttonConstraintTimeStartAction() {
+<b class="nc">&nbsp;        return (view, hourOfDay, minute) -&gt; {</b>
+<b class="nc">&nbsp;            LocalTime timeConstraintStart = LocalTime.of(hourOfDay, minute);</b>
+<b class="nc">&nbsp;            alarmViewModel.setConstraintNotificationTimeStart(getApplicationContext(), timeConstraintStart);</b>
+<b class="nc">&nbsp;            resetNotifications();</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private TimePickerDialog.OnTimeSetListener buttonConstraintTimeEndAction() {
+<b class="nc">&nbsp;        return (view, hourOfDay, minute) -&gt; {</b>
+<b class="nc">&nbsp;            LocalTime timeConstraintEnd = LocalTime.of(hourOfDay, minute);</b>
+<b class="nc">&nbsp;            alarmViewModel.setConstraintNotificationTimeEnd(getApplicationContext(), timeConstraintEnd);</b>
+<b class="nc">&nbsp;            resetNotifications();</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setNotificationsActions(boolean isChecked) {
+<b class="nc">&nbsp;        alarmViewModel.setNotificationsActive(getApplicationContext(), isChecked);</b>
+<b class="nc">&nbsp;        if (isChecked) {</b>
+<b class="nc">&nbsp;            setNotifications();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            NotificationHelper.cancelAlarms(getApplicationContext());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showTimePickerDialog(TimePickerDialog.OnTimeSetListener action) {
+<b class="nc">&nbsp;        LocalTime currentTime = LocalTime.now();</b>
+&nbsp;
+<b class="nc">&nbsp;        TimePickerDialog timePickerDialog = new TimePickerDialog(this,</b>
+&nbsp;                action,
+<b class="nc">&nbsp;                currentTime.getHour(),</b>
+<b class="nc">&nbsp;                currentTime.getMinute(),</b>
+&nbsp;                true);
+<b class="nc">&nbsp;        timePickerDialog.show();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setNotifications() {
+<b class="nc">&nbsp;        NotificationHelper.setNotificationRepeatableAlarm(</b>
+<b class="nc">&nbsp;                    getApplicationContext(),</b>
+<b class="nc">&nbsp;                    alarmViewModel.getSelectedNotificationsTime(),</b>
+<b class="nc">&nbsp;                    alarmViewModel.getHourNotificationPeriod(),</b>
+<b class="nc">&nbsp;                    alarmViewModel.getConstraintNotificationTimeStart(),</b>
+<b class="nc">&nbsp;                    alarmViewModel.getConstraintNotificationTimeEnd());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void resetNotifications() {
+<b class="nc">&nbsp;        if (switchCompatNotifications.isChecked()) {</b>
+<b class="nc">&nbsp;            NotificationHelper.cancelAlarms(getApplicationContext());</b>
+<b class="nc">&nbsp;            setNotifications();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onRestart() {
+<b class="nc">&nbsp;        super.onRestart();</b>
+<b class="nc">&nbsp;        setObservers();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setObservers() {
+<b class="nc">&nbsp;        alarmViewModel.isNotificationsActiveObserver(this, this::setChecked);</b>
+&nbsp;
+<b class="nc">&nbsp;        alarmViewModel.setSelectedNotificationsTimeObserver(this, time -&gt;</b>
+<b class="nc">&nbsp;                buttonSelectHourStart.setText(time.format(TIME_FORMATTER)));</b>
+&nbsp;
+<b class="nc">&nbsp;        alarmViewModel.setConstraintNotificationsTimeStartObserver(this, time -&gt;</b>
+<b class="nc">&nbsp;                buttonConstraintTimeStart.setText(time.format(TIME_FORMATTER)));</b>
+&nbsp;
+<b class="nc">&nbsp;        alarmViewModel.setConstraintNotificationsTimeEndObserver(this, time -&gt;</b>
+<b class="nc">&nbsp;                buttonConstraintTimeEnd.setText(time.format(TIME_FORMATTER)));</b>
+&nbsp;
+<b class="nc">&nbsp;        alarmViewModel.setHourNotificationPeriodObserver(this, integer -&gt;</b>
+<b class="nc">&nbsp;                spinnerHourSelectNotification.setSelection(hours.indexOf(integer)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setChecked(boolean isChecked) {
+<b class="nc">&nbsp;        userAction = false;</b>
+<b class="nc">&nbsp;        switchCompatNotifications.setChecked(isChecked);</b>
+<b class="nc">&nbsp;        userAction = true;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

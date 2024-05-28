@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > WaterDAO</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.database.dao</a>
+</div>
+
+<h1>Coverage Summary for Class: WaterDAO (com.kamjer.woda.database.dao)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WaterDAO</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WaterDAO$MockitoMock$Iumc9qa9</td>
+  </tr>
+  <tr>
+    <td class="name">WaterDAO$MockitoMock$Iumc9qa9$auxiliary$9VV0foaW</td>
+  </tr>
+  <tr>
+    <td class="name">WaterDAO$MockitoMock$Iumc9qa9$auxiliary$zAaUuUkV</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.database.dao;
+&nbsp;
+&nbsp;import androidx.lifecycle.LiveData;
+&nbsp;import androidx.room.Dao;
+&nbsp;import androidx.room.Delete;
+&nbsp;import androidx.room.Insert;
+&nbsp;import androidx.room.OnConflictStrategy;
+&nbsp;import androidx.room.Query;
+&nbsp;import androidx.room.Transaction;
+&nbsp;import androidx.room.Update;
+&nbsp;
+&nbsp;import com.kamjer.woda.model.Type;
+&nbsp;import com.kamjer.woda.model.Water;
+&nbsp;import com.kamjer.woda.model.WaterDay;
+&nbsp;import com.kamjer.woda.model.WaterDayWithWaters;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import io.reactivex.rxjava3.core.Completable;
+&nbsp;import io.reactivex.rxjava3.core.Flowable;
+&nbsp;import io.reactivex.rxjava3.core.Maybe;
+&nbsp;import io.reactivex.rxjava3.core.Single;
+&nbsp;
+&nbsp;@Dao
+<b class="nc">&nbsp;public abstract class WaterDAO {</b>
+&nbsp;
+&nbsp;//  Water table methods
+&nbsp;//  fetching
+&nbsp;    @Transaction
+&nbsp;    @Query(&quot;SELECT * FROM water WHERE typeId = :typeId&quot;)
+&nbsp;    public abstract LiveData&lt;List&lt;Water&gt;&gt; getWaterByType(long typeId);
+&nbsp;
+&nbsp;//  inserts
+&nbsp;    @Insert(onConflict = OnConflictStrategy.REPLACE)
+&nbsp;    public abstract Maybe&lt;Long&gt; insertWater(Water water);
+&nbsp;
+&nbsp;//  deletes
+&nbsp;    @Delete
+&nbsp;    public abstract Completable deleteWater(Water water);
+&nbsp;
+&nbsp;    @Delete
+&nbsp;    public abstract Completable deleteWaters(List&lt;Water&gt; waters);
+&nbsp;
+&nbsp;//  Type table methods
+&nbsp;//  fetching
+&nbsp;    @Transaction
+&nbsp;    @Query(&quot;SELECT * FROM type&quot;)
+&nbsp;    public abstract LiveData&lt;List&lt;Type&gt;&gt; getAllTypes();
+&nbsp;
+&nbsp;//  inserts
+&nbsp;    @Insert(onConflict = OnConflictStrategy.REPLACE)
+&nbsp;    public abstract Maybe&lt;Long&gt; insertType(Type type);
+&nbsp;
+&nbsp;    @Insert(onConflict = OnConflictStrategy.REPLACE)
+&nbsp;    public abstract Maybe&lt;List&lt;Long&gt;&gt; insertTypes(List&lt;Type&gt; types);
+&nbsp;
+&nbsp;    @Update
+&nbsp;    public abstract Completable updateType(Type type);
+&nbsp;
+&nbsp;//  deletes
+&nbsp;    @Delete
+&nbsp;    public abstract Completable deleteType(Type type);
+&nbsp;
+&nbsp;//  WaterDay table methods
+&nbsp;//  insert
+&nbsp;    @Insert(onConflict = OnConflictStrategy.REPLACE)
+&nbsp;    public abstract Completable insertWaterDay(WaterDay waterDay);
+&nbsp;
+&nbsp;    @Update
+&nbsp;    public abstract Completable updateWaterDay(WaterDay waterDay);
+&nbsp;
+&nbsp;//  WaterDayWithWater
+&nbsp;//  fetching
+&nbsp;    @Query(&quot;SELECT * FROM water_day WHERE date = :date&quot;)
+&nbsp;    public abstract LiveData&lt;WaterDayWithWaters&gt; getWaterDayWithWatersByDate(String date);
+&nbsp;
+&nbsp;    @Transaction
+&nbsp;    @Query(&quot;SELECT * FROM water_day&quot;)
+&nbsp;    public abstract LiveData&lt;List&lt;WaterDayWithWaters&gt;&gt; getAllWaterDayWithWaters();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

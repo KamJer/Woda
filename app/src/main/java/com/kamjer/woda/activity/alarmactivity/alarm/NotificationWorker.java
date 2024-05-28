@@ -25,7 +25,7 @@ public class NotificationWorker extends Worker {
     public Result doWork() {
         LocalTime timeConstraintStart = LocalTime.parse(getInputData().getString(TIME_CONSTRAINT_START));
         LocalTime timeConstraintEnd = LocalTime.parse(getInputData().getString(TIME_CONSTRAINT_END));
-        if (LocalTime.now().isBefore(timeConstraintEnd) && LocalTime.now().isAfter(timeConstraintStart)) {
+        if (LocalTime.now().isAfter(timeConstraintEnd) && LocalTime.now().isBefore(timeConstraintStart)) {
             NotificationHelper.createNotificationChannel(getApplicationContext());
 
             String drinkWaterNotificationTitle = getApplicationContext().getString(R.string.drink_water_notification_title);

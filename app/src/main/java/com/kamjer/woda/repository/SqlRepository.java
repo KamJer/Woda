@@ -17,10 +17,16 @@ public class SqlRepository {
     private String sqlDeleteTypeWhereId;
 
     public static SqlRepository getInstance() {
-        if (sqlRepository == null) {
-            sqlRepository = new SqlRepository();
+        SqlRepository result = sqlRepository;
+        if (result != null) {
+            return result;
         }
-        return sqlRepository;
+        synchronized (SqlRepository.class) {
+            if (sqlRepository == null) {
+                sqlRepository = new SqlRepository();
+            }
+            return sqlRepository;
+        }
     }
 
     public void loadSqlQuery(Context applicationContext) {

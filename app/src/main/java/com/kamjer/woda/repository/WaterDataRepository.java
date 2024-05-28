@@ -10,8 +10,8 @@ import androidx.lifecycle.Observer;
 import androidx.room.Room;
 
 import com.kamjer.woda.database.WaterDataValidation;
-import com.kamjer.woda.database.dao.WaterDAO;
 import com.kamjer.woda.database.WaterDatabase;
+import com.kamjer.woda.database.dao.WaterDAO;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.model.WaterDay;
@@ -42,26 +42,29 @@ public class WaterDataRepository {
     private WaterDatabase waterDatabase;
     private WaterDAO waterDAO;
 
-    private final MediatorLiveData<WaterDayWithWaters> waters = new MediatorLiveData<>();
+    private final MediatorLiveData<WaterDayWithWaters> waterDayWithWatersMediatorLiveData = new MediatorLiveData<>();
 
     private LiveData<List<WaterDayWithWaters>> allWaterDayWithWatersLiveData;
 
     private final MediatorLiveData<HashMap<Long, Type>> waterTypes = new MediatorLiveData<>();
 
     public void createWaterDatabase(Context context) {
-//        if database does not exists already create a new one
+//        if database does not exists create a new one
         if (waterDatabase == null) {
             this.waterDatabase = Room.databaseBuilder(context, WaterDatabase.class, WaterDataRepository.DATABASE_NAME)
                     .build();
             this.waterDAO = waterDatabase.waterDAO();
+
+            allWaterDayWithWatersLiveData = (getWaterDAO().getAllWaterDayWithWaters());
+            getAllTypes();
+            loadWaterDayWithWatersByDate(LocalDate.now());
         }
-        allWaterDayWithWatersLiveData = (getWaterDAO().getAllWaterDayWithWaters());
     }
 
     public void getAllTypes() {
         waterTypes.addSource(getWaterDAO().getAllTypes(), types -> {
             waterTypes.setValue((HashMap<Long, Type>) types.stream().collect(Collectors.toMap(
-                    type -> ((Type) type).getId(),
+                    Type::getId,
                     o -> o)));
 
             getWaterDAO().insertTypes(WaterDataRepository.containsDefaultTypes(ResourcesRepository
@@ -69,7 +72,7 @@ public class WaterDataRepository {
                             .getDefaultDrinksTypes(),
                     getWaterTypes().values()))
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .observeOn(Schedulers.newThread())
                     .subscribe();
         });
     }
@@ -79,21 +82,27 @@ public class WaterDataRepository {
     }
 
     public static WaterDataRepository getInstance() {
-        if (instance == null) {
-            instance = new WaterDataRepository();
+        WaterDataRepository result = instance;
+        if (result != null) {
+            return result;
         }
-        return instance;
+        synchronized (WaterDataRepository.class) {
+            if (instance == null) {
+                instance = new WaterDataRepository();
+            }
+            return instance;
+        }
     }
 
     public void loadWaterDayWithWatersByDate(LocalDate date) {
         LiveData<WaterDayWithWaters> waterDayWithWatersLiveData = getWaterDAO().getWaterDayWithWatersByDate(date.toString());
-        this.waters.addSource(waterDayWithWatersLiveData, waterDayWithWaters -> {
-            waters.setValue(Optional.ofNullable(waterDayWithWaters).map(waterDayWithWaters1 -> {
+        this.waterDayWithWatersMediatorLiveData.addSource(waterDayWithWatersLiveData, waterDayWithWaters -> {
+            waterDayWithWatersMediatorLiveData.setValue(Optional.ofNullable(waterDayWithWaters).map(waterDayWithWaters1 -> {
                 waterDayWithWaters1.getWaterDay().setInserted(true);
                 return waterDayWithWaters1;
             }).orElse(new WaterDayWithWaters(date, SharedPreferencesRepository.getInstance().getWaterAmountToDrink())));
 //            we need to remove it so there is no issue with to many sources being loaded to the livedata
-            waters.removeSource(waterDayWithWatersLiveData);
+            waterDayWithWatersMediatorLiveData.removeSource(waterDayWithWatersLiveData);
         });
     }
 
@@ -123,8 +132,15 @@ public class WaterDataRepository {
                 .subscribe(action, RxJavaPlugins::onError);
     }
 
+    public Disposable deleteWaters(List<Water> waters, Action action) {
+        return getWaterDAO().deleteWaters(waters)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(action, RxJavaPlugins::onError);
+    }
+
     public void setWaterDayWithWatersValue(WaterDayWithWaters waters) {
-        this.waters.setValue(waters);
+        this.waterDayWithWatersMediatorLiveData.setValue(waters);
     }
 
 
@@ -149,11 +165,11 @@ public class WaterDataRepository {
     }
 
     public MutableLiveData<WaterDayWithWaters> getWaterDayWithWatersLivaData() {
-        return waters;
+        return waterDayWithWatersMediatorLiveData;
     }
 
     public WaterDayWithWaters getWaterDayWithWatersValue() {
-        return Optional.ofNullable(waters.getValue())
+        return Optional.ofNullable(waterDayWithWatersMediatorLiveData.getValue())
                 .orElse(new WaterDayWithWaters(LocalDate.now(), SharedPreferencesRepository.DEFAULT_WATER_AMOUNT_TO_DRINK));
     }
 
@@ -252,6 +268,18 @@ public class WaterDataRepository {
 
     public LiveData<List<WaterDayWithWaters>> getAllWaterDayWithWatersLiveData() {
         return allWaterDayWithWatersLiveData;
+    }
+
+    public void setAllWaterDayWithWatersObserver(LifecycleOwner owner, Observer<List<WaterDayWithWaters>> observer) {
+        allWaterDayWithWatersLiveData.observe(owner, observer);
+    }
+
+    public List<WaterDayWithWaters> getAllWaterDayWithWatersLiveDataValue() {
+        return Optional.ofNullable(allWaterDayWithWatersLiveData.getValue()).orElse(new ArrayList<>());
+    }
+
+    public void loadAllWaterDayWithWaters() {
+        allWaterDayWithWatersLiveData = waterDAO.getAllWaterDayWithWaters();
     }
 
     public WaterDatabase getWaterDatabase() {

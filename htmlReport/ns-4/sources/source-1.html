@@ -1,0 +1,228 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > CalendarActivity</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.activity.calendaractivity</a>
+</div>
+
+<h1>Coverage Summary for Class: CalendarActivity (com.kamjer.woda.activity.calendaractivity)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CalendarActivity</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.activity.calendaractivity;
+&nbsp;
+&nbsp;import android.graphics.Color;
+&nbsp;import android.graphics.PorterDuff;
+&nbsp;import android.graphics.drawable.Drawable;
+&nbsp;import android.os.Bundle;
+&nbsp;import android.view.View;
+&nbsp;
+&nbsp;import androidx.annotation.Nullable;
+&nbsp;import androidx.appcompat.app.AppCompatActivity;
+&nbsp;import androidx.core.content.res.ResourcesCompat;
+&nbsp;import androidx.lifecycle.ViewModelProvider;
+&nbsp;
+&nbsp;import com.kamjer.mycalendarview.CalendarViewHolder;
+&nbsp;import com.kamjer.mycalendarview.CalendarView;
+&nbsp;import com.kamjer.mycalendarview.SelectedDataChangedListener;
+&nbsp;import com.kamjer.woda.R;
+&nbsp;import com.kamjer.woda.activity.calendaractivity.viewHolder.WaterCalendarViewHolder;
+&nbsp;import com.kamjer.woda.model.WaterDayWithWaters;
+&nbsp;import com.kamjer.woda.viewmodel.WaterViewModel;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+<b class="nc">&nbsp;public class CalendarActivity extends AppCompatActivity {</b>
+&nbsp;
+&nbsp;    private WaterViewModel waterViewModel;
+&nbsp;    private CalendarView calendarView;
+&nbsp;    private List&lt;WaterDayWithWaters&gt; waterDayWithWaters;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onCreate(@Nullable Bundle savedInstanceState) {
+<b class="nc">&nbsp;        super.onCreate(savedInstanceState);</b>
+&nbsp;//      getting viewModel
+<b class="nc">&nbsp;        waterViewModel = new ViewModelProvider(this,</b>
+<b class="nc">&nbsp;                ViewModelProvider.Factory.from(WaterViewModel.initializer)).get(WaterViewModel.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        waterViewModel.setWaterDayWithWatersObserver(this,</b>
+<b class="nc">&nbsp;                waterDayWithWaters -&gt; calendarView.setSelectedDate(waterDayWithWaters.getWaterDay().getDate()));</b>
+&nbsp;
+<b class="nc">&nbsp;        waterViewModel.setAllWaterDayWithWatersObserver(this, waterDayWithWaters -&gt; {</b>
+<b class="nc">&nbsp;            this.waterDayWithWaters = waterDayWithWaters;</b>
+<b class="nc">&nbsp;            calendarView.showMonthView();</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onStart() {
+<b class="nc">&nbsp;        super.onStart();</b>
+<b class="nc">&nbsp;        setContentView(R.layout.calendar_activity_layout);</b>
+&nbsp;//      after finding data creating calendar and operating on it
+<b class="nc">&nbsp;        calendarView = findViewById(R.id.calendarViewSelectDate);</b>
+&nbsp;
+&nbsp;//      setting loaded selected date
+<b class="nc">&nbsp;        calendarView.setCustomCalendarViewHolder(WaterCalendarViewHolder.class, R.layout.water_calendar_cell);</b>
+&nbsp;
+&nbsp;//      setting calendar listeners
+<b class="nc">&nbsp;        calendarView.setSelectedDateChangedListener(this::dateChangedAction);</b>
+<b class="nc">&nbsp;        calendarView.setCustomHolderBehavior(holder -&gt; colorDays(waterDayWithWaters, holder));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Colors dates in a calendar with a proper color corresponding to
+&nbsp;     * water drank in a day (gradient from red when 0% water drank, green when 100%),
+&nbsp;     * if water does not exist in a day paints that day red.
+&nbsp;     * @param waters list of waters from specific dates
+&nbsp;     * @param holder to modify
+&nbsp;     */
+&nbsp;    private void colorDays(List&lt;WaterDayWithWaters&gt; waters, CalendarViewHolder holder) {
+<b class="nc">&nbsp;        if (holder instanceof WaterCalendarViewHolder) {</b>
+<b class="nc">&nbsp;            WaterCalendarViewHolder waterHolder = (WaterCalendarViewHolder) holder;</b>
+&nbsp;
+<b class="nc">&nbsp;            int color = findWaterByDate(waters, holder.getDate()).map(waterFound -&gt; {</b>
+&nbsp;//                  painting elements for a found water
+&nbsp;//                  normalizing water drank
+<b class="nc">&nbsp;                float normalizedWater = Math.min(1.0f, (float) waterFound.getWaterDaySum() / (float) waterFound.getWaterDay().getWaterToDrink());</b>
+&nbsp;//                  calculating green value
+<b class="nc">&nbsp;                int g = (int) (255 * normalizedWater);</b>
+&nbsp;//                  calculating red value
+<b class="nc">&nbsp;                int r = (int) (255 - g);</b>
+&nbsp;
+<b class="nc">&nbsp;                return Color.rgb(r, g, 0);</b>
+<b class="nc">&nbsp;            }).orElseGet(() -&gt; {</b>
+&nbsp;//                  painting day in red (no value found, no water in a database, no water drank)
+<b class="nc">&nbsp;                int r = 255;</b>
+&nbsp;
+<b class="nc">&nbsp;                return Color.rgb(r, 0, 0);</b>
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            Drawable circle = ResourcesCompat.getDrawable(CalendarActivity.this.getResources(), R.drawable.circle, null);</b>
+<b class="nc">&nbsp;            if (circle != null) {</b>
+<b class="nc">&nbsp;                circle.setColorFilter(color, PorterDuff.Mode.SRC_OUT);</b>
+<b class="nc">&nbsp;                waterHolder.getCircle().setBackground(circle);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Action when data in a calendar changed
+&nbsp;     * @param view itemView from a holder in a calendar that represents day
+&nbsp;     * @param localDate new date
+&nbsp;     */
+&nbsp;    private void dateChangedAction(View view, LocalDate localDate) {
+<b class="nc">&nbsp;        waterViewModel.loadWaterDayWithWatersByDate(localDate);</b>
+<b class="nc">&nbsp;        this.finish();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds Water with specific date in a list, finds first one in a list(it should have only one anyway)
+&nbsp;     * @param waters list of waters
+&nbsp;     * @param date to find
+&nbsp;     * @return Optional of a found water
+&nbsp;     */
+&nbsp;    private Optional&lt;WaterDayWithWaters&gt; findWaterByDate(List&lt;WaterDayWithWaters&gt; waters, LocalDate date) {
+<b class="nc">&nbsp;        return waters.stream().filter(water -&gt; water.getWaterDay().getDate().equals(date)).findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onStop() {
+<b class="nc">&nbsp;        super.onStop();</b>
+<b class="nc">&nbsp;        waterViewModel.clearDisposable();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

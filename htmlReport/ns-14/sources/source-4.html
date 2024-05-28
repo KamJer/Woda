@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > WaterDayWithWaters</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.model</a>
+</div>
+
+<h1>Coverage Summary for Class: WaterDayWithWaters (com.kamjer.woda.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WaterDayWithWaters</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    44,4%
+  </span>
+  <span class="absValue">
+    (4/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56,2%
+  </span>
+  <span class="absValue">
+    (9/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.model;
+&nbsp;
+&nbsp;import androidx.annotation.Nullable;
+&nbsp;import androidx.room.Embedded;
+&nbsp;import androidx.room.Relation;
+&nbsp;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;public class WaterDayWithWaters implements Serializable {
+&nbsp;    @Embedded
+&nbsp;    private WaterDay waterDay;
+&nbsp;
+&nbsp;    @Relation(
+&nbsp;            parentColumn = &quot;date&quot;,
+&nbsp;            entityColumn = &quot;waterDayId&quot;
+&nbsp;    )
+&nbsp;    private List&lt;Water&gt; waters;
+&nbsp;
+<b class="nc">&nbsp;    public WaterDayWithWaters(LocalDate date, int waterToDrink) {</b>
+<b class="nc">&nbsp;        waterDay = new WaterDay(date, waterToDrink, false);</b>
+<b class="nc">&nbsp;        waters = new ArrayList&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public WaterDayWithWaters(WaterDay waterDay, List&lt;Water&gt; waters) {</b>
+<b class="fc">&nbsp;        this.waterDay = waterDay;</b>
+<b class="fc">&nbsp;        this.waters = waters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public WaterDay getWaterDay() {
+<b class="fc">&nbsp;        return waterDay;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setWaterDay(WaterDay waterDay) {
+<b class="nc">&nbsp;        this.waterDay = waterDay;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Water&gt; getWaters() {
+<b class="nc">&nbsp;        return waters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setWaters(List&lt;Water&gt; waters) {
+<b class="nc">&nbsp;        this.waters = waters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getWaterDaySum() {
+<b class="nc">&nbsp;        return waters.stream().mapToInt(Water::getWaterDrank).sum();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="fc">&nbsp;        int hashCode = 0;</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; waters.size(); i++) {</b>
+<b class="fc">&nbsp;            hashCode += waters.get(i).hashCode();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return waterDay.hashCode() + hashCode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(@Nullable Object obj) {
+<b class="fc">&nbsp;        return obj instanceof WaterDayWithWaters &amp;&amp; obj.hashCode() == this.hashCode();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

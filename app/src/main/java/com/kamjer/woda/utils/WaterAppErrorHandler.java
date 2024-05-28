@@ -4,8 +4,6 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.kamjer.woda.R;
-
 import java.util.Optional;
 
 import io.reactivex.rxjava3.functions.Consumer;

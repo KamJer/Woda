@@ -1,0 +1,253 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > CalendarViewAdapter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.mycalendarview</a>
+</div>
+
+<h1>Coverage Summary for Class: CalendarViewAdapter (com.kamjer.mycalendarview)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CalendarViewAdapter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.mycalendarview;
+&nbsp;
+&nbsp;import android.content.Context;
+&nbsp;import android.graphics.Color;
+&nbsp;import android.view.LayoutInflater;
+&nbsp;import android.view.View;
+&nbsp;import android.view.ViewGroup;
+&nbsp;
+&nbsp;import androidx.annotation.NonNull;
+&nbsp;import androidx.recyclerview.widget.RecyclerView;
+&nbsp;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.ArrayList;
+&nbsp;
+&nbsp;public class CalendarViewAdapter extends RecyclerView.Adapter&lt;CalendarViewHolder&gt; {
+&nbsp;    private static final int SELECTION_DATE_COLOR = Color.BLUE;
+&nbsp;    private static final int OUT_OF_MOTH_DATE_COLOR = Color.GRAY;
+&nbsp;    private final ArrayList&lt;LocalDate&gt; daysOfMonth;
+&nbsp;    private final DaysOfMonthView daysOfMonthView;
+<b class="nc">&nbsp;    private int selectedPosition = RecyclerView.NO_POSITION;</b>
+&nbsp;    private final LayoutInflater mInflater;
+&nbsp;    private SelectedDataChangedListener selectedDataChangedListener;
+&nbsp;    private CustomHolderBehavior customHolderBehavior;
+&nbsp;    private Constructor&lt;? extends CalendarViewHolder&gt; calendarViewHolderConstructor;
+&nbsp;    private final int layoutId;
+&nbsp;
+<b class="nc">&nbsp;    public CalendarViewAdapter(Constructor&lt;? extends CalendarViewHolder&gt; calendarViewHolderConstructor, int layoutId, SelectedDataChangedListener selectedDataChangedListener, CustomHolderBehavior customHolderBehavior, DaysOfMonthView daysOfMonthView, ArrayList&lt;LocalDate&gt; daysOfMonth, Context context) {</b>
+<b class="nc">&nbsp;        this.calendarViewHolderConstructor = calendarViewHolderConstructor;</b>
+<b class="nc">&nbsp;        this.layoutId = layoutId;</b>
+<b class="nc">&nbsp;        this.selectedDataChangedListener = selectedDataChangedListener;</b>
+<b class="nc">&nbsp;        this.customHolderBehavior = customHolderBehavior;</b>
+<b class="nc">&nbsp;        this.daysOfMonth = daysOfMonth;</b>
+<b class="nc">&nbsp;        this.daysOfMonthView = daysOfMonthView;</b>
+<b class="nc">&nbsp;        this.mInflater = LayoutInflater.from(context);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public CalendarViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+&nbsp;        try {
+<b class="nc">&nbsp;            View view = mInflater.inflate(layoutId, parent, false);</b>
+<b class="nc">&nbsp;            return calendarViewHolderConstructor.newInstance(view);</b>
+<b class="nc">&nbsp;        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onBindViewHolder(@NonNull CalendarViewHolder holder,int position) {
+&nbsp;//      highlighting selected date if it is selected
+<b class="nc">&nbsp;        if (daysOfMonth.get(position) != null) {</b>
+<b class="nc">&nbsp;            if (daysOfMonth.get(position).equals(daysOfMonthView.getSelectedDate())) {</b>
+<b class="nc">&nbsp;                holder.itemView.setBackgroundColor(SELECTION_DATE_COLOR);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                holder.itemView.setBackgroundColor(Color.TRANSPARENT);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;//      setting date to the holder
+<b class="nc">&nbsp;        holder.setDate(daysOfMonth.get(position));</b>
+&nbsp;//      setting listener
+<b class="nc">&nbsp;        holder.itemView.setOnClickListener(v -&gt; actionOnClickDate(v, holder, daysOfMonthView.getSelectedDate(), position));</b>
+&nbsp;//          all of extra bindings for a holder
+<b class="nc">&nbsp;        holder.bind(daysOfMonthView, this, position);</b>
+&nbsp;//      checking if date is in a shown month (if it is not make id gray and opaque,
+&nbsp;//      if it is explicitly make it black and not opaque,
+&nbsp;//      internal processing of recyclerView demands it to be set every binding)
+<b class="nc">&nbsp;        if (!daysOfMonth.get(position).getMonth().equals(daysOfMonthView.getShownMonth())) {</b>
+<b class="nc">&nbsp;            holder.getDateCell().setTextColor(OUT_OF_MOTH_DATE_COLOR);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            holder.getDateCell().setTextColor(Color.BLACK);</b>
+&nbsp;        }
+&nbsp;//      checking if a holder is a selected date
+<b class="nc">&nbsp;        if (holder.getDate().equals(daysOfMonthView.getSelectedDate())) {</b>
+<b class="nc">&nbsp;            setSelectedPosition(position);</b>
+&nbsp;        }
+&nbsp;//      checking if there is any custom behavior for a holder, if there is fire it
+<b class="nc">&nbsp;        if (customHolderBehavior != null) {</b>
+<b class="nc">&nbsp;            customHolderBehavior.customize(holder);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets position of a selected holder of selected date
+&nbsp;     * @param selectedPosition position of a holder with selected date
+&nbsp;     */
+&nbsp;    private void setSelectedPosition(int selectedPosition) {
+<b class="nc">&nbsp;        this.selectedPosition = selectedPosition;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns position of a holder with selected date
+&nbsp;     * @return position of a holder with selected date
+&nbsp;     */
+&nbsp;    private int getSelectedPosition() {
+<b class="nc">&nbsp;        return selectedPosition;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets behavior for action of clicking on a date
+&nbsp;     * @param v - itemView of a holder
+&nbsp;     * @param holder that is clicked
+&nbsp;     * @param selectedDate in a calendar
+&nbsp;     * @param position of a holder in an adapter
+&nbsp;     */
+&nbsp;    private void actionOnClickDate(View v, CalendarViewHolder holder, LocalDate selectedDate, int position) {
+&nbsp;//      setting background for new selected date
+<b class="nc">&nbsp;        holder.itemView.setBackgroundColor(SELECTION_DATE_COLOR);</b>
+&nbsp;//      if selected date is the same as this holder (aka this holder was clicked) set new selected position
+<b class="nc">&nbsp;        if (!selectedDate.equals(holder.getDate())) {</b>
+<b class="nc">&nbsp;            notifyItemChanged(getSelectedPosition());</b>
+<b class="nc">&nbsp;            setSelectedPosition(position);</b>
+&nbsp;//            inform parent there is a new selected date
+<b class="nc">&nbsp;            this.daysOfMonthView.setSelectedDate(holder.getDate());</b>
+&nbsp;        }
+&nbsp;//       if selectedDataChangedListener is null d fire
+<b class="nc">&nbsp;        if (selectedDataChangedListener != null) {</b>
+<b class="nc">&nbsp;            selectedDataChangedListener.dataChangedAction(holder.itemView, holder.getDate());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets behavior for change of selected date
+&nbsp;     * @param selectedDataChangedListener
+&nbsp;     */
+&nbsp;    public void setSelectedDataChangedListener(SelectedDataChangedListener selectedDataChangedListener) {
+<b class="nc">&nbsp;        this.selectedDataChangedListener = selectedDataChangedListener;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets behavior for custom looks and actions for a date
+&nbsp;     * @param customHolderBehavior
+&nbsp;     */
+&nbsp;    public void setCustomHolderBehavior(CustomHolderBehavior customHolderBehavior) {
+<b class="nc">&nbsp;        this.customHolderBehavior = customHolderBehavior;</b>
+&nbsp;//      this line is necessary if not new custom behavior does not fire
+<b class="nc">&nbsp;        this.notifyDataSetChanged();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCalendarViewHolderConstructor(Constructor&lt;CalendarViewHolder&gt; calendarViewHolderConstructor) {
+<b class="nc">&nbsp;        this.calendarViewHolderConstructor = calendarViewHolderConstructor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getItemCount() {
+<b class="nc">&nbsp;        return daysOfMonth.size();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

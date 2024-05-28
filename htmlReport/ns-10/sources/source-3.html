@@ -1,0 +1,176 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > TypeViewHolder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.activity.useractivity.typeView</a>
+</div>
+
+<h1>Coverage Summary for Class: TypeViewHolder (com.kamjer.woda.activity.useractivity.typeView)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TypeViewHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.activity.useractivity.typeView;
+&nbsp;
+&nbsp;import android.graphics.PorterDuff;
+&nbsp;import android.graphics.drawable.Drawable;
+&nbsp;import android.text.Editable;
+&nbsp;import android.text.TextWatcher;
+&nbsp;import android.util.Log;
+&nbsp;import android.view.View;
+&nbsp;import android.widget.EditText;
+&nbsp;import android.widget.ImageButton;
+&nbsp;import android.widget.Toast;
+&nbsp;
+&nbsp;import androidx.annotation.NonNull;
+&nbsp;import androidx.core.content.res.ResourcesCompat;
+&nbsp;import androidx.recyclerview.widget.RecyclerView;
+&nbsp;
+&nbsp;import com.kamjer.woda.R;
+&nbsp;import com.kamjer.woda.activity.useractivity.coloreditdialog.ColorSelectorAction;
+&nbsp;import com.kamjer.woda.model.Type;
+&nbsp;
+&nbsp;public class TypeViewHolder extends RecyclerView.ViewHolder{
+&nbsp;
+&nbsp;    private final EditText editTextType;
+&nbsp;    private final ImageButton buttonColorPicker;
+&nbsp;
+&nbsp;    private final ColorSelectorAction colorSelectorAction;
+&nbsp;    private final TypeNameChangedAction typeNameChangedAction;
+&nbsp;    private final ColorSelectorAction removeTypeAction;
+&nbsp;
+&nbsp;    private final ImageButton buttonRemoveType;
+&nbsp;
+&nbsp;    public TypeViewHolder(@NonNull View itemView,
+&nbsp;                          ColorSelectorAction colorSelectorAction,
+&nbsp;                          TypeNameChangedAction typeNameChangedAction,
+&nbsp;                          ColorSelectorAction removeTypeAction) {
+<b class="nc">&nbsp;        super(itemView);</b>
+<b class="nc">&nbsp;        this.colorSelectorAction = colorSelectorAction;</b>
+<b class="nc">&nbsp;        this.typeNameChangedAction = typeNameChangedAction;</b>
+<b class="nc">&nbsp;        this.removeTypeAction = removeTypeAction;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.editTextType = itemView.findViewById(R.id.editTextType);</b>
+<b class="nc">&nbsp;        this.buttonColorPicker = itemView.findViewById(R.id.buttonColorPicker);</b>
+<b class="nc">&nbsp;        this.buttonRemoveType = itemView.findViewById(R.id.buttonRemoveType);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void bind(@NonNull Type type, int position) {
+<b class="nc">&nbsp;        editTextType.setText(type.getType());</b>
+<b class="nc">&nbsp;        Drawable buttonShape = ResourcesCompat.getDrawable(itemView.getResources(), R.drawable.color_type_button_shape, null);</b>
+<b class="nc">&nbsp;        if (buttonShape != null) {</b>
+<b class="nc">&nbsp;            buttonShape.setColorFilter(type.getColor(), PorterDuff.Mode.SRC_IN);</b>
+<b class="nc">&nbsp;            buttonColorPicker.setBackground(buttonShape);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            Toast.makeText(itemView.getContext(), itemView.getContext().getResources().getText(R.string.error_message_can_not_load), Toast.LENGTH_LONG).show();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        buttonColorPicker.setOnClickListener(v -&gt; {</b>
+&nbsp;//          because how android manges focus i need to switch focus by hand when opening
+<b class="nc">&nbsp;            notifyFocusedCleared();</b>
+<b class="nc">&nbsp;            colorSelectorAction.action(type, position);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        editTextType.setOnFocusChangeListener((v, hasFocus) -&gt; {</b>
+<b class="nc">&nbsp;            if (!hasFocus) {</b>
+<b class="nc">&nbsp;                typeNameChangedAction.action(type, editTextType.getText());</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        buttonRemoveType.setOnClickListener(v -&gt; removeTypeAction.action(type, position));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void notifyFocusedCleared() {
+<b class="nc">&nbsp;        editTextType.clearFocus();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

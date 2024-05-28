@@ -1,0 +1,279 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > ImageWaterInGlass</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.activity.mainactivity.addwaterdialog.view</a>
+</div>
+
+<h1>Coverage Summary for Class: ImageWaterInGlass (com.kamjer.woda.activity.mainactivity.addwaterdialog.view)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImageWaterInGlass</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/73)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.activity.mainactivity.addwaterdialog.view;
+&nbsp;
+&nbsp;import android.content.Context;
+&nbsp;import android.graphics.Canvas;
+&nbsp;import android.graphics.Matrix;
+&nbsp;import android.graphics.Paint;
+&nbsp;import android.graphics.Path;
+&nbsp;import android.util.AttributeSet;
+&nbsp;
+&nbsp;import androidx.annotation.Nullable;
+&nbsp;import androidx.core.graphics.PathParser;
+&nbsp;
+&nbsp;import com.google.android.material.imageview.ShapeableImageView;
+&nbsp;import com.kamjer.woda.utils.FloatPoint;
+&nbsp;import com.kamjer.woda.viewmodel.WaterViewModel;
+&nbsp;
+&nbsp;public class ImageWaterInGlass extends ShapeableImageView {
+&nbsp;
+&nbsp;    private Path customPath;
+&nbsp;    private StringBuilder cutomPathStringBuilder;
+&nbsp;//    image size in pd
+&nbsp;    private static final int IMAGE_SIZE_X = 200;
+&nbsp;    private static final int IMAGE_SIZE_Y = 200;
+<b class="nc">&nbsp;    private final Paint paint = new Paint();</b>
+<b class="nc">&nbsp;    private final Matrix matrix = new Matrix();</b>
+&nbsp;
+&nbsp;    public ImageWaterInGlass(Context context) {
+<b class="nc">&nbsp;        super(context);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ImageWaterInGlass(Context context, @Nullable AttributeSet attrs) {
+<b class="nc">&nbsp;        super(context, attrs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ImageWaterInGlass(Context context, @Nullable AttributeSet attrs, int defStyle) {
+<b class="nc">&nbsp;        super(context, attrs, defStyle);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAmount(int amount) {
+<b class="nc">&nbsp;        cutomPathStringBuilder = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (amount&lt;= WaterViewModel.DEFAULT_WATER_DRANK_IN_ONE_GO) {</b>
+&nbsp;//          creating string builder for a path
+&nbsp;//          initial point to move mouse to
+<b class="nc">&nbsp;            FloatPoint stLeftPoint = newLeftPointInGlass(amount);</b>
+&nbsp;//          appending initial point
+<b class="nc">&nbsp;            cutomPathStringBuilder.append(&quot;M&quot;).</b>
+<b class="nc">&nbsp;                    append(stLeftPoint.getX()).</b>
+<b class="nc">&nbsp;                    append(&quot;,&quot;).</b>
+<b class="nc">&nbsp;                    append(stLeftPoint.getY()).</b>
+<b class="nc">&nbsp;                    append(&quot; &quot;);</b>
+&nbsp;//          creating bottom of a water in a glass and appending it
+<b class="nc">&nbsp;            String path = &quot;L75.48,140.02C75.95,142.47 78.01,148.98 85.17,149.02 85.17,149.02 115.36,149.04 115.36,149.04 122.04,149.02 124,142.55 124.52,140.05 &quot;;</b>
+<b class="nc">&nbsp;            cutomPathStringBuilder.append(path);</b>
+&nbsp;//          creating last point for water, the one on a right side and appending it
+<b class="nc">&nbsp;            FloatPoint rightPoint = newRightPointInGlass(amount);</b>
+<b class="nc">&nbsp;            cutomPathStringBuilder.append(&quot;L&quot;).</b>
+<b class="nc">&nbsp;                    append(rightPoint.getX()).</b>
+<b class="nc">&nbsp;                    append(&quot;,&quot;).</b>
+<b class="nc">&nbsp;                    append(rightPoint.getY()).</b>
+<b class="nc">&nbsp;                    append(&quot; Z&quot;);</b>
+<b class="nc">&nbsp;        } else {</b>
+&nbsp;//          creating string builder for a path
+&nbsp;//          initial point to move mouse to
+<b class="nc">&nbsp;            FloatPoint stLeftPoint = newLeftPointInPitcher(amount);</b>
+&nbsp;//          appending initial point
+<b class="nc">&nbsp;            cutomPathStringBuilder.append(&quot;M&quot;).</b>
+<b class="nc">&nbsp;                    append(stLeftPoint.getX()).</b>
+<b class="nc">&nbsp;                    append(&quot;,&quot;).</b>
+<b class="nc">&nbsp;                    append(stLeftPoint.getY()).</b>
+<b class="nc">&nbsp;                    append(&quot; &quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            String path = &quot;C127.05,135.75 126.75,138.74 124.94,139.8 124.94,139.8 78.91,139.9 78.88,139.8 77.12,139.61 76.5,135.8 76.5,135.8 &quot;;</b>
+<b class="nc">&nbsp;            cutomPathStringBuilder.append(path);</b>
+&nbsp;
+&nbsp;//          creating last point for water, the one on a right side and appending it
+<b class="nc">&nbsp;            FloatPoint rightPoint = newRightPointInPitcher(amount);</b>
+<b class="nc">&nbsp;            cutomPathStringBuilder.append(&quot;L&quot;).</b>
+<b class="nc">&nbsp;                    append(rightPoint.getX()).</b>
+<b class="nc">&nbsp;                    append(&quot;,&quot;).</b>
+<b class="nc">&nbsp;                    append(rightPoint.getY()).</b>
+<b class="nc">&nbsp;                    append(&quot; Z&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onDraw(Canvas canvas) {
+<b class="nc">&nbsp;        super.onDraw(canvas);</b>
+&nbsp;
+<b class="nc">&nbsp;        matrix.reset();</b>
+&nbsp;
+<b class="nc">&nbsp;        float scaleX = (float) getWidth() / IMAGE_SIZE_X;</b>
+<b class="nc">&nbsp;        float scaleY = (float) getHeight() / IMAGE_SIZE_Y;</b>
+&nbsp;
+<b class="nc">&nbsp;        matrix.postScale(scaleX, scaleY);</b>
+&nbsp;
+&nbsp;        // Apply scaling to the path
+<b class="nc">&nbsp;        customPath = PathParser.createPathFromPathData(cutomPathStringBuilder.toString());</b>
+<b class="nc">&nbsp;        customPath.transform(matrix);</b>
+&nbsp;
+<b class="nc">&nbsp;        int color = 0xFF337cf2;</b>
+&nbsp;
+<b class="nc">&nbsp;        paint.setColor(color);</b>
+<b class="nc">&nbsp;        paint.setStyle(Paint.Style.FILL_AND_STROKE);</b>
+&nbsp;
+<b class="nc">&nbsp;        canvas.drawPath(customPath, paint);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private FloatPoint newLeftPointInGlass(float amount) {
+&nbsp;//      angular coefficient
+<b class="nc">&nbsp;        float aLeft =   6.589041096f;</b>
+<b class="nc">&nbsp;        float bLeft = -355.1369863f;</b>
+&nbsp;
+&nbsp;//      calculating y position on a left side of a glass
+<b class="nc">&nbsp;        float y = clcYInGlass(amount);</b>
+&nbsp;//      calculating x position based on a already defined side of a glass
+<b class="nc">&nbsp;        float x = (y - bLeft) / aLeft;</b>
+&nbsp;//      returning new point
+<b class="nc">&nbsp;        return new FloatPoint(x, y);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private FloatPoint newRightPointInGlass(float amount) {
+&nbsp;//      angular coefficient
+<b class="nc">&nbsp;        float aRight = -6.119047619f;</b>
+<b class="nc">&nbsp;        float bRight = 898.9380952f;</b>
+&nbsp;
+&nbsp;//      calculating y position on a right side of a glass
+<b class="nc">&nbsp;        float y = clcYInGlass(amount);</b>
+&nbsp;//      calculating x position based on a already defined side of a glass
+<b class="nc">&nbsp;        float x = (y - bRight) / aRight;</b>
+&nbsp;//      returning new point
+<b class="nc">&nbsp;        return new FloatPoint(x, y);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private float clcYInGlass(float amount) {
+&nbsp;//      angular coefficient
+<b class="nc">&nbsp;        float a = -2.525252525f;</b>
+<b class="nc">&nbsp;        float b = 376.2626263f;</b>
+&nbsp;//      y value for a glass (from y = ax + b transformed to x = (y - b) / a)
+<b class="nc">&nbsp;        return (amount - b) / a;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private FloatPoint newLeftPointInPitcher(float amount) {
+&nbsp;//      angular coefficient
+<b class="nc">&nbsp;        float aLeft = -4.686567164f;</b>
+<b class="nc">&nbsp;        float bLeft = 731.4626866f;</b>
+&nbsp;
+&nbsp;//      calculating y position on a left side of a glass
+<b class="nc">&nbsp;        float y = clcYInPitcher(amount);</b>
+&nbsp;//      calculating x position based on a already defined side of a glass
+<b class="nc">&nbsp;        float x = (y - bLeft) / aLeft;</b>
+&nbsp;//      returning new point
+<b class="nc">&nbsp;        return new FloatPoint(x, y);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private FloatPoint newRightPointInPitcher(float amount) {
+&nbsp;//      angular coefficient
+<b class="nc">&nbsp;        float aRight = 5.190082645f;</b>
+<b class="nc">&nbsp;        float bRight = -245.6710744f;</b>
+&nbsp;
+&nbsp;//      calculating y position on a right side of a glass
+<b class="nc">&nbsp;        float y = clcYInPitcher(amount);</b>
+&nbsp;//      calculating x position based on a already defined side of a glass
+<b class="nc">&nbsp;        float x = (y - bRight) / aRight;</b>
+&nbsp;//      returning new point
+<b class="nc">&nbsp;        return new FloatPoint(x, y);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private float clcYInPitcher(float amount) {
+<b class="nc">&nbsp;        float a = -14.92537313f;</b>
+<b class="nc">&nbsp;        float b = 2089.552239f;</b>
+&nbsp;
+<b class="nc">&nbsp;        return (amount - b) / a;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

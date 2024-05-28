@@ -1,5 +1,6 @@
 package com.kamjer.woda.model;
 
+import androidx.annotation.Nullable;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
@@ -46,5 +47,19 @@ public class WaterDayWithWaters implements Serializable {
 
     public Integer getWaterDaySum() {
         return waters.stream().mapToInt(Water::getWaterDrank).sum();
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 0;
+        for (int i = 0; i < waters.size(); i++) {
+            hashCode += waters.get(i).hashCode();
+        }
+        return waterDay.hashCode() + hashCode;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        return obj instanceof WaterDayWithWaters && obj.hashCode() == this.hashCode();
     }
 }

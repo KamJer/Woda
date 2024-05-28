@@ -34,15 +34,18 @@
         </activity>
         <activity
             android:name=".activity.calendaractivity.CalendarActivity"
-            android:exported="true">
+            android:exported="true"
+            android:parentActivityName=".activity.mainactivity.MainActivity">
         </activity>
         <activity
             android:name=".activity.useractivity.UserActivity"
-            android:exported="true">
+            android:exported="true"
+            android:parentActivityName=".activity.mainactivity.MainActivity">
         </activity>
         <activity
             android:name=".activity.alarmactivity.AlarmActivity"
-            android:exported="true">
+            android:exported="true"
+            android:parentActivityName=".activity.mainactivity.MainActivity">
         </activity>
         <activity
             android:name=".activity.useractivity.coloreditdialog.ColorPickerDialog"

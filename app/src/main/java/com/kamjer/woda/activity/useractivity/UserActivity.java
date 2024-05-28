@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kamjer.woda.R;
 import com.kamjer.woda.activity.useractivity.coloreditdialog.ColorPickerDialog;
 import com.kamjer.woda.activity.useractivity.coloreditdialog.ColorSelectorAction;
@@ -49,7 +48,7 @@ public class UserActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        userViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(UserViewModel.class);
+        userViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(UserViewModel.initializer)).get(UserViewModel.class);
 
         ActivityResultLauncher<Intent> removeTypeConflictDialogLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -77,7 +76,7 @@ public class UserActivity extends AppCompatActivity {
                     }
                 });
 
-        buttonRemoveTypeAction = (type, position) -> userViewModel.loadWatersByType(type, waters -> {
+        buttonRemoveTypeAction = (type, position) -> userViewModel.loadWatersByType(type, this, waters -> {
             ArrayList<Water> waterList = new ArrayList<>(waters);
 
 //                if there are no waters with this type delete that type
@@ -130,14 +129,15 @@ public class UserActivity extends AppCompatActivity {
         super.onStart();
         setContentView(R.layout.user_activity_layout);
 
-        FloatingActionButton floatingActionButtonSetWaterAmount = findViewById(R.id.floatingActionButtonSetWaterAmount);
-        floatingActionButtonSetWaterAmount.setOnClickListener(this::floatingActionButtonSetWaterAmountAction);
-
         ImageButton addWaterTypeButton = findViewById(R.id.imageButtonAddWaterType);
-
         addWaterTypeButton.setOnClickListener(v -> addNewTypeAction());
 
         textViewWaterAmount = findViewById(R.id.editTextNumber);
+        textViewWaterAmount.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                setWaterAmountAction(v);
+            }
+        });
         adapter = createNewTypeAdapter(new ArrayList<>(userViewModel.getTypes().values()));
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         typeListRecycler = findViewById(R.id.recyclerViewTypeList);
@@ -156,10 +156,9 @@ public class UserActivity extends AppCompatActivity {
         userViewModel.removeType(typeToDelete);
     }
 
-    private void floatingActionButtonSetWaterAmountAction(View view) {
+    private void setWaterAmountAction(View view) {
         int waterAmountToDrink = Integer.parseInt(textViewWaterAmount.getText().toString());
         userViewModel.setWaterAmountToDrink(getApplicationContext(), waterAmountToDrink);
-        this.finish();
     }
 
     private void addNewTypeAction() {
@@ -178,14 +177,9 @@ public class UserActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-//        clears focus on all elements in a recyclerView, necessary to fire focus listener on ViewHolder
+//        clears focus on all elements in a recyclerView and textView, necessary to fire focus listener on ViewHolder
         typeListRecycler.notifyFocusCleared();
-        userViewModel.clearDisposable();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
+        textViewWaterAmount.clearFocus();
         userViewModel.clearDisposable();
     }
 }

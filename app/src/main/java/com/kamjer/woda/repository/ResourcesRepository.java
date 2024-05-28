@@ -18,10 +18,16 @@ public class ResourcesRepository {
     private List<Type> defaultDrinksTypes;
 
     public static ResourcesRepository getInstance() {
-        if (resourcesRepository == null) {
-            resourcesRepository = new ResourcesRepository();
+        ResourcesRepository result = resourcesRepository;
+        if (result != null) {
+            return result;
         }
-        return resourcesRepository;
+        synchronized (ResourcesRepository.class) {
+            if (resourcesRepository == null) {
+                resourcesRepository = new ResourcesRepository();
+            }
+            return resourcesRepository;
+        }
     }
 
     public void loadDefaultTypes(Context context) {

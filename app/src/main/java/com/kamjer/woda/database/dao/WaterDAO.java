@@ -26,10 +26,9 @@ public abstract class WaterDAO {
 
 //  Water table methods
 //  fetching
-
     @Transaction
     @Query("SELECT * FROM water WHERE typeId = :typeId")
-    public abstract Flowable<List<Water>> getWaterByType(long typeId);
+    public abstract LiveData<List<Water>> getWaterByType(long typeId);
 
 //  inserts
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -78,5 +77,4 @@ public abstract class WaterDAO {
     @Transaction
     @Query("SELECT * FROM water_day")
     public abstract LiveData<List<WaterDayWithWaters>> getAllWaterDayWithWaters();
-
 }

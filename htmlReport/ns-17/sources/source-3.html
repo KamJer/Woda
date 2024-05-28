@@ -1,0 +1,199 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > WaterViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.viewmodel</a>
+</div>
+
+<h1>Coverage Summary for Class: WaterViewModel (com.kamjer.woda.viewmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WaterViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (12/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (14/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.viewmodel;
+&nbsp;
+&nbsp;import androidx.lifecycle.LifecycleOwner;
+&nbsp;import androidx.lifecycle.Observer;
+&nbsp;import androidx.lifecycle.ViewModel;
+&nbsp;import androidx.lifecycle.viewmodel.ViewModelInitializer;
+&nbsp;
+&nbsp;import com.kamjer.woda.model.Type;
+&nbsp;import com.kamjer.woda.model.Water;
+&nbsp;import com.kamjer.woda.model.WaterDay;
+&nbsp;import com.kamjer.woda.model.WaterDayWithWaters;
+&nbsp;import com.kamjer.woda.repository.SharedPreferencesRepository;
+&nbsp;import com.kamjer.woda.repository.SqlRepository;
+&nbsp;import com.kamjer.woda.repository.WaterDataRepository;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import io.reactivex.rxjava3.disposables.CompositeDisposable;
+&nbsp;import io.reactivex.rxjava3.functions.Action;
+&nbsp;
+&nbsp;//main activity view model
+&nbsp;public class WaterViewModel extends ViewModel {
+&nbsp;
+&nbsp;    public static final int DEFAULT_WATER_DRANK_IN_ONE_GO = 250;
+&nbsp;
+&nbsp;    private final CompositeDisposable disposable;
+&nbsp;
+&nbsp;    private final WaterDataRepository waterDataRepository;
+&nbsp;
+<b class="fc">&nbsp;    public static final ViewModelInitializer&lt;WaterViewModel&gt; initializer = new ViewModelInitializer&lt;&gt;(</b>
+&nbsp;            WaterViewModel.class,
+&nbsp;            creationExtras -&gt;
+<b class="nc">&nbsp;                    new WaterViewModel(new CompositeDisposable(),</b>
+<b class="nc">&nbsp;                            WaterDataRepository.getInstance())</b>
+&nbsp;    );
+&nbsp;
+<b class="fc">&nbsp;    public WaterViewModel(CompositeDisposable compositeDisposable, WaterDataRepository waterDataRepository) {</b>
+<b class="fc">&nbsp;        this.disposable = compositeDisposable;</b>
+<b class="fc">&nbsp;        this.waterDataRepository = waterDataRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //    DATABASE OPERATIONS
+&nbsp;    public void loadWaterDayWithWatersByDate(LocalDate date) {
+<b class="fc">&nbsp;        waterDataRepository.loadWaterDayWithWatersByDate(date);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void insertWaterDay(WaterDay waterDay, Action onSuccess) {
+<b class="fc">&nbsp;        disposable.add(waterDataRepository.insertWaterDay(waterDay, onSuccess));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void insertWater(Water water) {
+<b class="fc">&nbsp;        disposable.add(waterDataRepository.insertWater(water, aLong -&gt; {</b>
+<b class="nc">&nbsp;            water.setId(aLong);</b>
+<b class="nc">&nbsp;            addWaterInDay(water);</b>
+&nbsp;        }));
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setWaterDayWithWatersObserver(LifecycleOwner owner, Observer&lt;WaterDayWithWaters&gt; observer) {
+<b class="nc">&nbsp;        waterDataRepository.getWaterDayWithWatersLivaData().observe(owner, observer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addWaterInDay(Water water) {
+<b class="fc">&nbsp;        waterDataRepository.addWaterInDay(water);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeWaterInDay(Water water) {
+<b class="fc">&nbsp;        waterDataRepository.removeWaterInDay(water);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public WaterDayWithWaters getWaterDayWithWatersValue() {
+<b class="fc">&nbsp;        return waterDataRepository.getWaterDayWithWatersValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void deleteWater(Water water) {
+<b class="fc">&nbsp;        disposable.add(waterDataRepository.deleteWater(water, () -&gt; removeWaterInDay(water)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LocalDate getActiveDate() {
+<b class="fc">&nbsp;        return getWaterDayWithWatersValue().getWaterDay().getDate();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearDisposable() {
+<b class="nc">&nbsp;        disposable.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAllWaterDayWithWatersObserver(LifecycleOwner owner, Observer&lt;List&lt;WaterDayWithWaters&gt;&gt; observer) {
+<b class="fc">&nbsp;        waterDataRepository.setAllWaterDayWithWatersObserver(owner, observer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAllTypesObserver(LifecycleOwner owner, Observer&lt;HashMap&lt;Long, Type&gt;&gt; observer) {
+<b class="fc">&nbsp;        waterDataRepository.setTypesLiveDataObserver(owner, observer);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,195 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1250"> 
+  <title>Coverage Report > AlarmViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.kamjer.woda.viewmodel</a>
+</div>
+
+<h1>Coverage Summary for Class: AlarmViewModel (com.kamjer.woda.viewmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AlarmViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94,4%
+  </span>
+  <span class="absValue">
+    (17/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94,7%
+  </span>
+  <span class="absValue">
+    (18/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.viewmodel;
+&nbsp;
+&nbsp;import android.content.Context;
+&nbsp;
+&nbsp;import androidx.lifecycle.LifecycleOwner;
+&nbsp;import androidx.lifecycle.Observer;
+&nbsp;import androidx.lifecycle.ViewModel;
+&nbsp;import androidx.lifecycle.viewmodel.ViewModelInitializer;
+&nbsp;
+&nbsp;import com.kamjer.woda.repository.SharedPreferencesRepository;
+&nbsp;import com.kamjer.woda.repository.SqlRepository;
+&nbsp;import com.kamjer.woda.repository.WaterDataRepository;
+&nbsp;
+&nbsp;import java.time.LocalTime;
+&nbsp;
+&nbsp;import io.reactivex.rxjava3.disposables.CompositeDisposable;
+&nbsp;
+&nbsp;public class AlarmViewModel extends ViewModel {
+&nbsp;
+&nbsp;    SharedPreferencesRepository sharedPreferencesRepository;
+&nbsp;
+<b class="fc">&nbsp;    public static final ViewModelInitializer&lt;AlarmViewModel&gt; initializer = new ViewModelInitializer&lt;&gt;(</b>
+&nbsp;            AlarmViewModel.class,
+&nbsp;            creationExtras -&gt;
+<b class="nc">&nbsp;                    new AlarmViewModel(SharedPreferencesRepository.getInstance())</b>
+&nbsp;    );
+&nbsp;
+<b class="fc">&nbsp;    public AlarmViewModel(SharedPreferencesRepository sharedPreferencesRepository) {</b>
+<b class="fc">&nbsp;        this.sharedPreferencesRepository = sharedPreferencesRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSelectedNotificationsTimeObserver(LifecycleOwner owner, Observer&lt;LocalTime&gt; observer){
+<b class="fc">&nbsp;        sharedPreferencesRepository.getSelectedNotificationsTimeLiveData().observe(owner, observer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void isNotificationsActiveObserver(LifecycleOwner owner, Observer&lt;Boolean&gt; observer){
+<b class="fc">&nbsp;        sharedPreferencesRepository.getNotificationsActiveLiveData().observe(owner, observer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setConstraintNotificationsTimeStartObserver(LifecycleOwner owner, Observer&lt;LocalTime&gt; observer){
+<b class="fc">&nbsp;        sharedPreferencesRepository.getConstraintNotificationTimeStartLiveData().observe(owner, observer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setConstraintNotificationsTimeEndObserver(LifecycleOwner owner, Observer&lt;LocalTime&gt; observer){
+<b class="fc">&nbsp;        sharedPreferencesRepository.getConstraintNotificationTimeEndLiveData().observe(owner, observer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setHourNotificationPeriodObserver(LifecycleOwner owner, Observer&lt;Integer&gt; observer) {
+<b class="fc">&nbsp;        sharedPreferencesRepository.getHourNotificationPeriodLiveData().observe(owner, observer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LocalTime getSelectedNotificationsTime() {
+<b class="fc">&nbsp;        return sharedPreferencesRepository.getSelectedNotificationsTime();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LocalTime getConstraintNotificationTimeStart() {
+<b class="fc">&nbsp;        return sharedPreferencesRepository.getConstraintNotificationTimeStart();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LocalTime getConstraintNotificationTimeEnd() {
+<b class="fc">&nbsp;        return sharedPreferencesRepository.getConstraintNotificationTimeEnd();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isNotificationsActive() {
+<b class="fc">&nbsp;        return sharedPreferencesRepository.isNotificationsActive();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getHourNotificationPeriod() {
+<b class="fc">&nbsp;        return sharedPreferencesRepository.getHourNotificationPeriod();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSelectedNotificationsTime(Context applicationContext, LocalTime selectedTime) {
+<b class="fc">&nbsp;        sharedPreferencesRepository.setSelectedNotificationsTime(applicationContext, selectedTime);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setConstraintNotificationTimeStart(Context applicationContext, LocalTime timeConstraintStart) {
+<b class="fc">&nbsp;        sharedPreferencesRepository.setConstraintNotificationTimeStart(applicationContext, timeConstraintStart);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setConstraintNotificationTimeEnd(Context applicationContext, LocalTime timeConstraintEnd) {
+<b class="fc">&nbsp;        sharedPreferencesRepository.setConstraintNotificationTimeEnd(applicationContext, timeConstraintEnd);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setNotificationsActive(Context applicationContext, boolean isChecked) {
+<b class="fc">&nbsp;        sharedPreferencesRepository.setNotificationsActive(applicationContext, isChecked);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setHourNotificationPeriod(Context applicationContext, int hourNotificationPeriod) {
+<b class="fc">&nbsp;        sharedPreferencesRepository.setHourNotificationPeriod(applicationContext, hourNotificationPeriod);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-05-18 14:11</div>
+</div>
+</body>
+</html>
