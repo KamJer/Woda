@@ -32,7 +32,7 @@ The main view contains:
 2. User Button (top right corner, first)
 3. Notifications Button (top right corner, second)
 
-![glowna_aktywnosc](https://github.com/KamJer/Woda/assets/104097463/3def9499-4efe-4371-90c0-cf1f350f1b3f)
+<img src="https://github.com/KamJer/Woda/assets/104097463/3def9499-4efe-4371-90c0-cf1f350f1b3f" width="360" height="800"/>
 
 Additionally, it contains a graphical representation of consumed drinks and a progress bar showing the goal set for a specific day.
 
