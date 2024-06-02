@@ -2,67 +2,58 @@
 
 ## Overview
 
-Woda to aplikacja na Android OS do zapisywania spożytych napojów oraz ich typów. Woda pozwala na:
- - zapisywanie ilości napojów
- - definiowanie typów napojów
- - ustawienie notyfikacji mających na celu przypomnienie o konieczności nawadniania
+Woda is an Android OS application for recording consumed drinks and their types. Woda allows you to:
+- Record the amount of drinks consumed
+- Define types of drinks
+- Set notifications to remind you to stay hydrated
 
 ## Prerequisites
 
-Aby skompilować i wykorzytsać projekt będą konieczne: 
- - Android Studio z zainstalowanym sdk
- - Urządzenie z Android OS o minimalnym sdk 26
+To compile and use the project, you will need:
+- Android Studio with SDK installed
+- A device with Android OS, minimum SDK 26
 
 ## Installation
 
-1. sklonuj lub pobierz repozystorium
-2. zaimportuj projekt do Android Studio
-3. wygeneruj apk przy użyciu opcji "Build" -> "Build Bandle(s)/APK(s)"
-4. zaimportuj apk na swoje urządzenie 
-5. zainstaluj aplikację
+1. Clone or download the repository
+2. Import the project into Android Studio
+3. Generate the APK using the "Build" -> "Build Bundle(s)/APK(s)" option
+4. Transfer the APK to your device
+5. Install the application
 
 ## Usage
 
-Aplikacja po otwarciu uruchomi główny widok.
+The application will open to the main view.
 
-### Główny widok
+### Main View
 
-{???}
+The main view contains:
+1. Calendar Button (top left corner)
+2. User Button (top right corner, first)
+3. Notifications Button (top right corner, second)
 
-Główny widok zawiera:
-1. Przycisk Kalendarza (lewy górny róg)
-2. Przycisk Użytkownika (prawy górny róg, pierwszy)
-3. Przycisk Notyfikacji (prawy górny róg, drugi)
+Additionally, it contains a graphical representation of consumed drinks and a progress bar showing the goal set for a specific day.
 
-Ponadto zawiera graficzną reprezentację wypitych napojów oraz pasek postępu zawierający ustawiony na konkretny dzień cel
+#### Adding/Removing Consumed Drinks
 
-#### Dodawanie/Usuwanie wypitych napojów
+By clicking the "+" or "-" button at the bottom of the screen, a dialog will be displayed asking the user to enter the volume of the consumed drink or the drink to be removed and its type.
 
-Po kliknięciu przyciski "+" lub "-" w dolnej cześci ekranu zostanie wyświetlony dialog proszący użytkownika o podanie objętości 
-wypitego napoju lub napoju do usinięcia oraz jego typu. 
+### Calendar View
 
-<???>
+The calendar view shows information about all the drinks entered so far and displays them in a calendar format.
 
-### Okno Kalendarza
+The amount of drinks consumed is color-coded:
+1. Green: fully achieved goal for the day
+2. Red: no data entered
 
-Widok kalendarza zawiera informację dotyczące wszystkich wprowadzonych do tej pory napojów i pokazuje je w postaci kolendarza. 
+For intermediate data, the application interpolates colors between red and green.
 
-<???>
+Clicking on a specific day will automatically take the user to the main view with the selected date.
 
-Ilość wypitych napojów zakodowana jest kolorystycznie. 
-1. Zielony: w pełni osiągnięty cel na dany dzień
-2. Czerwony: brak wprowadzanie jakikolwiek danych  
+### User View
 
-W przypadku danych pośrednich, aplikacja interpoluje kolory pomiędzy czerwonym a zielonym
+This view allows the user to set the drinking goal for the currently selected day and all subsequent days, and to define user-specific drink types.
 
-Aplikacja po kliknięciu w dany dzieńautomatycznie przeniesie użtkownika do głównego widoku z wybraną datą
+### Notifications View
 
-### Okno Użytkownika
-
-Widok pozwala na ustalenie celu do wypicia w obecnie wybranym dniu oraz wszytskich nastepnych oraz na zdefiniowanie typów napojów użytkownika. 
-<???>
-
-### Okno Notyfikacji
-
-Okno notyfikacji pozwala na zdefiniowanie czy, w jakiej częstotliwości oraz w jakim okresie notyfikacje mają się nie pojawiać.
-<???> 
+The notifications view allows you to define whether, at what frequency, and during which period notifications should not appear.
