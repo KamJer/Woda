@@ -40,9 +40,13 @@ Additionally, it contains a graphical representation of consumed drinks and a pr
 
 By clicking the "+" or "-" button at the bottom of the screen, a dialog will be displayed asking the user to enter the volume of the consumed drink or the drink to be removed and its type.
 
+<img src="https://github.com/KamJer/Woda/assets/104097463/93dc1223-2b08-481d-aa7a-777fc19e1e67" width="360" height="800"/>
+
 ### Calendar View
 
 The calendar view shows information about all the drinks entered so far and displays them in a calendar format.
+
+<img src="https://github.com/KamJer/Woda/assets/104097463/4446ad7f-145a-486c-a43e-da78e816aedb" width="360" height="800"/>
 
 The amount of drinks consumed is color-coded:
 1. Green: fully achieved goal for the day
@@ -56,6 +60,10 @@ Clicking on a specific day will automatically take the user to the main view wit
 
 This view allows the user to set the drinking goal for the currently selected day and all subsequent days, and to define user-specific drink types.
 
+<img src="https://github.com/KamJer/Woda/assets/104097463/38e9454e-8202-40f4-891b-874bdad8e9f0" width="360" height="800"/>
+
 ### Notifications View
 
 The notifications view allows you to define whether, at what frequency, and during which period notifications should not appear.
+<img src="https://github.com/KamJer/Woda/assets/104097463/8c4b753b-3bb2-41a1-858c-1c522a5ac0e6" width="360" height="800"/>
+
