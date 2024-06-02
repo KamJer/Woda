@@ -63,7 +63,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     0%
   </span>
   <span class="absValue">
-    (0/94)
+    (0/95)
   </span>
 </td>
 </tr>
@@ -102,11 +102,11 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import com.google.android.material.floatingactionbutton.FloatingActionButton;
 &nbsp;import com.kamjer.woda.R;
 &nbsp;import com.kamjer.woda.activity.alarmactivity.AlarmActivity;
-&nbsp;import com.kamjer.woda.activity.mainactivity.addwaterdialog.AddWaterDialog;
 &nbsp;import com.kamjer.woda.activity.calendaractivity.CalendarActivity;
-&nbsp;import com.kamjer.woda.activity.useractivity.UserActivity;
+&nbsp;import com.kamjer.woda.activity.mainactivity.addwaterdialog.AddWaterDialog;
 &nbsp;import com.kamjer.woda.activity.mainactivity.listeners.ChangeWatersGestureListener;
 &nbsp;import com.kamjer.woda.activity.mainactivity.waterimage.WaterImage;
+&nbsp;import com.kamjer.woda.activity.useractivity.UserActivity;
 &nbsp;import com.kamjer.woda.model.Type;
 &nbsp;import com.kamjer.woda.model.Water;
 &nbsp;import com.kamjer.woda.model.WaterDay;
@@ -115,7 +115,6 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import com.kamjer.woda.utils.WaterAppErrorHandler;
 &nbsp;import com.kamjer.woda.viewmodel.WaterViewModel;
 &nbsp;
-&nbsp;import java.time.LocalDate;
 &nbsp;import java.util.HashMap;
 &nbsp;import java.util.List;
 &nbsp;import java.util.Optional;
@@ -316,9 +315,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    private void setObservers() {
 &nbsp;        //      creating observer for liveData in a ViewModel
 <b class="nc">&nbsp;        waterViewModel.setWaterDayWithWatersObserver(this, this::setObserverOnWaters);</b>
-<b class="nc">&nbsp;        waterViewModel.setAllTypesObserver(this, longTypeHashMap -&gt; {</b>
-<b class="nc">&nbsp;            typeHashMap = longTypeHashMap;</b>
-&nbsp;        });
+<b class="nc">&nbsp;        waterViewModel.setAllTypesObserver(this, longTypeHashMap -&gt; typeHashMap = longTypeHashMap);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    @Override
@@ -326,6 +323,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;        super.onStop();</b>
 <b class="nc">&nbsp;        waterViewModel.clearDisposable();</b>
 <b class="nc">&nbsp;        AppInitializer.clearAppResources();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void onResume() {
+<b class="nc">&nbsp;        super.onResume();</b>
+<b class="nc">&nbsp;        setObservers();</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    @Override
@@ -365,7 +368,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-05-18 14:11</div>
+    <div style="float:right;">generated on 2024-05-30 11:57</div>
 </div>
 </body>
 </html>

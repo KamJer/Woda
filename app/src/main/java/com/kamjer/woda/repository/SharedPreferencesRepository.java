@@ -16,34 +16,53 @@ public class SharedPreferencesRepository {
 
     public static final int DEFAULT_WATER_AMOUNT_TO_DRINK = 1500;
 
-    private static final String WATER_AMOUNT_TO_DRINK_NAME = "waterAmountToDrink";
-    private static final String NOTIFICATIONS_ACTIVE_NAME = "isNotificationsActive";
-    private static final String SELECTED_NOTIFICATIONS_TIME_NAME = "selectedNotificationsTime";
-    private static final String CONSTRAINT_NOTIFICATIONS_TIME_START_NAME = "constraintNotificationsTimeStart";
-    private static final String CONSTRAINT_NOTIFICATIONS_TIME_END_NAME = "constraintNotificationsTimeEnd";
-    private static final String HOUR_NOTIFICATION_PERIOD_NAME = "hourNotificationPeriodName";
+    public static final String WATER_AMOUNT_TO_DRINK_NAME = "waterAmountToDrink";
+    public static final String NOTIFICATIONS_ACTIVE_NAME = "isNotificationsActive";
+    public static final String SELECTED_NOTIFICATIONS_TIME_NAME = "selectedNotificationsTime";
+    public static final String CONSTRAINT_NOTIFICATIONS_TIME_START_NAME = "constraintNotificationsTimeStart";
+    public static final String CONSTRAINT_NOTIFICATIONS_TIME_END_NAME = "constraintNotificationsTimeEnd";
+    public static final String HOUR_NOTIFICATION_PERIOD_NAME = "hourNotificationPeriodName";
 
     public static final LocalTime TIME_CONSTRAINT_START_DEFAULT = LocalTime.of(22, 0);
     public static final LocalTime TIME_CONSTRAINT_END_DEFAULT = LocalTime.of(8, 0);
 
-    private final MutableLiveData<Integer> waterAmountToDrinkMutableLiveData = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> notificationsActiveLiveData = new MutableLiveData<>();
-    private final MutableLiveData<LocalTime> selectedNotificationsTimeLiveData = new MutableLiveData<>();
-    private final MutableLiveData<LocalTime> constraintNotificationTimeStartLiveData = new MutableLiveData<>();
-    private final MutableLiveData<LocalTime> constraintNotificationTimeEndLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> waterAmountToDrinkMutableLiveData;
+    private final MutableLiveData<Boolean> notificationsActiveLiveData;
+    private final MutableLiveData<LocalTime> selectedNotificationsTimeLiveData;
+    private final MutableLiveData<LocalTime> constraintNotificationTimeStartLiveData;
+    private final MutableLiveData<LocalTime> constraintNotificationTimeEndLiveData;
 
-    private final MutableLiveData<Integer> hourNotificationPeriodLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> hourNotificationPeriodLiveData;
 
     private static SharedPreferencesRepository sharedPreferencesRepository;
 
-    public static SharedPreferencesRepository getInstance(){
+    public SharedPreferencesRepository(MutableLiveData<Integer> waterAmountToDrinkMutableLiveData,
+                                       MutableLiveData<Boolean> notificationsActiveLiveData,
+                                       MutableLiveData<LocalTime> selectedNotificationsTimeLiveData,
+                                       MutableLiveData<LocalTime> constraintNotificationTimeStartLiveData,
+                                       MutableLiveData<LocalTime> constraintNotificationTimeEndLiveData,
+                                       MutableLiveData<Integer> hourNotificationPeriodLiveData) {
+        this.waterAmountToDrinkMutableLiveData = waterAmountToDrinkMutableLiveData;
+        this.notificationsActiveLiveData = notificationsActiveLiveData;
+        this.selectedNotificationsTimeLiveData = selectedNotificationsTimeLiveData;
+        this.constraintNotificationTimeStartLiveData = constraintNotificationTimeStartLiveData;
+        this.constraintNotificationTimeEndLiveData = constraintNotificationTimeEndLiveData;
+        this.hourNotificationPeriodLiveData = hourNotificationPeriodLiveData;
+    }
+
+    public static SharedPreferencesRepository getInstance() {
         SharedPreferencesRepository result = sharedPreferencesRepository;
         if (result != null) {
             return result;
         }
         synchronized (SharedPreferencesRepository.class) {
             if (sharedPreferencesRepository == null) {
-                sharedPreferencesRepository = new SharedPreferencesRepository();
+                sharedPreferencesRepository = new SharedPreferencesRepository(new MutableLiveData<>(),
+                        new MutableLiveData<>(),
+                        new MutableLiveData<>(),
+                        new MutableLiveData<>(),
+                        new MutableLiveData<>(),
+                        new MutableLiveData<>());
             }
             return sharedPreferencesRepository;
         }
@@ -51,6 +70,7 @@ public class SharedPreferencesRepository {
 
     /**
      * Loads water amount to drink from SharedPreferences
+     *
      * @param applicationContext context of an app
      */
     public void loadWaterAmount(Context applicationContext) {
@@ -76,16 +96,17 @@ public class SharedPreferencesRepository {
 
     /**
      * Loads if notifications are active from SharedPreferences
+     *
      * @param applicationContext context of an app
      */
     public void loadActiveNotification(Context applicationContext) {
         SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         boolean notificationsActive = sharedPref.getBoolean(NOTIFICATIONS_ACTIVE_NAME, false);
-        SharedPreferencesRepository.getInstance().setNotificationsActive(notificationsActive);
+        setNotificationsActive(notificationsActive);
     }
 
     public void setNotificationsActive(Context applicationContext, boolean notificationsActive) {
-        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putBoolean(NOTIFICATIONS_ACTIVE_NAME, notificationsActive);
         editor.apply();
@@ -102,6 +123,7 @@ public class SharedPreferencesRepository {
 
     /**
      * Loads selected time for notifications to start
+     *
      * @param applicationContext context of an app
      */
     public void loadSelectedNotificationTime(Context applicationContext) {
@@ -111,7 +133,7 @@ public class SharedPreferencesRepository {
     }
 
     public void setSelectedNotificationsTime(Context context, LocalTime selectedNotificationsTime) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(SELECTED_NOTIFICATIONS_TIME_NAME, selectedNotificationsTime.toString());
         editor.apply();
@@ -128,6 +150,7 @@ public class SharedPreferencesRepository {
 
     /**
      * Loads selected start time for notifications to not fire
+     *
      * @param applicationContext context of an app
      */
     public void loadConstraintNotificationTimeStart(Context applicationContext) {
@@ -137,7 +160,7 @@ public class SharedPreferencesRepository {
     }
 
     public void setConstraintNotificationTimeStart(Context context, LocalTime constraintNotificationTimeStart) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(CONSTRAINT_NOTIFICATIONS_TIME_START_NAME, constraintNotificationTimeStart.toString());
         editor.apply();
@@ -154,6 +177,7 @@ public class SharedPreferencesRepository {
 
     /**
      * Loads selected end time for notifications to not fire
+     *
      * @param applicationContext context of an app
      */
     public void loadConstraintNotificationTimeEnd(Context applicationContext) {
@@ -163,7 +187,7 @@ public class SharedPreferencesRepository {
     }
 
     public void setConstraintNotificationTimeEnd(Context context, LocalTime constraintNotificationTimeEnd) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(CONSTRAINT_NOTIFICATIONS_TIME_END_NAME, constraintNotificationTimeEnd.toString());
         editor.apply();
@@ -189,7 +213,7 @@ public class SharedPreferencesRepository {
     }
 
     public void setHourNotificationPeriod(Context context, int hourNotificationPeriod) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(HOUR_NOTIFICATION_PERIOD_NAME, hourNotificationPeriod);
         editor.apply();

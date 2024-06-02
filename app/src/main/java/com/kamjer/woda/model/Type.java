@@ -20,7 +20,7 @@ public class Type implements Serializable {
     }
 
     @Ignore
-    public Type (String type, int color) {
+    public Type(String type, int color) {
         this.type = type;
         this.color = color;
     }

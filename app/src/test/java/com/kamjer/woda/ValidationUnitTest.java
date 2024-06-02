@@ -18,8 +18,8 @@ import java.util.List;
 public class ValidationUnitTest {
 
     @Test
-    public void typeValidation_isTrue() {
-//        mocking repository
+    public void typeValidationTypeToRemove_isTrue() {
+//      mocking repository
         ResourcesRepository resourcesRepository = Mockito.mock(ResourcesRepository.class);
 //      default types for mock
         List<Type> defaultTypes = new ArrayList<>();
@@ -43,7 +43,7 @@ public class ValidationUnitTest {
     }
 
     @Test
-    public void typeValidation_isFalse() {
+    public void typeValidationTypeToRemove_isFalse() {
         ResourcesRepository resourcesRepository = Mockito.mock(ResourcesRepository.class);
 
         List<Type> defaultTypes = new ArrayList<>();

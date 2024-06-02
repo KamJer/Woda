@@ -77,19 +77,14 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.kamjer.woda.viewmodel;
 &nbsp;
-&nbsp;import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
-&nbsp;
-&nbsp;import android.app.Application;
 &nbsp;import android.content.Context;
 &nbsp;
-&nbsp;import androidx.appcompat.app.AppCompatActivity;
 &nbsp;import androidx.lifecycle.LifecycleOwner;
 &nbsp;import androidx.lifecycle.LiveData;
 &nbsp;import androidx.lifecycle.Observer;
 &nbsp;import androidx.lifecycle.ViewModel;
 &nbsp;import androidx.lifecycle.viewmodel.ViewModelInitializer;
 &nbsp;
-&nbsp;import com.kamjer.woda.activity.mainactivity.MainActivity;
 &nbsp;import com.kamjer.woda.model.Type;
 &nbsp;import com.kamjer.woda.model.Water;
 &nbsp;import com.kamjer.woda.repository.SharedPreferencesRepository;
@@ -100,21 +95,21 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import java.util.HashMap;
 &nbsp;import java.util.List;
 &nbsp;
-&nbsp;import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 &nbsp;import io.reactivex.rxjava3.core.Completable;
 &nbsp;import io.reactivex.rxjava3.disposables.CompositeDisposable;
-&nbsp;import io.reactivex.rxjava3.disposables.Disposable;
 &nbsp;import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 &nbsp;import io.reactivex.rxjava3.schedulers.Schedulers;
 &nbsp;
 &nbsp;public class UserViewModel extends ViewModel {
 &nbsp;
-&nbsp;    private final SqlRepository sqlRepository;
-&nbsp;    private LiveData&lt;List&lt;Water&gt;&gt; watersByTypeLiveData;
-&nbsp;    private WaterDataRepository waterDataRepository;
-&nbsp;    private SharedPreferencesRepository sharedPreferencesRepository;
 &nbsp;
-&nbsp;    private CompositeDisposable disposable;
+&nbsp;    private final SqlRepository sqlRepository;
+&nbsp;    private final WaterDataRepository waterDataRepository;
+&nbsp;    private final SharedPreferencesRepository sharedPreferencesRepository;
+&nbsp;
+&nbsp;    private LiveData&lt;List&lt;Water&gt;&gt; watersByTypeLiveData;
+&nbsp;
+&nbsp;    private final CompositeDisposable disposable;
 &nbsp;
 <b class="fc">&nbsp;    public static final ViewModelInitializer&lt;UserViewModel&gt; initializer = new ViewModelInitializer&lt;&gt;(</b>
 &nbsp;            UserViewModel.class,
@@ -244,7 +239,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-05-18 14:11</div>
+    <div style="float:right;">generated on 2024-05-30 11:57</div>
 </div>
 </body>
 </html>

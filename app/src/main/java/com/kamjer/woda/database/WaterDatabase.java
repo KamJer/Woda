@@ -9,6 +9,7 @@ import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.database.dao.WaterDAO;
 import com.kamjer.woda.model.WaterDay;
+
 import androidx.room.Database;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public abstract class WaterDatabase extends RoomDatabase {
 
     /**
      * Performs custom Query on a database not necessarily suporrted by Room
+     *
      * @param sql list of sql commends to perform
      */
     public void customQuery(List<String> sql) {

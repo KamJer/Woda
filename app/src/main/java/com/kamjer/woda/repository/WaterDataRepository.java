@@ -42,18 +42,41 @@ public class WaterDataRepository {
     private WaterDatabase waterDatabase;
     private WaterDAO waterDAO;
 
-    private final MediatorLiveData<WaterDayWithWaters> waterDayWithWatersMediatorLiveData = new MediatorLiveData<>();
+    private final MediatorLiveData<WaterDayWithWaters> waterDayWithWatersMediatorLiveData;
 
     private LiveData<List<WaterDayWithWaters>> allWaterDayWithWatersLiveData;
 
-    private final MediatorLiveData<HashMap<Long, Type>> waterTypes = new MediatorLiveData<>();
+    private final MediatorLiveData<HashMap<Long, Type>> waterTypes;
+
+    private ResourcesRepository resourcesRepository;
+
+    public WaterDataRepository( MediatorLiveData<WaterDayWithWaters> waterDayWithWatersMediatorLiveData,
+                                LiveData<List<WaterDayWithWaters>> allWaterDayWithWatersLiveData,
+                                MediatorLiveData<HashMap<Long, Type>> waterTypes,
+                                ResourcesRepository resourcesRepository) {
+        this.waterDayWithWatersMediatorLiveData = waterDayWithWatersMediatorLiveData;
+        this.allWaterDayWithWatersLiveData = allWaterDayWithWatersLiveData;
+        this.waterTypes = waterTypes;
+        this.resourcesRepository = resourcesRepository;
+    }
+
+    public WaterDataRepository(WaterDatabase waterDatabase,
+                               MediatorLiveData<WaterDayWithWaters> waterDayWithWatersMediatorLiveData,
+                               LiveData<List<WaterDayWithWaters>> allWaterDayWithWatersLiveData,
+                               MediatorLiveData<HashMap<Long, Type>> waterTypes) {
+        this.waterDatabase = waterDatabase;
+        this.waterDAO = waterDatabase.waterDAO();
+        this.waterDayWithWatersMediatorLiveData = waterDayWithWatersMediatorLiveData;
+        this.allWaterDayWithWatersLiveData = allWaterDayWithWatersLiveData;
+        this.waterTypes = waterTypes;
+    }
 
     public void createWaterDatabase(Context context) {
 //        if database does not exists create a new one
         if (waterDatabase == null) {
             this.waterDatabase = Room.databaseBuilder(context, WaterDatabase.class, WaterDataRepository.DATABASE_NAME)
                     .build();
-            this.waterDAO = waterDatabase.waterDAO();
+            setWaterDAO(waterDatabase.waterDAO());
 
             allWaterDayWithWatersLiveData = (getWaterDAO().getAllWaterDayWithWaters());
             getAllTypes();
@@ -61,16 +84,16 @@ public class WaterDataRepository {
         }
     }
 
+
     public void getAllTypes() {
         waterTypes.addSource(getWaterDAO().getAllTypes(), types -> {
             waterTypes.setValue((HashMap<Long, Type>) types.stream().collect(Collectors.toMap(
                     Type::getId,
                     o -> o)));
 
-            getWaterDAO().insertTypes(WaterDataRepository.containsDefaultTypes(ResourcesRepository
-                            .getInstance()
-                            .getDefaultDrinksTypes(),
-                    getWaterTypes().values()))
+            getWaterDAO().insertTypes(WaterDataRepository.containsDefaultTypes(resourcesRepository
+                                    .getDefaultDrinksTypes(),
+                            getWaterTypes().values()))
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.newThread())
                     .subscribe();
@@ -81,6 +104,12 @@ public class WaterDataRepository {
         return waterDAO;
     }
 
+    public void setWaterDAO(WaterDAO waterDAO) {
+        this.waterDAO = waterDAO;
+    }
+
+
+
     public static WaterDataRepository getInstance() {
         WaterDataRepository result = instance;
         if (result != null) {
@@ -88,7 +117,10 @@ public class WaterDataRepository {
         }
         synchronized (WaterDataRepository.class) {
             if (instance == null) {
-                instance = new WaterDataRepository();
+                instance = new WaterDataRepository(new MediatorLiveData<>(),
+                        new MutableLiveData<>(),
+                        new MediatorLiveData<>(),
+                        ResourcesRepository.getInstance());
             }
             return instance;
         }
@@ -186,10 +218,11 @@ public class WaterDataRepository {
                 .updateType(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {}, RxJavaPlugins::onError);
+                .subscribe(() -> {
+                }, RxJavaPlugins::onError);
     }
 
-    public Disposable removeType(Type type) throws IllegalArgumentException{
+    public Disposable removeType(Type type) throws IllegalArgumentException {
         if (WaterDataValidation.validateTypeToRemove(type)) {
             throw new IllegalArgumentException(ResourcesRepository.getInstance().getDeleteTypeDefaultMessageException());
         }
@@ -197,13 +230,15 @@ public class WaterDataRepository {
                 .deleteType(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {}, RxJavaPlugins::onError);
+                .subscribe(() -> {
+                }, RxJavaPlugins::onError);
 
     }
 
     /**
      * Sets observer on a type liveData
-     * @param owner owner of a observer to set
+     *
+     * @param owner    owner of a observer to set
      * @param observer observer to set
      */
     public void setTypesLiveDataObserver(LifecycleOwner owner, Observer<HashMap<Long, Type>> observer) {
@@ -212,6 +247,7 @@ public class WaterDataRepository {
 
     /**
      * Returns new HashMap of Types, changing it does not effect original Map
+     *
      * @return new map of Types
      */
     public HashMap<Long, Type> getWaterTypes() {
@@ -221,6 +257,7 @@ public class WaterDataRepository {
     /**
      * Checks if map of types contains all of types in an array
      * if types are not contained in a map they are added to a list and returned
+     *
      * @param defaultTypes - types to check
      * @param typesToCheck - map of types to compare to
      * @return list of Types not contained in a map, if all types from an array are contained in a map list length is 0
@@ -240,6 +277,7 @@ public class WaterDataRepository {
 
     /**
      * Finds all of used types in a passed list of waters
+     *
      * @param waters list of waters to check
      * @return list of maps
      */
@@ -249,6 +287,7 @@ public class WaterDataRepository {
 
     /**
      * Returns the amount of water to drink to achieve set goal, returns value from active waterDay
+     *
      * @return value of water to drink
      */
     public int getWaterAmountToDrink() {
@@ -257,13 +296,17 @@ public class WaterDataRepository {
 
     /**
      * Sets in an active WaterDay new water amount to drink and updates WaterDay
+     *
      * @param waterAmountToDrink - new goal
      */
     public Disposable setWaterAmountToDrink(int waterAmountToDrink) {
         WaterDayWithWaters waterDayWithWatersToUpdate = getWaterDayWithWatersValue();
         waterDayWithWatersToUpdate.getWaterDay().setWaterToDrink(waterAmountToDrink);
         setWaterDayWithWatersValue(waterDayWithWatersToUpdate);
-        return getWaterDAO().updateWaterDay(waterDayWithWatersToUpdate.getWaterDay()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
+        return getWaterDAO().updateWaterDay(waterDayWithWatersToUpdate.getWaterDay())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
     public LiveData<List<WaterDayWithWaters>> getAllWaterDayWithWatersLiveData() {

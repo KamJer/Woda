@@ -52,18 +52,18 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    2,9%
+    58,8%
   </span>
   <span class="absValue">
-    (1/34)
+    (20/34)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    2,6%
+    74,7%
   </span>
   <span class="absValue">
-    (2/78)
+    (62/83)
   </span>
 </td>
 </tr>
@@ -89,56 +89,82 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import java.time.LocalTime;
 &nbsp;import java.util.Optional;
 &nbsp;
-<b class="nc">&nbsp;public class SharedPreferencesRepository {</b>
+&nbsp;public class SharedPreferencesRepository {
 &nbsp;
 &nbsp;    public static final int DEFAULT_WATER_AMOUNT_TO_DRINK = 1500;
 &nbsp;
-&nbsp;    private static final String WATER_AMOUNT_TO_DRINK_NAME = &quot;waterAmountToDrink&quot;;
-&nbsp;    private static final String NOTIFICATIONS_ACTIVE_NAME = &quot;isNotificationsActive&quot;;
-&nbsp;    private static final String SELECTED_NOTIFICATIONS_TIME_NAME = &quot;selectedNotificationsTime&quot;;
-&nbsp;    private static final String CONSTRAINT_NOTIFICATIONS_TIME_START_NAME = &quot;constraintNotificationsTimeStart&quot;;
-&nbsp;    private static final String CONSTRAINT_NOTIFICATIONS_TIME_END_NAME = &quot;constraintNotificationsTimeEnd&quot;;
-&nbsp;    private static final String HOUR_NOTIFICATION_PERIOD_NAME = &quot;hourNotificationPeriodName&quot;;
+&nbsp;    public static final String WATER_AMOUNT_TO_DRINK_NAME = &quot;waterAmountToDrink&quot;;
+&nbsp;    public static final String NOTIFICATIONS_ACTIVE_NAME = &quot;isNotificationsActive&quot;;
+&nbsp;    public static final String SELECTED_NOTIFICATIONS_TIME_NAME = &quot;selectedNotificationsTime&quot;;
+&nbsp;    public static final String CONSTRAINT_NOTIFICATIONS_TIME_START_NAME = &quot;constraintNotificationsTimeStart&quot;;
+&nbsp;    public static final String CONSTRAINT_NOTIFICATIONS_TIME_END_NAME = &quot;constraintNotificationsTimeEnd&quot;;
+&nbsp;    public static final String HOUR_NOTIFICATION_PERIOD_NAME = &quot;hourNotificationPeriodName&quot;;
 &nbsp;
 <b class="fc">&nbsp;    public static final LocalTime TIME_CONSTRAINT_START_DEFAULT = LocalTime.of(22, 0);</b>
 <b class="fc">&nbsp;    public static final LocalTime TIME_CONSTRAINT_END_DEFAULT = LocalTime.of(8, 0);</b>
 &nbsp;
-<b class="nc">&nbsp;    private final MutableLiveData&lt;Integer&gt; waterAmountToDrinkMutableLiveData = new MutableLiveData&lt;&gt;();</b>
-<b class="nc">&nbsp;    private final MutableLiveData&lt;Boolean&gt; notificationsActiveLiveData = new MutableLiveData&lt;&gt;();</b>
-<b class="nc">&nbsp;    private final MutableLiveData&lt;LocalTime&gt; selectedNotificationsTimeLiveData = new MutableLiveData&lt;&gt;();</b>
-<b class="nc">&nbsp;    private final MutableLiveData&lt;LocalTime&gt; constraintNotificationTimeStartLiveData = new MutableLiveData&lt;&gt;();</b>
-<b class="nc">&nbsp;    private final MutableLiveData&lt;LocalTime&gt; constraintNotificationTimeEndLiveData = new MutableLiveData&lt;&gt;();</b>
+&nbsp;    private final MutableLiveData&lt;Integer&gt; waterAmountToDrinkMutableLiveData;
+&nbsp;    private final MutableLiveData&lt;Boolean&gt; notificationsActiveLiveData;
+&nbsp;    private final MutableLiveData&lt;LocalTime&gt; selectedNotificationsTimeLiveData;
+&nbsp;    private final MutableLiveData&lt;LocalTime&gt; constraintNotificationTimeStartLiveData;
+&nbsp;    private final MutableLiveData&lt;LocalTime&gt; constraintNotificationTimeEndLiveData;
 &nbsp;
-<b class="nc">&nbsp;    private final MutableLiveData&lt;Integer&gt; hourNotificationPeriodLiveData = new MutableLiveData&lt;&gt;();</b>
+&nbsp;    private final MutableLiveData&lt;Integer&gt; hourNotificationPeriodLiveData;
 &nbsp;
 &nbsp;    private static SharedPreferencesRepository sharedPreferencesRepository;
 &nbsp;
-&nbsp;    public static SharedPreferencesRepository getInstance(){
-<b class="nc">&nbsp;        if (sharedPreferencesRepository == null) {</b>
-<b class="nc">&nbsp;            sharedPreferencesRepository = new SharedPreferencesRepository();</b>
+&nbsp;    public SharedPreferencesRepository(MutableLiveData&lt;Integer&gt; waterAmountToDrinkMutableLiveData,
+&nbsp;                                       MutableLiveData&lt;Boolean&gt; notificationsActiveLiveData,
+&nbsp;                                       MutableLiveData&lt;LocalTime&gt; selectedNotificationsTimeLiveData,
+&nbsp;                                       MutableLiveData&lt;LocalTime&gt; constraintNotificationTimeStartLiveData,
+&nbsp;                                       MutableLiveData&lt;LocalTime&gt; constraintNotificationTimeEndLiveData,
+<b class="fc">&nbsp;                                       MutableLiveData&lt;Integer&gt; hourNotificationPeriodLiveData) {</b>
+<b class="fc">&nbsp;        this.waterAmountToDrinkMutableLiveData = waterAmountToDrinkMutableLiveData;</b>
+<b class="fc">&nbsp;        this.notificationsActiveLiveData = notificationsActiveLiveData;</b>
+<b class="fc">&nbsp;        this.selectedNotificationsTimeLiveData = selectedNotificationsTimeLiveData;</b>
+<b class="fc">&nbsp;        this.constraintNotificationTimeStartLiveData = constraintNotificationTimeStartLiveData;</b>
+<b class="fc">&nbsp;        this.constraintNotificationTimeEndLiveData = constraintNotificationTimeEndLiveData;</b>
+<b class="fc">&nbsp;        this.hourNotificationPeriodLiveData = hourNotificationPeriodLiveData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static SharedPreferencesRepository getInstance() {
+<b class="nc">&nbsp;        SharedPreferencesRepository result = sharedPreferencesRepository;</b>
+<b class="nc">&nbsp;        if (result != null) {</b>
+<b class="nc">&nbsp;            return result;</b>
 &nbsp;        }
-<b class="nc">&nbsp;        return sharedPreferencesRepository;</b>
+<b class="nc">&nbsp;        synchronized (SharedPreferencesRepository.class) {</b>
+<b class="nc">&nbsp;            if (sharedPreferencesRepository == null) {</b>
+<b class="nc">&nbsp;                sharedPreferencesRepository = new SharedPreferencesRepository(new MutableLiveData&lt;&gt;(),</b>
+&nbsp;                        new MutableLiveData&lt;&gt;(),
+&nbsp;                        new MutableLiveData&lt;&gt;(),
+&nbsp;                        new MutableLiveData&lt;&gt;(),
+&nbsp;                        new MutableLiveData&lt;&gt;(),
+&nbsp;                        new MutableLiveData&lt;&gt;());
+&nbsp;            }
+<b class="nc">&nbsp;            return sharedPreferencesRepository;</b>
+<b class="nc">&nbsp;        }</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Loads water amount to drink from SharedPreferences
+&nbsp;     *
 &nbsp;     * @param applicationContext context of an app
 &nbsp;     */
 &nbsp;    public void loadWaterAmount(Context applicationContext) {
-<b class="nc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
-<b class="nc">&nbsp;        setWaterAmountToDrink(sharedPref.getInt(WATER_AMOUNT_TO_DRINK_NAME, DEFAULT_WATER_AMOUNT_TO_DRINK));</b>
+<b class="fc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
+<b class="fc">&nbsp;        setWaterAmountToDrink(sharedPref.getInt(WATER_AMOUNT_TO_DRINK_NAME, DEFAULT_WATER_AMOUNT_TO_DRINK));</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public void setWaterAmountToDrink(Context applicationContext, int waterAmountToDrink) {
-<b class="nc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
-<b class="nc">&nbsp;        SharedPreferences.Editor editor = sharedPref.edit();</b>
-<b class="nc">&nbsp;        editor.putInt(WATER_AMOUNT_TO_DRINK_NAME, waterAmountToDrink);</b>
-<b class="nc">&nbsp;        editor.apply();</b>
-<b class="nc">&nbsp;        setWaterAmountToDrink(waterAmountToDrink);</b>
+<b class="fc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
+<b class="fc">&nbsp;        SharedPreferences.Editor editor = sharedPref.edit();</b>
+<b class="fc">&nbsp;        editor.putInt(WATER_AMOUNT_TO_DRINK_NAME, waterAmountToDrink);</b>
+<b class="fc">&nbsp;        editor.apply();</b>
+<b class="fc">&nbsp;        setWaterAmountToDrink(waterAmountToDrink);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    private void setWaterAmountToDrink(int waterAmountToDrink) {
-<b class="nc">&nbsp;        waterAmountToDrinkMutableLiveData.setValue(waterAmountToDrink);</b>
+<b class="fc">&nbsp;        waterAmountToDrinkMutableLiveData.setValue(waterAmountToDrink);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public int getWaterAmountToDrink() {
@@ -147,24 +173,25 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Loads if notifications are active from SharedPreferences
+&nbsp;     *
 &nbsp;     * @param applicationContext context of an app
 &nbsp;     */
 &nbsp;    public void loadActiveNotification(Context applicationContext) {
-<b class="nc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
-<b class="nc">&nbsp;        boolean notificationsActive = sharedPref.getBoolean(NOTIFICATIONS_ACTIVE_NAME, false);</b>
-<b class="nc">&nbsp;        SharedPreferencesRepository.getInstance().setNotificationsActive(notificationsActive);</b>
+<b class="fc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
+<b class="fc">&nbsp;        boolean notificationsActive = sharedPref.getBoolean(NOTIFICATIONS_ACTIVE_NAME, false);</b>
+<b class="fc">&nbsp;        setNotificationsActive(notificationsActive);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public void setNotificationsActive(Context applicationContext, boolean notificationsActive) {
-<b class="nc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences),Context.MODE_PRIVATE);</b>
-<b class="nc">&nbsp;        SharedPreferences.Editor editor = sharedPref.edit();</b>
-<b class="nc">&nbsp;        editor.putBoolean(NOTIFICATIONS_ACTIVE_NAME, notificationsActive);</b>
-<b class="nc">&nbsp;        editor.apply();</b>
-<b class="nc">&nbsp;        setNotificationsActive(notificationsActive);</b>
+<b class="fc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
+<b class="fc">&nbsp;        SharedPreferences.Editor editor = sharedPref.edit();</b>
+<b class="fc">&nbsp;        editor.putBoolean(NOTIFICATIONS_ACTIVE_NAME, notificationsActive);</b>
+<b class="fc">&nbsp;        editor.apply();</b>
+<b class="fc">&nbsp;        setNotificationsActive(notificationsActive);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    private void setNotificationsActive(boolean isNotificationsActive) {
-<b class="nc">&nbsp;        this.notificationsActiveLiveData.setValue(isNotificationsActive);</b>
+<b class="fc">&nbsp;        this.notificationsActiveLiveData.setValue(isNotificationsActive);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public boolean isNotificationsActive() {
@@ -173,20 +200,21 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Loads selected time for notifications to start
+&nbsp;     *
 &nbsp;     * @param applicationContext context of an app
 &nbsp;     */
 &nbsp;    public void loadSelectedNotificationTime(Context applicationContext) {
-<b class="nc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
-<b class="nc">&nbsp;        LocalTime selectedNotificationTime = LocalTime.parse(sharedPref.getString(SELECTED_NOTIFICATIONS_TIME_NAME, LocalTime.now().toString()));</b>
-<b class="nc">&nbsp;        setSelectedNotificationsTime(selectedNotificationTime);</b>
+<b class="fc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
+<b class="fc">&nbsp;        LocalTime selectedNotificationTime = LocalTime.parse(sharedPref.getString(SELECTED_NOTIFICATIONS_TIME_NAME, LocalTime.now().toString()));</b>
+<b class="fc">&nbsp;        setSelectedNotificationsTime(selectedNotificationTime);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public void setSelectedNotificationsTime(Context context, LocalTime selectedNotificationsTime) {
-<b class="nc">&nbsp;        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);</b>
-<b class="nc">&nbsp;        SharedPreferences.Editor editor = sharedPref.edit();</b>
-<b class="nc">&nbsp;        editor.putString(SELECTED_NOTIFICATIONS_TIME_NAME, selectedNotificationsTime.toString());</b>
-<b class="nc">&nbsp;        editor.apply();</b>
-<b class="nc">&nbsp;        setSelectedNotificationsTime(selectedNotificationsTime);</b>
+<b class="fc">&nbsp;        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
+<b class="fc">&nbsp;        SharedPreferences.Editor editor = sharedPref.edit();</b>
+<b class="fc">&nbsp;        editor.putString(SELECTED_NOTIFICATIONS_TIME_NAME, selectedNotificationsTime.toString());</b>
+<b class="fc">&nbsp;        editor.apply();</b>
+<b class="fc">&nbsp;        setSelectedNotificationsTime(selectedNotificationsTime);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public LocalTime getSelectedNotificationsTime() {
@@ -194,25 +222,26 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    private void setSelectedNotificationsTime(LocalTime selectedNotificationsTime) {
-<b class="nc">&nbsp;        this.selectedNotificationsTimeLiveData.setValue(selectedNotificationsTime);</b>
+<b class="fc">&nbsp;        this.selectedNotificationsTimeLiveData.setValue(selectedNotificationsTime);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Loads selected start time for notifications to not fire
+&nbsp;     *
 &nbsp;     * @param applicationContext context of an app
 &nbsp;     */
 &nbsp;    public void loadConstraintNotificationTimeStart(Context applicationContext) {
-<b class="nc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
-<b class="nc">&nbsp;        LocalTime constraintNotificationsTimeStart = LocalTime.parse(sharedPref.getString(CONSTRAINT_NOTIFICATIONS_TIME_START_NAME, TIME_CONSTRAINT_START_DEFAULT.toString()));</b>
-<b class="nc">&nbsp;        setConstraintNotificationTimeStart(constraintNotificationsTimeStart);</b>
+<b class="fc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
+<b class="fc">&nbsp;        LocalTime constraintNotificationsTimeStart = LocalTime.parse(sharedPref.getString(CONSTRAINT_NOTIFICATIONS_TIME_START_NAME, TIME_CONSTRAINT_START_DEFAULT.toString()));</b>
+<b class="fc">&nbsp;        setConstraintNotificationTimeStart(constraintNotificationsTimeStart);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public void setConstraintNotificationTimeStart(Context context, LocalTime constraintNotificationTimeStart) {
-<b class="nc">&nbsp;        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);</b>
-<b class="nc">&nbsp;        SharedPreferences.Editor editor = sharedPref.edit();</b>
-<b class="nc">&nbsp;        editor.putString(CONSTRAINT_NOTIFICATIONS_TIME_START_NAME, constraintNotificationTimeStart.toString());</b>
-<b class="nc">&nbsp;        editor.apply();</b>
-<b class="nc">&nbsp;        setConstraintNotificationTimeStart(constraintNotificationTimeStart);</b>
+<b class="fc">&nbsp;        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
+<b class="fc">&nbsp;        SharedPreferences.Editor editor = sharedPref.edit();</b>
+<b class="fc">&nbsp;        editor.putString(CONSTRAINT_NOTIFICATIONS_TIME_START_NAME, constraintNotificationTimeStart.toString());</b>
+<b class="fc">&nbsp;        editor.apply();</b>
+<b class="fc">&nbsp;        setConstraintNotificationTimeStart(constraintNotificationTimeStart);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public LocalTime getConstraintNotificationTimeStart() {
@@ -220,25 +249,26 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    private void setConstraintNotificationTimeStart(LocalTime constraintNotificationTimeStart) {
-<b class="nc">&nbsp;        this.constraintNotificationTimeStartLiveData.setValue(constraintNotificationTimeStart);</b>
+<b class="fc">&nbsp;        this.constraintNotificationTimeStartLiveData.setValue(constraintNotificationTimeStart);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Loads selected end time for notifications to not fire
+&nbsp;     *
 &nbsp;     * @param applicationContext context of an app
 &nbsp;     */
 &nbsp;    public void loadConstraintNotificationTimeEnd(Context applicationContext) {
-<b class="nc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
-<b class="nc">&nbsp;        LocalTime constraintNotificationsTimeEnd = LocalTime.parse(sharedPref.getString(CONSTRAINT_NOTIFICATIONS_TIME_END_NAME, TIME_CONSTRAINT_END_DEFAULT.toString()));</b>
-<b class="nc">&nbsp;        setConstraintNotificationTimeEnd(constraintNotificationsTimeEnd);</b>
+<b class="fc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
+<b class="fc">&nbsp;        LocalTime constraintNotificationsTimeEnd = LocalTime.parse(sharedPref.getString(CONSTRAINT_NOTIFICATIONS_TIME_END_NAME, TIME_CONSTRAINT_END_DEFAULT.toString()));</b>
+<b class="fc">&nbsp;        setConstraintNotificationTimeEnd(constraintNotificationsTimeEnd);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public void setConstraintNotificationTimeEnd(Context context, LocalTime constraintNotificationTimeEnd) {
-<b class="nc">&nbsp;        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);</b>
-<b class="nc">&nbsp;        SharedPreferences.Editor editor = sharedPref.edit();</b>
-<b class="nc">&nbsp;        editor.putString(CONSTRAINT_NOTIFICATIONS_TIME_END_NAME, constraintNotificationTimeEnd.toString());</b>
-<b class="nc">&nbsp;        editor.apply();</b>
-<b class="nc">&nbsp;        setConstraintNotificationTimeEnd(constraintNotificationTimeEnd);</b>
+<b class="fc">&nbsp;        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
+<b class="fc">&nbsp;        SharedPreferences.Editor editor = sharedPref.edit();</b>
+<b class="fc">&nbsp;        editor.putString(CONSTRAINT_NOTIFICATIONS_TIME_END_NAME, constraintNotificationTimeEnd.toString());</b>
+<b class="fc">&nbsp;        editor.apply();</b>
+<b class="fc">&nbsp;        setConstraintNotificationTimeEnd(constraintNotificationTimeEnd);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public LocalTime getConstraintNotificationTimeEnd() {
@@ -246,13 +276,13 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    private void setConstraintNotificationTimeEnd(LocalTime constraintNotificationTimeEnd) {
-<b class="nc">&nbsp;        this.constraintNotificationTimeEndLiveData.setValue(constraintNotificationTimeEnd);</b>
+<b class="fc">&nbsp;        this.constraintNotificationTimeEndLiveData.setValue(constraintNotificationTimeEnd);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public void loadHourNotificationPeriod(Context applicationContext) {
-<b class="nc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
-<b class="nc">&nbsp;        int hourNotificationPeriod = sharedPref.getInt(HOUR_NOTIFICATION_PERIOD_NAME, 1);</b>
-<b class="nc">&nbsp;        setHourNotificationPeriod(hourNotificationPeriod);</b>
+<b class="fc">&nbsp;        SharedPreferences sharedPref = applicationContext.getSharedPreferences(applicationContext.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
+<b class="fc">&nbsp;        int hourNotificationPeriod = sharedPref.getInt(HOUR_NOTIFICATION_PERIOD_NAME, 1);</b>
+<b class="fc">&nbsp;        setHourNotificationPeriod(hourNotificationPeriod);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public Integer getHourNotificationPeriod() {
@@ -260,15 +290,15 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    public void setHourNotificationPeriod(Context context, int hourNotificationPeriod) {
-<b class="nc">&nbsp;        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences),Context.MODE_PRIVATE);</b>
-<b class="nc">&nbsp;        SharedPreferences.Editor editor = sharedPref.edit();</b>
-<b class="nc">&nbsp;        editor.putInt(HOUR_NOTIFICATION_PERIOD_NAME, hourNotificationPeriod);</b>
-<b class="nc">&nbsp;        editor.apply();</b>
-<b class="nc">&nbsp;        setHourNotificationPeriod(hourNotificationPeriod);</b>
+<b class="fc">&nbsp;        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);</b>
+<b class="fc">&nbsp;        SharedPreferences.Editor editor = sharedPref.edit();</b>
+<b class="fc">&nbsp;        editor.putInt(HOUR_NOTIFICATION_PERIOD_NAME, hourNotificationPeriod);</b>
+<b class="fc">&nbsp;        editor.apply();</b>
+<b class="fc">&nbsp;        setHourNotificationPeriod(hourNotificationPeriod);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    private void setHourNotificationPeriod(int hourNotificationPeriod) {
-<b class="nc">&nbsp;        hourNotificationPeriodLiveData.setValue(hourNotificationPeriod);</b>
+<b class="fc">&nbsp;        hourNotificationPeriodLiveData.setValue(hourNotificationPeriod);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public MutableLiveData&lt;Integer&gt; getWaterAmountToDrinkLiveData() {
@@ -322,7 +352,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-05-18 14:11</div>
+    <div style="float:right;">generated on 2024-05-30 11:57</div>
 </div>
 </body>
 </html>

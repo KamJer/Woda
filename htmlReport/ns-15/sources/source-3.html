@@ -44,26 +44,26 @@ Current scope:     <a href="../../index.html">all classes</a>
   <td class="name">SqlRepository</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/9)
+    (9/9)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    95,2%
   </span>
   <span class="absValue">
-    (0/16)
+    (20/21)
   </span>
 </td>
 </tr>
@@ -82,7 +82,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import com.kamjer.woda.R;
 &nbsp;import com.kamjer.woda.model.Water;
 &nbsp;
-<b class="nc">&nbsp;public class SqlRepository {</b>
+<b class="fc">&nbsp;public class SqlRepository {</b>
 &nbsp;
 &nbsp;    private static SqlRepository sqlRepository;
 &nbsp;
@@ -94,43 +94,49 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    private String sqlDeleteTypeWhereId;
 &nbsp;
 &nbsp;    public static SqlRepository getInstance() {
-<b class="nc">&nbsp;        if (sqlRepository == null) {</b>
-<b class="nc">&nbsp;            sqlRepository = new SqlRepository();</b>
+<b class="fc">&nbsp;        SqlRepository result = sqlRepository;</b>
+<b class="fc">&nbsp;        if (result != null) {</b>
+<b class="fc">&nbsp;            return result;</b>
 &nbsp;        }
-<b class="nc">&nbsp;        return sqlRepository;</b>
+<b class="fc">&nbsp;        synchronized (SqlRepository.class) {</b>
+<b class="fc">&nbsp;            if (sqlRepository == null) {</b>
+<b class="fc">&nbsp;                sqlRepository = new SqlRepository();</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return sqlRepository;</b>
+<b class="nc">&nbsp;        }</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public void loadSqlQuery(Context applicationContext) {
-<b class="nc">&nbsp;        sqlDropTempTable = applicationContext.getString(R.string.sql_drop_table);</b>
-<b class="nc">&nbsp;        sqlCreateTempTable = applicationContext.getString(R.string.sql_create_temp_table);</b>
-<b class="nc">&nbsp;        sqlDeleteFromWater = applicationContext.getString(R.string.sql_delete_from_water);</b>
-<b class="nc">&nbsp;        sqlInsertIntoWaterFromTemp = applicationContext.getString(R.string.sql_insert_into_water_from_temp);</b>
-<b class="nc">&nbsp;        sqlDeleteTypeWhereId = applicationContext.getString(R.string.sql_delete_type_where_id);</b>
-<b class="nc">&nbsp;        sqlInsertIntoWaterValues = applicationContext.getString(R.string.sql_insert_into_water_values);</b>
+<b class="fc">&nbsp;        sqlDropTempTable = applicationContext.getString(R.string.sql_drop_table);</b>
+<b class="fc">&nbsp;        sqlCreateTempTable = applicationContext.getString(R.string.sql_create_temp_table);</b>
+<b class="fc">&nbsp;        sqlDeleteFromWater = applicationContext.getString(R.string.sql_delete_from_water);</b>
+<b class="fc">&nbsp;        sqlInsertIntoWaterFromTemp = applicationContext.getString(R.string.sql_insert_into_water_from_temp);</b>
+<b class="fc">&nbsp;        sqlDeleteTypeWhereId = applicationContext.getString(R.string.sql_delete_type_where_id);</b>
+<b class="fc">&nbsp;        sqlInsertIntoWaterValues = applicationContext.getString(R.string.sql_insert_into_water_values);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public String getSqlDropTempTable() {
-<b class="nc">&nbsp;        return sqlDropTempTable;</b>
+<b class="fc">&nbsp;        return sqlDropTempTable;</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public String getSqlCreateTempTable() {
-<b class="nc">&nbsp;        return sqlCreateTempTable;</b>
+<b class="fc">&nbsp;        return sqlCreateTempTable;</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public String getSqlDeleteFromWater() {
-<b class="nc">&nbsp;        return sqlDeleteFromWater;</b>
+<b class="fc">&nbsp;        return sqlDeleteFromWater;</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public String getSqlInsertIntoWaterFromTemp() {
-<b class="nc">&nbsp;        return sqlInsertIntoWaterFromTemp;</b>
+<b class="fc">&nbsp;        return sqlInsertIntoWaterFromTemp;</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public String getSqlDeleteTypeWhereId(long id) {
-<b class="nc">&nbsp;        return sqlDeleteTypeWhereId = sqlDeleteTypeWhereId.replace(&quot;?&quot;, String.valueOf(id));</b>
+<b class="fc">&nbsp;        return sqlDeleteTypeWhereId = sqlDeleteTypeWhereId.replace(&quot;?&quot;, String.valueOf(id));</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public String getSqlInsertIntoWaterValues(Water water) {
-<b class="nc">&nbsp;        return sqlInsertIntoWaterValues = sqlInsertIntoWaterValues.replace(&quot;?&quot;, water.toString());</b>
+<b class="fc">&nbsp;        return sqlInsertIntoWaterValues = sqlInsertIntoWaterValues.replace(&quot;?&quot;, water.toString());</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -156,7 +162,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-05-18 14:11</div>
+    <div style="float:right;">generated on 2024-05-30 11:57</div>
 </div>
 </body>
 </html>

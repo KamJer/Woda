@@ -87,7 +87,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:srcCompat="@drawable/glass"
-        android:layout_above="@+id/relativeLayoutProgressBar"
         app:layout_constraintBottom_toTopOf="@+id/guideline5"
         app:layout_constraintEnd_toStartOf="@+id/guideline4"
         app:layout_constraintStart_toStartOf="@+id/guideline1"
