@@ -65,5 +65,6 @@ This view allows the user to set the drinking goal for the currently selected da
 ### Notifications View
 
 The notifications view allows you to define whether, at what frequency, and during which period notifications should not appear.
+
 <img src="https://github.com/KamJer/Woda/assets/104097463/8c4b753b-3bb2-41a1-858c-1c522a5ac0e6" width="360" height="800"/>
 
