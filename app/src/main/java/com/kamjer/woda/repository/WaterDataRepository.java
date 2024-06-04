@@ -16,6 +16,7 @@ import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
 import com.kamjer.woda.model.WaterDay;
 import com.kamjer.woda.model.WaterDayWithWaters;
+import com.kamjer.woda.utils.exception.TypeToRemoveCanNotBeDefaultException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -222,9 +223,9 @@ public class WaterDataRepository {
                 }, RxJavaPlugins::onError);
     }
 
-    public Disposable removeType(Type type) throws IllegalArgumentException {
+    public Disposable removeType(Type type) throws TypeToRemoveCanNotBeDefaultException {
         if (WaterDataValidation.validateTypeToRemove(type)) {
-            throw new IllegalArgumentException(ResourcesRepository.getInstance().getDeleteTypeDefaultMessageException());
+            throw new TypeToRemoveCanNotBeDefaultException(ResourcesRepository.getInstance().getDeleteTypeDefaultMessageException());
         }
         return getWaterDAO()
                 .deleteType(type)
@@ -232,7 +233,6 @@ public class WaterDataRepository {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
                 }, RxJavaPlugins::onError);
-
     }
 
     /**

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -25,6 +26,8 @@ import com.kamjer.woda.activity.useractivity.typeView.TypeNameChangedAction;
 import com.kamjer.woda.activity.useractivity.typeView.TypeRecyclerView;
 import com.kamjer.woda.model.Type;
 import com.kamjer.woda.model.Water;
+import com.kamjer.woda.repository.ResourcesRepository;
+import com.kamjer.woda.utils.exception.TypeToRemoveCanNotBeDefaultException;
 import com.kamjer.woda.viewmodel.UserViewModel;
 
 import java.util.ArrayList;
@@ -81,8 +84,12 @@ public class UserActivity extends AppCompatActivity {
 
 //                if there are no waters with this type delete that type
             if (waters.isEmpty()) {
-                userViewModel.removeType(type);
-//                    if there are waters with this type ask user what to do
+                try {
+                    userViewModel.removeType(type);
+                } catch (TypeToRemoveCanNotBeDefaultException e) {
+                    Toast.makeText(this, ResourcesRepository.getInstance().getDeleteTypeDefaultMessageException(), Toast.LENGTH_LONG).show();
+                }
+//              if there are waters with this type ask user what to do
             } else {
                 Intent deleteTypeConflictDialogIntent = new Intent(this, DeleteTypeConflictDialog.class);
                 deleteTypeConflictDialogIntent.putExtra(DeleteTypeConflictDialog.TYPE_LIST_NAME, new ArrayList<>(userViewModel.getTypes().values()));
@@ -153,7 +160,11 @@ public class UserActivity extends AppCompatActivity {
 
     private void deleteTypesDialogAction(List<Water> waterList, Type typeToDelete) {
         userViewModel.removeWaters(waterList);
-        userViewModel.removeType(typeToDelete);
+        try {
+            userViewModel.removeType(typeToDelete);
+        } catch (TypeToRemoveCanNotBeDefaultException e) {
+            Toast.makeText(this, ResourcesRepository.getInstance().getDeleteTypeDefaultMessageException(), Toast.LENGTH_LONG).show();
+        }
     }
 
     private void setWaterAmountAction(View view) {

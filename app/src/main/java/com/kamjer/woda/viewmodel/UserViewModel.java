@@ -13,6 +13,7 @@ import com.kamjer.woda.model.Water;
 import com.kamjer.woda.repository.SharedPreferencesRepository;
 import com.kamjer.woda.repository.SqlRepository;
 import com.kamjer.woda.repository.WaterDataRepository;
+import com.kamjer.woda.utils.exception.TypeToRemoveCanNotBeDefaultException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -110,7 +111,7 @@ public class UserViewModel extends ViewModel {
         disposable.add(waterDataRepository.insertType(type, type::setId));
     }
 
-    public void removeType(Type type) {
+    public void removeType(Type type) throws TypeToRemoveCanNotBeDefaultException {
         disposable.add(waterDataRepository.removeType(type));
     }
 
