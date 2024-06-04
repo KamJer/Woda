@@ -25,6 +25,7 @@ import com.kamjer.woda.model.WaterDayWithWaters;
 import com.kamjer.woda.repository.SharedPreferencesRepository;
 import com.kamjer.woda.repository.SqlRepository;
 import com.kamjer.woda.repository.WaterDataRepository;
+import com.kamjer.woda.utils.exception.TypeToRemoveCanNotBeDefaultException;
 import com.kamjer.woda.viewmodel.UserViewModel;
 
 import org.junit.Before;
@@ -161,7 +162,7 @@ public class UserViewModelUnitTest {
     }
 
     @Test
-    public void removeType_isRemoveTypeCalled() {
+    public void removeType_isRemoveTypeCalled() throws TypeToRemoveCanNotBeDefaultException {
         userViewModel.removeType(type);
         verify(waterDataRepository, times(1)).removeType(type);
     }
